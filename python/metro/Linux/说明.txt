@@ -1,0 +1,25 @@
+
+开发环境：
+	Linux Shadow 3.14-kali1-amd64 #1 SMP Debian (2014-06-07) x86_64 GNU/Linux
+	Python 2.7
+	数据库 : sqlite3 ( Python自带 )
+	默认管理密码 : admin
+		可以从classes.py里边的ADMINPASSWORD修改
+	默认有两张余票
+
+price.xls
+	从百度上边下载的西安地铁票价表
+initDatabase.py
+	需要xlrd模块支持,用于创建数据库和写入数据
+	生成文件metro.db
+metro.db
+	已经生成好的数据库文件，可以直接使用
+	（也可以使用initDatabase.py重新生成）
+slowPrint.py
+	带延迟地把字符一个个输出
+classes.py
+	所有的类
+getpass.py
+	输入密码的模块
+main.py
+	主程序
