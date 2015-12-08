@@ -1,0 +1,42 @@
+/*
+ *  由于结构体A是结构体B的第一个结构
+ *  拥有相同的地址
+ *  所以将B强制转换成类型A
+ *  再赋值为另一个B
+ *  相当于直接赋值
+ */
+
+#include <stdio.h>
+#include <stdlib.h>
+
+// struct hw_device_t
+typedef struct A {
+    long a ;
+} A ;
+
+// struct camera_device
+typedef struct B {
+    A a ;
+    int b ;
+} B ;
+
+//QCamera2HardwareInterface::mCameraDevice
+static B target ;
+
+//QCamera2HardwareInterface::openCamera(struct hw_device_t **hw_device)
+void func( A** a ) {
+    *a = &target.a ;
+    return ;
+}
+
+int main( )
+{
+    B* b ;
+    b = ( B* )malloc( sizeof( B* ) ) ;
+    target.a.a = 4 ;
+    func( (A**) b ) ;
+    printf( "[+] %d\n" , target.a.a ) ;
+    printf( "[+] %d\n" , *(int*)b->a.a ) ;
+    return 0 ;
+}
+
