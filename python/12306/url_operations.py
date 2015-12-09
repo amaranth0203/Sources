@@ -1,19 +1,30 @@
 #!/usr/bin/env python_
 #-*- coding=utf-8 -*-
 
-import webbrowser , urllib , urllib2 , os , sys , requests , json , httplib 
+import webbrowser 
+import urllib  
+import urllib2  
+import os  
+import sys  
+import requests  
+import json  
+import httplib  
+import cookielib  
+import time
 from BeautifulSoup import BeautifulSoup
 
 def test_output( ) :
     print "[+] function : " + test_output.__name__
 
 def open_htmlcode_in_browser( html ) :
+    # print html
     tmp_file_name = "__temp__.html"
     webbrowser.register('firefox', None, webbrowser.GenericBrowser('firefox'), 1)
     #print webbrowser._tryorder
     with open( tmp_file_name , "w+" ) as f :
         f.write( html )
     webbrowser.get("firefox").open( "file://" + os.popen( "cygpath -w " + os.path.realpath( tmp_file_name ) ).read() )
+    # time.sleep( 2 ) 
     os.remove( tmp_file_name )
 
 def get_html( url ) :
@@ -22,8 +33,6 @@ def get_html( url ) :
 
 def test( ) :
     pass
-    url1 = "http://yydzh.com/login.php?"
-    url2 = "http://yydzh.com/hack.php?H_name=avatar&index=show&uid=465056"
     headers = {
         "Host": "yydzh.com",
         "User-Agent" : "Mozilla/5.0 (Windows NT 6.1; WOW64; rv:42.0) Gecko/20100101 Firefox/42.0" , 
@@ -49,6 +58,7 @@ def test( ) :
     }
     data = urllib.urlencode(data) 
 
+    url1 = "http://yydzh.com/login.php"
     # r = requests.post(url1, data=json.dumps(payload), headers=headers)
     # print data
     # req1 = urllib2.Request( url1 , data , headers) 
@@ -56,6 +66,7 @@ def test( ) :
     # cookie = response1.headers.get( 'Set-Cookie' )
     # print type(response1.read())
 
+    url2 = "http://yydzh.com/"
     # req2 = urllib2.Request( url2 )
     # req2.add_header( 'cookie' , cookie )
     # response2 = urllib2.urlopen( req2 )
@@ -67,16 +78,35 @@ def test( ) :
         # print e.headers
         # return e.fp.read()
 
-    session = requests.session( )
-    session.encoding = "utf-8"
-    r = session.post( url1 , data=data )
-    r = session.get( url2 )
-    print r.headers
-    print r.text.encode(r.encoding)
-    return r.text.encode('utf-8')
+    # url3 = "http://yydzh.com/hack/announce/announce.js?76367"
+    # url4 = "http://yydzh.com/new.php?action=article&fidin=71_34_38_20_2_197_3_4_77_5_66_68_17_70_59_32_62_26_72_44_6_7_78_37_33_42_51_52_198_200_199_102&pre=1&num=8&length=35&order=2&style=2"
+    # url5 = "http://yydzh.com/new.php?action=article&fidin=71_34_38_20_2_197_3_4_77_5_66_68_17_70_59_32_62_26_72_44_6_7_78_37_33_42_51_52_198_200_199_102&pre=1&num=8&length=37&order=1&style=2"
+    # url6 = "http://yydzh.com/new.php?action=article&fidin=71_34_38_20_2_197_3_4_5_66_68_17_70_59_32_62_26_72_44_6_7&pre=1&num=8&length=35&order=3&style=2&timer=1"
+    url7 = "http://yydzh.com/profile.php?action=show&uid=465056"
+    url8 = "http://yydzh.com/hack.php?H_name=avatar&index=show&uid=465056"
+    # session = requests.session( )
+    # session.encoding = "utf-8"
+    # r = session.post( url1 , data=data )
+    # r_encoding = r.encoding
+    # r = session.get( url2 )
+    # r = session.get( url3 )
+    # r = session.get( url4 )
+    # r = session.get( url5 )
+    # r = session.get( url6 )
+    # r = session.get( url7 )
+    # r = session.get( url8 )
+    # print r.headers
+    # return r.text.encode(r_encoding)
+    cj = cookielib.CookieJar()
+    opener = urllib2.build_opener(urllib2.HTTPCookieProcessor(cj))
+    opener.open(url1, data)
+    resp = opener.open(url2)
+    resp = opener.open(url8)
+    # print resp.read()
+    return resp.read().strip()
 
 if __name__ == "__main__" :
     print "[+] testing functions..."
     # print get_html( "http://www.baidu.com" )
-    # open_htmlcode_in_browser( test( ) )
-    test( )
+    open_htmlcode_in_browser( test( ) )
+    # test( )
