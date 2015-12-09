@@ -24,19 +24,12 @@ if __name__ == "__main__" :
     if not check_log( log_filename , "Target boot image:" , 0 , 18 ) :
         exit( "[-] check_log() failed" )
 
-    if not check_device( ) :
-        exit( "[-] check_device() failed" )
-
     if not check_fastboot_mode( ) :
-        if check_root( ) :
+        if not check_device( ) :
+            exit( "[-] check_device() failed" )
+        else :
             if not reboot_fastboot( ) :
                 exit( "[-] reboot_fastboot() failed" )
-        else :
-            if root_device( ) :
-                if not reboot_fastboot( ) :
-                    exit( "[-] reboot_fastboot() failed" )
-            else :
-                exit( "[-] root_device() failed" )
 
     flash_boot( read_log( log_filename , "Target boot image:" , 0 , 18 ) )
     lexec( "fastboot reboot" )

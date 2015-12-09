@@ -26,9 +26,12 @@ if __name__ == "__main__" :
         if not root_device( ) :
             exit( "[-] root_device() failed" )
 
-    cmd = "adb shell '(cat /proc/kmsg | while read LINE; do echo \\\\06kernel\\\\0$LINE\\\\0 > /dev/log/main; done)'"
-    process1 = subprocess.Popen( shlex.split( cmd ), stdout=subprocess.PIPE )
-    process2 = subprocess.Popen( shlex.split( "adb logcat -v time" ) , stdout=subprocess.PIPE )
+#    cmd1 = "adb shell '(cat /proc/kmsg | while read LINE; do echo \\\\06kernel\\\\0$LINE\\\\0 > /dev/log/main; done)'"
+    cmd1 = "adb logcat -v time -f /dev/kmsg"
+    process1 = subprocess.Popen( shlex.split( cmd1 ), stdout=subprocess.PIPE )
+#    cmd2 = "adb logcat -v time"
+    cmd2 = "adb shell cat /proc/kmsg "
+    process2 = subprocess.Popen( shlex.split( cmd2 ) , stdout=subprocess.PIPE )
     while True:
         output = process2.stdout.readline()
         if output == '' and process2.poll() is not None:
@@ -43,4 +46,3 @@ if __name__ == "__main__" :
 
     # cmd = "adb shell '(cat /proc/kmsg | while read LINE; do echo \\\\06kernel\\\\0$LINE\\\\0 > /dev/log/main; done)' | adb logcat -v time"
     # os.system( cmd )
-
