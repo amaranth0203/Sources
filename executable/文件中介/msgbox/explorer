@@ -1,0 +1,9 @@
+#!/bin/bash
+# 使用lexec explorer 代替
+
+pwd_=$(pwd) 
+if [ $# -eq 0 ] ; then
+    echo $pwd_ | sed -e 's/\//\\/g' | sed -e 's/\\opt\\qiyunhu/z:/' | tee "$(dirname $0)/flag"
+else
+    readlink -f $1 | sed -e 's/\//\\/g' | sed -e 's/\\opt\\qiyunhu/z:/' | tee "$(dirname $0)/flag"
+fi

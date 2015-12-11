@@ -1,0 +1,16 @@
+#!/bin/bash
+#最后一个参数当作目录处理
+
+printf "" > "$(dirname $0)/flag"
+
+while [ $# -gt 1 ]
+do
+    printf "$1 " | tee -a "$(dirname $0)/flag"
+    shift
+done
+
+directory=`readlink -f $1`
+directory=${directory//\//\\}
+directory=${directory//\\opt\\qiyunhu/z:}
+
+printf ${directory} | tee -a "$(dirname $0)/flag"
