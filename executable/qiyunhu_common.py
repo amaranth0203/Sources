@@ -86,11 +86,15 @@ def root_device( ) :
 #   前提：安卓设备（单一）已经打开debug模式
 #   对设备进行root
 #
-    rc = lexec( "adb vivoroot" )
+    rc = lexec( "adb root" )
     if rc.strip().find( "as root" ) > 0 :
         return True
     else :
-        return False
+        rc = lexec( "adb vivoroot" )
+        if rc.strip().find( "as root" ) > 0 :
+            return True
+        else :
+            return False
  
 def reboot_fastboot( ) :    
 #
@@ -173,6 +177,7 @@ def kill_process( process_name ) :
     return
 
 def kill_camera_service( ) :
+    kill_process( "org.codeaurora.snapcam" )
     kill_process( "com.android.camera" )
     kill_process( "mm-qcamera-daemon" )
 
