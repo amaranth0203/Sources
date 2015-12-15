@@ -35,7 +35,7 @@ if __name__ == "__main__" :
             exit( "[-] root_device() failed" )
 
     push_lib( read_log( log_filename , "Install:" , 0 , 8 ) )
-    kill_camera_service( )
+    # kill_camera_service( )
 
 
 
