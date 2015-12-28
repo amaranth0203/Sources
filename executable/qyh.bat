@@ -2,10 +2,12 @@
 setlocal enabledelayedexpansion
 
 if "%*" equ "" (
-    echo %0 [ push_lib ^|
-    echo       kill_camera ^|
-    echo       start_camera ^|
-    echo       take_picture ]
+    echo %0 [ 
+    echo        push_lib          ^|
+    echo        kill_camera       ^|
+    echo        start_camera      ^|
+    echo        take_picture      
+    echo     ]
 )
 
 :start
