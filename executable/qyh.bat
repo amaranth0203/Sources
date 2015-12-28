@@ -2,7 +2,10 @@
 setlocal enabledelayedexpansion
 
 if "%*" equ "" (
-    echo %0 [push_lib^|kill_camera^|start_camera^|take_picture]
+    echo %0 [ push_lib ^|
+    echo       kill_camera ^|
+    echo       start_camera ^|
+    echo       take_picture ]
 )
 
 :start
@@ -19,6 +22,21 @@ if "%1" neq "" (
     if "%1" equ "take_picture" (
         call :take_picture
     )
+    if "%1" equ "check_device" (
+        set "flag=false"
+        call :check_device flag
+        echo !flag!
+    )
+    if "%1" equ "check_root" (
+        set "flag=false"
+        call :check_root flag
+        echo !flag!
+    )
+    if "%1" equ "check_log" (
+        set "flag=false"
+        call :check_log flag
+        echo !flag!
+    )
     shift
     goto :start
 )
@@ -30,6 +48,14 @@ rem     belongs to take_picture
 rem     in file qyh.ini first
 rem
 :take_picture
+
+set "flag=false"
+call :check_device flag
+if "!flag!" == "false" (
+    echo [-] check_device false
+    goto :eof
+)
+
 set "cmd="
 call :read_ini take_picture command cmd
 echo !cmd!
@@ -42,6 +68,14 @@ rem     belongs to start_camera
 rem     in file qyh.ini first
 rem
 :start_camera
+
+set "flag=false"
+call :check_device flag
+if "!flag!" == "false" (
+    echo [-] check_device false
+    goto :eof
+)
+
 set "cmd="
 call :read_ini start_camera command cmd
 echo !cmd!
@@ -58,6 +92,21 @@ rem         left -> right
 rem         up -> down
 rem
 :kill_camera
+
+set "flag=false"
+call :check_device flag
+if "!flag!" == "false" (
+    echo [-] check_device false
+    goto :eof
+)
+
+set "flag=false"
+call :check_root flag
+if "!flag!" == "false" (
+    echo [-] check_root false
+    goto :eof
+)
+
 set "thread_name="
 call :read_ini kill_camera camera_thread_name thread_name
 call :kill_thread !thread_name!
@@ -86,6 +135,28 @@ rem     belongs to push_lib
 rem     in file qyh.ini first
 rem
 :push_lib
+
+set "flag=false"
+call :check_log flag
+if "!flag!" == "false" (
+    echo [-] check_log false
+    goto :eof
+)
+
+set "flag=false"
+call :check_device flag
+if "!flag!" == "false" (
+    echo [-] check_device false
+    goto :eof
+)
+
+set "flag=false"
+call :check_root flag
+if "!flag!" == "false" (
+    echo [-] check_root false
+    goto :eof
+)
+
 set "log_filename="
 call :read_ini push_lib log_file log_filename
 for /f "delims=" %%x in ( !log_filename! ) do (
@@ -158,5 +229,68 @@ for /f "delims=" %%i in ( %~dp0/!file! ) do (
 )
 :end_for
 set "%3=!target_value!"
+goto :eof
+
+rem
+rem     check all values belongs to check_log in file qyh.ini first
+rem
+:check_log
+set "log_file="
+call :read_ini check_log log_file log_file
+set "%1=false"
+for /f "delims=" %%i in ( !log_file! ) do (
+    set "line=%%i"
+    if "!line:~0,8!" equ "Install:" (
+        set "%1=true"
+        goto :eof
+    ) 
+)
+set "%1=false"
+goto :eof
+
+rem
+rem     check all values belongs to check_root in file qyh.ini first
+rem
+:check_root
+set "cmd_check="
+set "success="
+set "failed="
+call :read_ini check_root command cmd_check
+call :read_ini check_root success success
+set "%1=false"
+echo !cmd_check!
+for /f "delims=" %%i in ( '!cmd_check!' ) do (
+    set "line=%%i"
+    echo !line!
+    if "!line! " == "!success!" (
+        set "%1=true"
+        goto :eof
+    ) 
+)
+set "%1=false"
+goto :eof
+
+rem
+rem     check all values belongs to check_device in file qyh.ini first
+rem
+:check_device
+set "cmd_check="
+set "success="
+set "failed="
+call :read_ini check_device command cmd_check
+call :read_ini check_device success success
+call :read_ini check_device failed failed
+echo !cmd_check!
+for /f "delims=" %%i in ( '!cmd_check!' ) do (
+    set "line=%%i"
+    echo !line!
+    if "!line:~0,24!" neq "List of devices attached" (
+        if "!line:~-6,6!" == "device" (
+            set "%1=true"
+            goto :eof
+        ) 
+    )
+)
+set "%1=false"
 goto :eof
 
