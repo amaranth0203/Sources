@@ -1,9 +1,6 @@
 #!/usr/bin/env python_
 #-*- coding=utf-8 -*-
 
-#
-#   大部分是使用adb/fastboot用到的函数
-#
 import sys , os , subprocess , shlex
 from ctypes import *
 try:
@@ -221,20 +218,6 @@ def kill_process( process_name ) :
     lexec( kill_cmd )
     return
 
-def start_image_capture( ) :
-    lexec( 'adb shell "am start -a android.media.action.IMAGE_CAPTURE"' )
-
-def main_menu( ) :
-    print ' ' + os.path.basename( sys.argv[0] ) + ' [                             '
-    print '           push_lib (pl)       |  '
-    print '           kill_camera (kc)    |  '
-    print '           start_camera (sc)   |  '
-    print '           take_picture (tp)   |  '
-    print '           power_button (pb)   |  '
-    print '           unlock_screen (us)  |  '
-    print '           log_fname (lf)      |  '
-    print '        ]                         '
-
 def push_lib( ) :
 
     config = ConfigParser( ) 
@@ -273,7 +256,68 @@ def kill_camera( ) :
         kill_process( process_name )
 
 def start_camera( ) :
-    print 'a'
+
+    if not check_device( ) :
+        exit( "[-] check_device() failed" )
+
+    config = ConfigParser( ) 
+    config.read( os.path.dirname( os.path.realpath( __file__ ) ) + '/qyh.ini' )
+    cmd = config.get( "start_camera" , "command" )
+    lexec( cmd )
+
+def take_picture( ) :
+
+    if not check_device( ) :
+        exit( "[-] check_device() failed" )
+
+    config = ConfigParser( ) 
+    config.read( os.path.dirname( os.path.realpath( __file__ ) ) + '/qyh.ini' )
+    cmd = config.get( "take_picture" , "command" )
+    lexec( cmd )
+
+def power_button( ) :
+
+    if not check_device( ) :
+        exit( "[-] check_device() failed" )
+
+    config = ConfigParser( ) 
+    config.read( os.path.dirname( os.path.realpath( __file__ ) ) + '/qyh.ini' )
+    cmd = config.get( "power_button" , "command" )
+    lexec( cmd )
+
+def unlock_screen( ) :
+
+    if not check_device( ) :
+        exit( "[-] check_device() failed" )
+
+    config = ConfigParser( ) 
+    config.read( os.path.dirname( os.path.realpath( __file__ ) ) + '/qyh.ini' )
+    cmd = config.get( "unlock_screen" , "command" )
+    lexec( cmd )
+
+def log_fname( ) :
+
+    config = ConfigParser( ) 
+    config.read( os.path.dirname( os.path.realpath( __file__ ) ) + '/qyh.ini' )
+    print_green( "[+] push_lib  : " + config.get( "push_lib" , "log_file" ) )
+    print_green( "[+] check_lib : " + config.get( "check_log" , "log_file" ) )
+
+def mobicat( ) :
+    config = ConfigParser( ) 
+    config.read( os.path.dirname( os.path.realpath( __file__ ) ) + '/qyh.ini' )
+    for cmd in config.get ( "mobicat" , "command" ).split( "\"" ) :
+        lexec( cmd )
+
+def main_menu( ) :
+    print ' ' + os.path.basename( sys.argv[0] ) + ' [                             '
+    print '           push_lib (pl)       |  '
+    print '           kill_camera (kc)    |  '
+    print '           start_camera (sc)   |  '
+    print '           take_picture (tp)   |  '
+    print '           power_button (pb)   |  '
+    print '           unlock_screen (us)  |  '
+    print '           log_fname (lf)      |  '
+    print '        ]'
 
 if __name__ == "__main__" :
     pass
@@ -288,20 +332,17 @@ if __name__ == "__main__" :
             elif arg == "start_camera" or arg == "sc" :
                 start_camera( )
             elif arg == "take_picture" or arg == "tp" :
-                print 'call take_picture'
+                take_picture( )
             elif arg == "power_button" or arg == "pb" :
-                print 'call power_button'
+                power_button( )
             elif arg == "unlock_screen" or arg == "us" :
-                print 'call unlock_screen'
+                unlock_screen( )
             elif arg == "log_fname" or arg == "lf" :
-                print 'call log_fname'
+                log_fname( )
+            elif arg == "mobicat" :
+                mobicat( )
             else :
                 main_menu( )
-
-
-    # config = ConfigParser( ) 
-    # config.read( os.path.dirname( os.path.realpath( __file__ ) ) + '/qyh.ini' )
-    # print config.get( 'push_lib' , 'log_file' )
 
 
 

@@ -1,8 +1,8 @@
 #!/usr/bin/env python_
 #-*- coding=utf-8 -*-
 
-import qiyunhu_common
-from qiyunhu_common import * ;  
+# import qiyunhu_common
+# from qiyunhu_common import * ;  
 
 import signal
 import sys
@@ -16,6 +16,15 @@ def signal_handler(signal, frame):
     sys.exit(0)  
 
 if __name__ == "__main__" :
+
+    print( '''
+adb shell '(cat /proc/kmsg | while read LINE; do echo \\\\06kernel\\\\0$LINE\\\\0 > /dev/log/main; done)'
+
+adb logcat -v time -f /dev/kmsg
+adb shell cat /proc/kmsg
+            ''')
+
+    exit( 0 )
 
     signal.signal(signal.SIGINT, signal_handler)
 
