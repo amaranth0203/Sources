@@ -1,47 +1,126 @@
 @echo off
 setlocal enabledelayedexpansion
 
+python %~dp0/qyh.py %*
+goto :eof
+
 if "%*" equ "" (
+:usage
     echo %0 [ 
-    echo        push_lib          ^|
-    echo        kill_camera       ^|
-    echo        start_camera      ^|
-    echo        take_picture      
+    echo        push_lib ^(pl^)       ^|
+    echo        kill_camera ^(kc^)    ^|
+    echo        start_camera ^(sc^)   ^|
+    echo        take_picture ^(tp^)   ^|
+    echo        power_button ^(pb^)   ^|
+    echo        unlock_screen ^(us^)  ^|
+    echo        log_fname ^(lf^)      ^|
     echo     ]
 )
 
 :start
 if "%1" neq "" (
+    set "para_valid=false"
+rem push lib file
     if "%1" equ "push_lib" (
         call :push_lib 
+        set "para_valid=true"
     )
+    if "%1" equ "pl" (
+        call :push_lib 
+        set "para_valid=true"
+    )
+rem kill camera process
     if "%1" equ "kill_camera" (
         call :kill_camera
+        set "para_valid=true"
     )
+    if "%1" equ "kc" (
+        call :kill_camera
+        set "para_valid=true"
+    )
+rem start camera client
     if "%1" equ "start_camera" (
         call :start_camera
+        set "para_valid=true"
     )
+    if "%1" equ "sc" (
+        call :start_camera
+        set "para_valid=true"
+    )
+rem take picture
     if "%1" equ "take_picture" (
         call :take_picture
+        set "para_valid=true"
     )
+    if "%1" equ "tp" (
+        call :take_picture
+        set "para_valid=true"
+    )
+rem unlock screen
+    if "%1" equ "unlock_screen" (
+        call :unlock_screen
+        set "para_valid=true"
+    )
+    if "%1" equ "us" (
+        call :unlock_screen
+        set "para_valid=true"
+    )
+rem press power button
+    if "%1" equ "power_button" (
+        call :power_button
+        set "para_valid=true"
+    )
+    if "%1" equ "pb" (
+        call :power_button
+        set "para_valid=true"
+    )
+rem print log file full path and filename
+    if "%1" equ "log_fname" (
+        call :log_fname
+        set "para_valid=true"
+    )
+    if "%1" equ "lf" (
+        call :log_fname
+        set "para_valid=true"
+    )
+rem ----------------------
     if "%1" equ "check_device" (
         set "flag=false"
         call :check_device flag
         echo !flag!
+        set "para_valid=true"
     )
     if "%1" equ "check_root" (
         set "flag=false"
         call :check_root flag
         echo !flag!
+        set "para_valid=true"
     )
     if "%1" equ "check_log" (
         set "flag=false"
         call :check_log flag
         echo !flag!
+        set "para_valid=true"
     )
-    shift
-    goto :start
+    if "!para_valid!" == "true" (
+        shift
+        goto :start
+    )
+    if "!para_valid!" == "false" (
+        echo [-] para_valid false : %1
+        shift
+        goto :usage
+    )
 )
+goto :eof
+
+:log_fname
+set "check_log_file="
+set "push_log_file="
+call :read_ini check_log log_file check_log_file
+call :read_ini push_lib log_file push_log_file
+echo check_log_file = !check_log_file!
+echo push_log_file  = !push_log_file!
 goto :eof
 
 rem
@@ -85,7 +164,31 @@ echo !cmd!
 goto :eof
 
 rem
-rem     set the value of camera_thread_name 
+rem     set the value of command 
+rem     belongs to unlock_screen 
+rem     in file qyh.ini first
+rem
+:unlock_screen
+set "cmd="
+call :read_ini unlock_screen command cmd
+echo !cmd!
+!cmd!
+goto :eof
+
+rem
+rem     set the value of command 
+rem     belongs to power_button 
+rem     in file qyh.ini first
+rem
+:power_button
+set "cmd="
+call :read_ini power_button command cmd
+echo !cmd!
+!cmd!
+goto :eof
+
+rem
+rem     set the value of camera_process_name 
 rem     belongs to kill_camera 
 rem     in file qyh.ini first
 rem
@@ -94,23 +197,8 @@ rem         left -> right
 rem         up -> down
 rem
 :kill_camera
-
-set "flag=false"
-call :check_device flag
-if "!flag!" == "false" (
-    echo [-] check_device false
-    goto :eof
-)
-
-set "flag=false"
-call :check_root flag
-if "!flag!" == "false" (
-    echo [-] check_root false
-    goto :eof
-)
-
 set "thread_name="
-call :read_ini kill_camera camera_thread_name thread_name
+call :read_ini kill_camera camera_process_name thread_name
 call :kill_thread !thread_name!
 goto :eof
 
