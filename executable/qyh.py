@@ -25,7 +25,7 @@ def print_color( str , color ) :
     std_output_hdl = windll.Kernel32.GetStdHandle(STD_OUTPUT_HANDLE_ID)
     windll.Kernel32.SetConsoleTextAttribute(std_output_hdl, color)
     print( str )
-    windll.Kernel32.SetConsoleTextAttribute(std_output_hdl, 15)
+    windll.Kernel32.SetConsoleTextAttribute(std_output_hdl, 7)
 
 def print_green_light( str ) :
     print_color( str , 2 )
