@@ -207,7 +207,7 @@ def kill_process( process_name ) :
 #   前提：安卓设备（单一）已经打开debug模式并且root
 #   ps之后查找进程名并结束
 #
-    print_green_light( "\n[+] kill process : " + process_name )
+    print_green_light( "\n[+] kill process : " + process_name + "\n" )
     rc = lexec( "adb shell ps | find \"" + process_name + "\"" )
     if rc.strip() == "" :
         print_red( "[-] process " + process_name + " not exist ><" + "\n" )
