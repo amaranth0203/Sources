@@ -24,7 +24,7 @@ def print_color( str , color ) :
     windll.Kernel32.GetStdHandle.restype = c_ulong
     std_output_hdl = windll.Kernel32.GetStdHandle(STD_OUTPUT_HANDLE_ID)
     windll.Kernel32.SetConsoleTextAttribute(std_output_hdl, color)
-    print( str )
+    sys.stdout.write( str )
     windll.Kernel32.SetConsoleTextAttribute(std_output_hdl, 7)
 
 def print_green_light( str ) :
@@ -51,7 +51,7 @@ def lexec( cmd ) :
 #   等到命令执行完毕之后
 #   再输出命令的输出并返回命令执行结果
 #
-    print_yellow( "[!] " + cmd )
+    print_yellow( "[!] " + cmd + "\n" )
     rc = os.popen( cmd ).read( )
     print rc
     return rc
@@ -63,7 +63,7 @@ def lexec_( cmd ) :
 #   等到命令执行完毕之后
 #   再返回命令执行结果
 #
-    print_yellow( "[!] " + cmd )
+    print_yellow( "[!] " + cmd + "\n" )
     rc = ""
     process = subprocess.Popen( shlex.split( cmd ), stdout=subprocess.PIPE )
     while True:
@@ -154,7 +154,7 @@ def reboot_fastboot( ) :
             print_green_light( "[+] enter fastboot mode\n" )
             return True
         else :
-            print_green_light( "[+] wait for devices : " + try_count )
+            print_green_light( "[+] wait for devices : " + try_count + "\n" )
             try_count -= 1
     # lexec( "fastboot continue" )
     return False
@@ -210,7 +210,7 @@ def kill_process( process_name ) :
     print_green_light( "\n[+] kill process : " + process_name )
     rc = lexec( "adb shell ps | find \"" + process_name + "\"" )
     if rc.strip() == "" :
-        print_red( "[-] process " + process_name + " not exist ><" )
+        print_red( "[-] process " + process_name + " not exist ><" + "\n" )
         return
     kill_cmd = ""
     kill_cmd += "adb shell kill -9" + " "
@@ -299,8 +299,8 @@ def log_fname( ) :
 
     config = ConfigParser( ) 
     config.read( os.path.dirname( os.path.realpath( __file__ ) ) + '/qyh.ini' )
-    print_green( "[+] push_lib  : " + config.get( "push_lib" , "log_file" ) )
-    print_green( "[+] check_lib : " + config.get( "check_log" , "log_file" ) )
+    print_green( "[+] push_lib  : " + config.get( "push_lib" , "log_file" ) + "\n" )
+    print_green( "[+] check_lib : " + config.get( "check_log" , "log_file" ) + "\n" )
 
 def mobicat( ) :
     config = ConfigParser( ) 
@@ -309,15 +309,15 @@ def mobicat( ) :
         lexec( cmd )
 
 def main_menu( ) :
-    print ' ' + os.path.basename( sys.argv[0] ) + ' [                             '
-    print '           push_lib (pl)       |  '
-    print '           kill_camera (kc)    |  '
-    print '           start_camera (sc)   |  '
-    print '           take_picture (tp)   |  '
-    print '           power_button (pb)   |  '
-    print '           unlock_screen (us)  |  '
-    print '           log_fname (lf)      |  '
-    print '        ]'
+    sys.stdout.write( ' ' + os.path.basename( sys.argv[0] ) + ' [\n' )
+    sys.stdout.write( '           push_lib (' );print_green('pl');sys.stdout.write(')       | \n' )
+    sys.stdout.write( '           kill_camera (' );print_green('kc');sys.stdout.write(')    | \n' )
+    sys.stdout.write( '           start_camera (' );print_green('sc');sys.stdout.write(')   | \n' )
+    sys.stdout.write( '           take_picture (' );print_green('tp');sys.stdout.write(')   | \n' )
+    sys.stdout.write( '           power_button (' );print_green('pb');sys.stdout.write(')   | \n' )
+    sys.stdout.write( '           unlock_screen (' );print_green('us');sys.stdout.write(')  | \n' )
+    sys.stdout.write( '           log_fname (' );print_green('lf');sys.stdout.write(')      | \n' )
+    sys.stdout.write( '        ]\n' )
 
 if __name__ == "__main__" :
     pass
