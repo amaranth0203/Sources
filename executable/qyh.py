@@ -140,7 +140,7 @@ def root_device( ) :
  
 def reboot_fastboot( ) :    
 #
-#   前提：安卓设备（单一）已经打开debug模式并且root
+#   前提：安卓设备（单一）已经打开debug模式
 #
 #   尝试进入fastboot模式
 #   进入成功返回True
@@ -241,6 +241,32 @@ def push_lib( ) :
         cmd_push += log[log.find("/system"):log.rfind("/")].strip() + " "
         lexec_( cmd_push )
 
+def flash_boot( ) :
+
+    config = ConfigParser( ) 
+    config.read( os.path.dirname( os.path.realpath( __file__ ) ) + '/qyh.ini' )
+    log_filename = config.get( 'flash_boot' , 'log_file' )
+
+    if not check_log( log_filename , "Target boot image:" , 0 , 18 ) :
+        exit( "[-] check_log() failed" )
+
+    if not check_fastboot_mode( ) :
+        if not check_device( ) :
+            exit( "[-] check_device() failed" )
+        else :
+            if not reboot_fastboot( ) :
+                exit( "[-] reboot_fastboot() failed" )
+
+    lexec_( "fastboot bbk unlock_vivo" )
+
+    for log in read_log( log_filename , "Target boot image:" , 0 , 18 ) :
+        cmd_flash = "fastboot flash boot "
+        cmd_flash += os.path.dirname( log_filename ).replace( '\\' , '/' ) + '/'
+        cmd_flash += log[log.find("out"):].strip() + " "
+        lexec_( cmd_flash )
+
+    lexec_( "fastboot reboot" )
+
 def kill_camera( ) :
 
     if not check_device( ) :
@@ -299,24 +325,39 @@ def log_fname( ) :
 
     config = ConfigParser( ) 
     config.read( os.path.dirname( os.path.realpath( __file__ ) ) + '/qyh.ini' )
-    print_green( "[+] push_lib  : " + config.get( "push_lib" , "log_file" ) + "\n" )
-    print_green( "[+] check_lib : " + config.get( "check_log" , "log_file" ) + "\n" )
+    print_green( "[+] push_lib   : " + config.get( "push_lib" , "log_file" ) + "\n" )
+    print_green( "[+] check_lib  : " + config.get( "check_log" , "log_file" ) + "\n" )
+    print_green( "[+] flash_boot : " + config.get( "flash_boot" , "log_file" ) + "\n" )
+
+def logcat_with_dmesg( ) :
+
+    config = ConfigParser( ) 
+    config.read( os.path.dirname( os.path.realpath( __file__ ) ) + '/qyh.ini' )
+    print_yellow( config.get( "logcat_with_dmesg" , "command" ) + "\n" )
 
 def mobicat( ) :
     config = ConfigParser( ) 
     config.read( os.path.dirname( os.path.realpath( __file__ ) ) + '/qyh.ini' )
     for cmd in config.get ( "mobicat" , "command" ).split( "\"" ) :
-        lexec( cmd )
+        print_yellow( cmd + "\n" )
+
+def metadata( ) :
+    config = ConfigParser( ) 
+    config.read( os.path.dirname( os.path.realpath( __file__ ) ) + '/qyh.ini' )
+    for cmd in config.get ( "metadata" , "command" ).split( "\"" ) :
+        print_yellow( cmd + "\n" )
 
 def main_menu( ) :
     sys.stdout.write( ' ' + os.path.basename( sys.argv[0] ) + ' [\n' )
-    sys.stdout.write( '           push_lib (' );print_green('pl');sys.stdout.write(')       | \n' )
-    sys.stdout.write( '           kill_camera (' );print_green('kc');sys.stdout.write(')    | \n' )
-    sys.stdout.write( '           start_camera (' );print_green('sc');sys.stdout.write(')   | \n' )
-    sys.stdout.write( '           take_picture (' );print_green('tp');sys.stdout.write(')   | \n' )
-    sys.stdout.write( '           power_button (' );print_green('pb');sys.stdout.write(')   | \n' )
-    sys.stdout.write( '           unlock_screen (' );print_green('us');sys.stdout.write(')  | \n' )
-    sys.stdout.write( '           log_fname (' );print_green('lf');sys.stdout.write(')      | \n' )
+    sys.stdout.write( '           push_lib (' );print_green('pl');sys.stdout.write(')               | \n' )
+    sys.stdout.write( '           flash_boot (' );print_green('fb');sys.stdout.write(')             | \n' )
+    sys.stdout.write( '           kill_camera (' );print_green('kc');sys.stdout.write(')            | \n' )
+    sys.stdout.write( '           start_camera (' );print_green('sc');sys.stdout.write(')           | \n' )
+    sys.stdout.write( '           take_picture (' );print_green('tp');sys.stdout.write(')           | \n' )
+    sys.stdout.write( '           power_button (' );print_green('pb');sys.stdout.write(')           | \n' )
+    sys.stdout.write( '           unlock_screen (' );print_green('us');sys.stdout.write(')          | \n' )
+    sys.stdout.write( '           log_fname (' );print_green('lf');sys.stdout.write(')              | \n' )
+    sys.stdout.write( '           logcat_with_dmesg (' );print_green('ld');sys.stdout.write(')      | \n' )
     sys.stdout.write( '        ]\n' )
 
 if __name__ == "__main__" :
@@ -327,6 +368,8 @@ if __name__ == "__main__" :
         for arg in sys.argv[1:] :
             if arg == "push_lib" or arg == "pl" :
                 push_lib( )
+            elif arg == "flash_boot" or arg == "fb" :
+                flash_boot( )
             elif arg == "kill_camera" or arg == "kc" :
                 kill_camera( )
             elif arg == "start_camera" or arg == "sc" :
@@ -339,8 +382,12 @@ if __name__ == "__main__" :
                 unlock_screen( )
             elif arg == "log_fname" or arg == "lf" :
                 log_fname( )
+            elif arg == "logcat_with_dmesg" or arg == "ld" :
+                logcat_with_dmesg( )
             elif arg == "mobicat" :
                 mobicat( )
+            elif arg == "metadata" :
+                metadata( )
             else :
                 main_menu( )
 
