@@ -3,6 +3,7 @@
 
 import sys , os , subprocess , shlex
 from ctypes import *
+from sys import platform as _platform
 try:
     from configparser import ConfigParser
 except ImportError:
@@ -20,12 +21,28 @@ def print_color_test( ) :
         print color
 
 def print_color( str , color ) :
-    STD_OUTPUT_HANDLE_ID = c_ulong(0xfffffff5)
-    windll.Kernel32.GetStdHandle.restype = c_ulong
-    std_output_hdl = windll.Kernel32.GetStdHandle(STD_OUTPUT_HANDLE_ID)
-    windll.Kernel32.SetConsoleTextAttribute(std_output_hdl, color)
-    sys.stdout.write( str )
-    windll.Kernel32.SetConsoleTextAttribute(std_output_hdl, 7)
+    if _platform == "win32" :
+        STD_OUTPUT_HANDLE_ID = c_ulong(0xfffffff5)
+        windll.Kernel32.GetStdHandle.restype = c_ulong
+        std_output_hdl = windll.Kernel32.GetStdHandle(STD_OUTPUT_HANDLE_ID)
+        windll.Kernel32.SetConsoleTextAttribute(std_output_hdl, color)
+        sys.stdout.write( str )
+        windll.Kernel32.SetConsoleTextAttribute(std_output_hdl, 7)
+    elif _platform == "linux" or _platform == "linux2" or _platform == "cygwin" :
+        color_code = {
+            "none" : "\033[0m",
+            2  : "\033[0;32m" ,
+            4  : "\033[0;31m" ,
+            6  : "\033[0;33m" ,
+            10 : "\033[1;32m" ,
+            12 : "\033[1;31m" ,
+            14 : "\033[1;33m" ,
+        }
+        sys.stdout.write( color_code[color] + str + color_code["none"] )
+    elif _platform == "darwin" :
+        sys.stdout.write( str )
+    else :
+        sys.stdout.write( str )
 
 def print_green_light( str ) :
     print_color( str , 2 )
@@ -178,7 +195,7 @@ def check_log( log_filename , keyword , k_index_start , k_index_end ) :
                 if line[k_index_start:k_index_end] == keyword :
                     print_green_light( "[+] log available\n" )
                     return True ;
-        print_red( "[+] log not available ><\n" )
+        print_red( "[-] log not available ><\n" )
         return False
     except IOError :
         print_red( "[-] log file not exist ><\n" )
@@ -236,7 +253,8 @@ def push_lib( ) :
 
     for log in read_log( log_filename , "Install:" , 0 , 8 ) :
         cmd_push = 'adb push '
-        cmd_push += os.path.dirname( log_filename ).replace( '\\' , '/' ) + '/'
+        # cmd_push += os.path.dirname( log_filename ).replace( '\\' , '/' ) + '/'
+        cmd_push += log_filename[:log_filename.rfind('/')] + '/'
         cmd_push += log[log.find("out"):].strip() + ' '
         cmd_push += log[log.find("/system"):log.rfind("/")].strip() + " "
         lexec_( cmd_push )
@@ -261,7 +279,8 @@ def flash_boot( ) :
 
     for log in read_log( log_filename , "Target boot image:" , 0 , 18 ) :
         cmd_flash = "fastboot flash boot "
-        cmd_flash += os.path.dirname( log_filename ).replace( '\\' , '/' ) + '/'
+        # cmd_flash += os.path.dirname( log_filename ).replace( '\\' , '/' ) + '/'
+        cmd_flash += log_filename[:log_filename.rfind('/')] + '/'
         cmd_flash += log[log.find("out"):].strip() + " "
         lexec_( cmd_flash )
 
@@ -313,8 +332,8 @@ def power_button( ) :
 
 def unlock_screen( ) :
 
-    if not check_device( ) :
-        exit( "[-] check_device() failed" )
+    # if not check_device( ) :
+        # exit( "[-] check_device() failed" )
 
     config = ConfigParser( ) 
     config.read( os.path.dirname( os.path.realpath( __file__ ) ) + '/qyh.ini' )
@@ -328,6 +347,17 @@ def log_fname( ) :
     print_green( "[+] push_lib   : " + config.get( "push_lib" , "log_file" ) + "\n" )
     print_green( "[+] check_lib  : " + config.get( "check_log" , "log_file" ) + "\n" )
     print_green( "[+] flash_boot : " + config.get( "flash_boot" , "log_file" ) + "\n" )
+
+def check_lib_log( ) :
+
+    config = ConfigParser( ) 
+    config.read( os.path.dirname( os.path.realpath( __file__ ) ) + '/qyh.ini' )
+    log_filename = config.get( 'push_lib' , 'log_file' )
+
+    if check_log( log_filename , "Install:" , 0 , 8 ) :
+        print_green_light( "[+] check lib log success" + "\n" ) ;
+    else :
+        print_red( "[-] check lib log failed" + "\n" ) ;
 
 def logcat_with_dmesg( ) :
 
@@ -357,6 +387,7 @@ def main_menu( ) :
     sys.stdout.write( '           power_button (' );print_green('pb');sys.stdout.write(')           | \n' )
     sys.stdout.write( '           unlock_screen (' );print_green('us');sys.stdout.write(')          | \n' )
     sys.stdout.write( '           log_fname (' );print_green('lf');sys.stdout.write(')              | \n' )
+    sys.stdout.write( '           check_lib_log (' );print_green('cll');sys.stdout.write(')          | \n' )
     sys.stdout.write( '           logcat_with_dmesg (' );print_green('ld');sys.stdout.write(')      | \n' )
     sys.stdout.write( '        ]\n' )
 
@@ -382,6 +413,8 @@ if __name__ == "__main__" :
                 unlock_screen( )
             elif arg == "log_fname" or arg == "lf" :
                 log_fname( )
+            elif arg == "check_lib_log" or arg == "cll" :
+                check_lib_log( )
             elif arg == "logcat_with_dmesg" or arg == "ld" :
                 logcat_with_dmesg( )
             elif arg == "mobicat" :
