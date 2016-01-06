@@ -251,12 +251,14 @@ def push_lib( ) :
         if not root_device( ) :
             exit( "[-] root_device() failed" )
 
-    for log in read_log( log_filename , "Install:" , 0 , 8 ) :
+    logs = read_log( log_filename , "Install:" , 0 , 8 )
+    for index , log in enumerate( logs ) :
         cmd_push = 'adb push '
         # cmd_push += os.path.dirname( log_filename ).replace( '\\' , '/' ) + '/'
         cmd_push += log_filename[:log_filename.rfind('/')] + '/'
         cmd_push += log[log.find("out"):].strip() + ' '
         cmd_push += log[log.find("/system"):log.rfind("/")].strip() + " "
+        print( "[+] " + str( index + 1 ) + "/" + str( len( logs ) ) + " file(s) :") ;
         lexec_( cmd_push )
 
 def flash_boot( ) :
@@ -286,7 +288,7 @@ def flash_boot( ) :
 
     lexec_( "fastboot reboot" )
 
-def kill_camera( ) :
+def kill_camera_svr_and_clt( ) :
 
     if not check_device( ) :
         exit( "[-] check_device() failed" )
@@ -297,7 +299,35 @@ def kill_camera( ) :
 
     config = ConfigParser( ) 
     config.read( os.path.dirname( os.path.realpath( __file__ ) ) + '/qyh.ini' )
-    for process_name in config.get( 'kill_camera' , 'camera_process_name' ).split( ' ' ) :
+    for process_name in config.get( 'kill_camera_svr_and_clt' , 'camera_process_name' ).split( ' ' ) :
+        kill_process( process_name )
+
+def kill_camera_service( ) :
+
+    if not check_device( ) :
+        exit( "[-] check_device() failed" )
+
+    if not check_root( ) :
+        if not root_device( ) :
+            exit( "[-] root_device() failed" )
+
+    config = ConfigParser( ) 
+    config.read( os.path.dirname( os.path.realpath( __file__ ) ) + '/qyh.ini' )
+    for process_name in config.get( 'kill_camera_service' , 'camera_process_name' ).split( ' ' ) :
+        kill_process( process_name )
+
+def kill_camera_client( ) :
+
+    if not check_device( ) :
+        exit( "[-] check_device() failed" )
+
+    if not check_root( ) :
+        if not root_device( ) :
+            exit( "[-] root_device() failed" )
+
+    config = ConfigParser( ) 
+    config.read( os.path.dirname( os.path.realpath( __file__ ) ) + '/qyh.ini' )
+    for process_name in config.get( 'kill_camera_client' , 'camera_process_name' ).split( ' ' ) :
         kill_process( process_name )
 
 def start_camera( ) :
@@ -381,13 +411,15 @@ def main_menu( ) :
     sys.stdout.write( ' ' + os.path.basename( sys.argv[0] ) + ' [\n' )
     sys.stdout.write( '           push_lib (' );print_green('pl');sys.stdout.write(')               | \n' )
     sys.stdout.write( '           flash_boot (' );print_green('fb');sys.stdout.write(')             | \n' )
-    sys.stdout.write( '           kill_camera (' );print_green('kc');sys.stdout.write(')            | \n' )
+    sys.stdout.write( '           kill_camera_svr_and_clt (' );print_green('kc');sys.stdout.write(')| \n' )
+    sys.stdout.write( '           kill_camera_service (' );print_green('kcs');sys.stdout.write(')   | \n' )
+    sys.stdout.write( '           kill_camera_client (' );print_green('kcc');sys.stdout.write(')    | \n' )
     sys.stdout.write( '           start_camera (' );print_green('sc');sys.stdout.write(')           | \n' )
     sys.stdout.write( '           take_picture (' );print_green('tp');sys.stdout.write(')           | \n' )
     sys.stdout.write( '           power_button (' );print_green('pb');sys.stdout.write(')           | \n' )
     sys.stdout.write( '           unlock_screen (' );print_green('us');sys.stdout.write(')          | \n' )
     sys.stdout.write( '           log_fname (' );print_green('lf');sys.stdout.write(')              | \n' )
-    sys.stdout.write( '           check_lib_log (' );print_green('cll');sys.stdout.write(')          | \n' )
+    sys.stdout.write( '           check_lib_log (' );print_green('cll');sys.stdout.write(')         | \n' )
     sys.stdout.write( '           logcat_with_dmesg (' );print_green('ld');sys.stdout.write(')      | \n' )
     sys.stdout.write( '        ]\n' )
 
@@ -401,8 +433,12 @@ if __name__ == "__main__" :
                 push_lib( )
             elif arg == "flash_boot" or arg == "fb" :
                 flash_boot( )
-            elif arg == "kill_camera" or arg == "kc" :
-                kill_camera( )
+            elif arg == "kill_camera_svr_and_clt" or arg == "kc" :
+                kill_camera_svr_and_clt( )
+            elif arg == "kill_camera_service" or arg == "kcs" :
+                kill_camera_service( )
+            elif arg == "kill_camera_client" or arg == "kcc" :
+                kill_camera_client( )
             elif arg == "start_camera" or arg == "sc" :
                 start_camera( )
             elif arg == "take_picture" or arg == "tp" :
