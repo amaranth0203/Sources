@@ -20,7 +20,10 @@ def print_color_test( ) :
         print "hello : " 
         print color
 
-def print_color( str , color ) :
+def print_none_color( str , color ) :
+    sys.stdout.write( str )
+
+def print_colorful( str , color ) :
     if _platform == "win32" :
         STD_OUTPUT_HANDLE_ID = c_ulong(0xfffffff5)
         windll.Kernel32.GetStdHandle.restype = c_ulong
@@ -43,6 +46,8 @@ def print_color( str , color ) :
         sys.stdout.write( str )
     else :
         sys.stdout.write( str )
+
+print_color = print_colorful
 
 def print_green_light( str ) :
     print_color( str , 2 )
@@ -235,7 +240,23 @@ def kill_process( process_name ) :
     lexec( kill_cmd )
     return
 
-def push_lib( ) :
+def set_colorful( para ) :
+    if not len( para ) == 1 :
+        print_red( "[-] invalid parameters\n" )
+        return False
+    if para[0].lower( ) not in [ 'true' , 'false' ] :
+        print_red( "[-] invalid parameters\n" )
+        return False
+    config = ConfigParser( ) 
+    config.read( os.path.dirname( os.path.realpath( __file__ ) ) + '/qyh.ini' )
+    config.set( 'colorful' , 'flag' , para[0].lower( ) )
+    with open( os.path.dirname( os.path.realpath( __file__ ) ) + '/qyh.ini' , 'wb' ) as ini_file :
+        config.write( ini_file )
+    flag = config.get( 'colorful' , 'flag' ).lower( )
+    print_green( "[+] colorful : " + flag + "\n" )
+    return True
+
+def push_lib( para ) :
 
     config = ConfigParser( ) 
     config.read( os.path.dirname( os.path.realpath( __file__ ) ) + '/qyh.ini' )
@@ -260,8 +281,9 @@ def push_lib( ) :
         cmd_push += log[log.find("/system"):log.rfind("/")].strip() + " "
         print( "[+] " + str( index + 1 ) + "/" + str( len( logs ) ) + " file(s) :") ;
         lexec_( cmd_push )
+    return True
 
-def flash_boot( ) :
+def flash_boot( para ) :
 
     config = ConfigParser( ) 
     config.read( os.path.dirname( os.path.realpath( __file__ ) ) + '/qyh.ini' )
@@ -287,8 +309,9 @@ def flash_boot( ) :
         lexec_( cmd_flash )
 
     lexec_( "fastboot reboot" )
+    return True
 
-def kill_camera_svr_and_clt( ) :
+def kill_camera_svr_and_clt( para ) :
 
     if not check_device( ) :
         exit( "[-] check_device() failed" )
@@ -301,8 +324,9 @@ def kill_camera_svr_and_clt( ) :
     config.read( os.path.dirname( os.path.realpath( __file__ ) ) + '/qyh.ini' )
     for process_name in config.get( 'kill_camera_svr_and_clt' , 'camera_process_name' ).split( ' ' ) :
         kill_process( process_name )
+    return True
 
-def kill_camera_service( ) :
+def kill_camera_service( para ) :
 
     if not check_device( ) :
         exit( "[-] check_device() failed" )
@@ -315,8 +339,9 @@ def kill_camera_service( ) :
     config.read( os.path.dirname( os.path.realpath( __file__ ) ) + '/qyh.ini' )
     for process_name in config.get( 'kill_camera_service' , 'camera_process_name' ).split( ' ' ) :
         kill_process( process_name )
+    return True
 
-def kill_camera_client( ) :
+def kill_camera_client( para ) :
 
     if not check_device( ) :
         exit( "[-] check_device() failed" )
@@ -329,8 +354,9 @@ def kill_camera_client( ) :
     config.read( os.path.dirname( os.path.realpath( __file__ ) ) + '/qyh.ini' )
     for process_name in config.get( 'kill_camera_client' , 'camera_process_name' ).split( ' ' ) :
         kill_process( process_name )
+    return True
 
-def start_camera( ) :
+def start_camera( para ) :
 
     if not check_device( ) :
         exit( "[-] check_device() failed" )
@@ -339,8 +365,9 @@ def start_camera( ) :
     config.read( os.path.dirname( os.path.realpath( __file__ ) ) + '/qyh.ini' )
     cmd = config.get( "start_camera" , "command" )
     lexec( cmd )
+    return True
 
-def take_picture( ) :
+def take_picture( para ) :
 
     if not check_device( ) :
         exit( "[-] check_device() failed" )
@@ -349,8 +376,9 @@ def take_picture( ) :
     config.read( os.path.dirname( os.path.realpath( __file__ ) ) + '/qyh.ini' )
     cmd = config.get( "take_picture" , "command" )
     lexec( cmd )
+    return True
 
-def power_button( ) :
+def power_button( para ) :
 
     if not check_device( ) :
         exit( "[-] check_device() failed" )
@@ -359,8 +387,9 @@ def power_button( ) :
     config.read( os.path.dirname( os.path.realpath( __file__ ) ) + '/qyh.ini' )
     cmd = config.get( "power_button" , "command" )
     lexec( cmd )
+    return True
 
-def unlock_screen( ) :
+def unlock_screen( para ) :
 
     # if not check_device( ) :
         # exit( "[-] check_device() failed" )
@@ -369,16 +398,18 @@ def unlock_screen( ) :
     config.read( os.path.dirname( os.path.realpath( __file__ ) ) + '/qyh.ini' )
     cmd = config.get( "unlock_screen" , "command" )
     lexec( cmd )
+    return True
 
-def log_fname( ) :
+def log_fname( para ) :
 
     config = ConfigParser( ) 
     config.read( os.path.dirname( os.path.realpath( __file__ ) ) + '/qyh.ini' )
     print_green( "[+] push_lib   : " + config.get( "push_lib" , "log_file" ) + "\n" )
     print_green( "[+] check_lib  : " + config.get( "check_log" , "log_file" ) + "\n" )
     print_green( "[+] flash_boot : " + config.get( "flash_boot" , "log_file" ) + "\n" )
+    return True
 
-def check_lib_log( ) :
+def check_lib_log( para ) :
 
     config = ConfigParser( ) 
     config.read( os.path.dirname( os.path.realpath( __file__ ) ) + '/qyh.ini' )
@@ -388,77 +419,97 @@ def check_lib_log( ) :
         print_green_light( "[+] check lib log success" + "\n" ) ;
     else :
         print_red( "[-] check lib log failed" + "\n" ) ;
+    return True
 
-def logcat_with_dmesg( ) :
+def logcat_with_dmesg( para ) :
 
     config = ConfigParser( ) 
     config.read( os.path.dirname( os.path.realpath( __file__ ) ) + '/qyh.ini' )
     print_yellow( config.get( "logcat_with_dmesg" , "command" ) + "\n" )
+    return True
 
-def mobicat( ) :
+def mobicat( para ) :
     config = ConfigParser( ) 
     config.read( os.path.dirname( os.path.realpath( __file__ ) ) + '/qyh.ini' )
     for cmd in config.get ( "mobicat" , "command" ).split( "\"" ) :
         print_yellow( cmd + "\n" )
+    return True
 
-def metadata( ) :
+def metadata( para ) :
     config = ConfigParser( ) 
     config.read( os.path.dirname( os.path.realpath( __file__ ) ) + '/qyh.ini' )
     for cmd in config.get ( "metadata" , "command" ).split( "\"" ) :
         print_yellow( cmd + "\n" )
+    return True
 
 def main_menu( ) :
     sys.stdout.write( ' ' + os.path.basename( sys.argv[0] ) + ' [\n' )
-    sys.stdout.write( '           push_lib (' );print_green('pl');sys.stdout.write(')               | \n' )
-    sys.stdout.write( '           flash_boot (' );print_green('fb');sys.stdout.write(')             | \n' )
-    sys.stdout.write( '           kill_camera_svr_and_clt (' );print_green('kc');sys.stdout.write(')| \n' )
-    sys.stdout.write( '           kill_camera_service (' );print_green('kcs');sys.stdout.write(')   | \n' )
-    sys.stdout.write( '           kill_camera_client (' );print_green('kcc');sys.stdout.write(')    | \n' )
-    sys.stdout.write( '           start_camera (' );print_green('sc');sys.stdout.write(')           | \n' )
-    sys.stdout.write( '           take_picture (' );print_green('tp');sys.stdout.write(')           | \n' )
-    sys.stdout.write( '           power_button (' );print_green('pb');sys.stdout.write(')           | \n' )
-    sys.stdout.write( '           unlock_screen (' );print_green('us');sys.stdout.write(')          | \n' )
-    sys.stdout.write( '           log_fname (' );print_green('lf');sys.stdout.write(')              | \n' )
-    sys.stdout.write( '           check_lib_log (' );print_green('cll');sys.stdout.write(')         | \n' )
-    sys.stdout.write( '           logcat_with_dmesg (' );print_green('ld');sys.stdout.write(')      | \n' )
+    sys.stdout.write( '           set_colorful [ true | false ]              \n' )
+    sys.stdout.write( '           push_lib (' );print_green('pl');sys.stdout.write(')               \n' )
+    sys.stdout.write( '           flash_boot (' );print_green('fb');sys.stdout.write(')             \n' )
+    sys.stdout.write( '           kill_camera_svr_and_clt (' );print_green('kc');sys.stdout.write(')\n' )
+    sys.stdout.write( '           kill_camera_service (' );print_green('kcs');sys.stdout.write(')   \n' )
+    sys.stdout.write( '           kill_camera_client (' );print_green('kcc');sys.stdout.write(')    \n' )
+    sys.stdout.write( '           start_camera (' );print_green('sc');sys.stdout.write(')           \n' )
+    sys.stdout.write( '           take_picture (' );print_green('tp');sys.stdout.write(')           \n' )
+    sys.stdout.write( '           power_button (' );print_green('pb');sys.stdout.write(')           \n' )
+    sys.stdout.write( '           unlock_screen (' );print_green('us');sys.stdout.write(')          \n' )
+    sys.stdout.write( '           log_fname (' );print_green('lf');sys.stdout.write(')              \n' )
+    sys.stdout.write( '           check_lib_log (' );print_green('cll');sys.stdout.write(')         \n' )
+    sys.stdout.write( '           logcat_with_dmesg (' );print_green('ld');sys.stdout.write(')      \n' )
     sys.stdout.write( '        ]\n' )
+
+def read_global_config( para ) :
+    global print_color
+    config = ConfigParser( ) 
+    config.read( os.path.dirname( os.path.realpath( __file__ ) ) + '/qyh.ini' )
+    flag = config.get( 'colorful' , 'flag' ).lower( )
+    if not flag == "true" :
+        pass 
+        print_color = print_none_color
+    return True
+
+qyh_f = {
+    "set_colorful"              : set_colorful ,
+    "push_lib"                  : push_lib , 
+    "pl"                        : push_lib , 
+    "flash_boot"                : flash_boot ,    
+    "fb"                        : flash_boot ,    
+    "kill_camera_svr_and_clt"   : kill_camera_svr_and_clt , 
+    "kc"                        : kill_camera_svr_and_clt , 
+    "kill_camera_service"       : kill_camera_service , 
+    "kcs"                       : kill_camera_service , 
+    "kill_camera_client"        : kill_camera_client , 
+    "kcc"                       : kill_camera_client , 
+    "start_camera"              : start_camera , 
+    "sc"                        : start_camera , 
+    "take_picture"              : take_picture , 
+    "tp"                        : take_picture , 
+    "power_button"              : power_button , 
+    "pb"                        : power_button , 
+    "unlock_screen"             : unlock_screen , 
+    "us"                        : unlock_screen , 
+    "log_fname"                 : log_fname , 
+    "lf"                        : log_fname , 
+    "check_lib_log"             : check_lib_log , 
+    "cll"                       : check_lib_log , 
+    "logcat_with_dmesg"         : logcat_with_dmesg , 
+    "ld"                        : logcat_with_dmesg , 
+    "mobicat"                   : mobicat , 
+    "metadata"                  : metadata , 
+}
 
 if __name__ == "__main__" :
     pass
-    if len( sys.argv ) < 2 :
-        main_menu( )
-    else :
-        for arg in sys.argv[1:] :
-            if arg == "push_lib" or arg == "pl" :
-                push_lib( )
-            elif arg == "flash_boot" or arg == "fb" :
-                flash_boot( )
-            elif arg == "kill_camera_svr_and_clt" or arg == "kc" :
-                kill_camera_svr_and_clt( )
-            elif arg == "kill_camera_service" or arg == "kcs" :
-                kill_camera_service( )
-            elif arg == "kill_camera_client" or arg == "kcc" :
-                kill_camera_client( )
-            elif arg == "start_camera" or arg == "sc" :
-                start_camera( )
-            elif arg == "take_picture" or arg == "tp" :
-                take_picture( )
-            elif arg == "power_button" or arg == "pb" :
-                power_button( )
-            elif arg == "unlock_screen" or arg == "us" :
-                unlock_screen( )
-            elif arg == "log_fname" or arg == "lf" :
-                log_fname( )
-            elif arg == "check_lib_log" or arg == "cll" :
-                check_lib_log( )
-            elif arg == "logcat_with_dmesg" or arg == "ld" :
-                logcat_with_dmesg( )
-            elif arg == "mobicat" :
-                mobicat( )
-            elif arg == "metadata" :
-                metadata( )
-            else :
+    read_global_config( [] )
+    if not len( sys.argv ) < 2 :
+        if sys.argv[1] in qyh_f :
+            if not qyh_f[sys.argv[1]]( sys.argv[2:] ) :
                 main_menu( )
+        else :
+            main_menu( )
+    else :
+        main_menu( )
 
 
 
