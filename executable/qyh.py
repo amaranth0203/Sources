@@ -442,6 +442,21 @@ def metadata( para ) :
         print_yellow( cmd + "\n" )
     return True
 
+def open_source_dir( para ) :
+    if _platform == "win32" or _platform == "cygwin" :
+        cmd_open = "explorer "
+        cmd_open += os.path.dirname( os.path.realpath( __file__ ) )
+        lexec( cmd_open )
+    elif _platform == "linux" or _platform == "linux2" :
+        cmd_open = "nautilus "
+        cmd_open += os.path.dirname( os.path.realpath( __file__ ) )
+        lexec( cmd_open )
+    elif _platform == "darwin" :
+        print_green( "[+] Wow, this is Mac OS\n" ) ;
+    else :
+        print_red( "[-]unknow os\n" ) ;
+    return True
+
 def main_menu( ) :
     sys.stdout.write( ' ' + os.path.basename( sys.argv[0] ) + ' [\n' )
     sys.stdout.write( '           set_colorful [ true | false ]              \n' )
@@ -457,6 +472,7 @@ def main_menu( ) :
     sys.stdout.write( '           log_fname (' );print_green('lf');sys.stdout.write(')              \n' )
     sys.stdout.write( '           check_lib_log (' );print_green('cll');sys.stdout.write(')         \n' )
     sys.stdout.write( '           logcat_with_dmesg (' );print_green('ld');sys.stdout.write(')      \n' )
+    sys.stdout.write( '           open_source_dir (' );print_green('osd');sys.stdout.write(')      \n' )
     sys.stdout.write( '        ]\n' )
 
 def read_global_config( para ) :
@@ -497,6 +513,8 @@ qyh_f = {
     "ld"                        : logcat_with_dmesg , 
     "mobicat"                   : mobicat , 
     "metadata"                  : metadata , 
+    "open_source_dir"           : open_source_dir ,
+    "osd"                       : open_source_dir ,
 }
 
 if __name__ == "__main__" :
