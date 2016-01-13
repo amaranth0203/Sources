@@ -1,4 +1,4 @@
-#!/usr/bin/env python_
+ï»¿#!/usr/bin/env python_
 #-*- coding=utf-8 -*-
 
 import sys , os , subprocess , shlex
@@ -69,9 +69,9 @@ def print_yellow( str ) :
 
 def lexec( cmd ) :
 #
-#   Ö´ÐÐÃüÁî
-#   µÈµ½ÃüÁîÖ´ÐÐÍê±ÏÖ®ºó
-#   ÔÙÊä³öÃüÁîµÄÊä³ö²¢·µ»ØÃüÁîÖ´ÐÐ½á¹û
+#   æ‰§è¡Œå‘½ä»¤
+#   ç­‰åˆ°å‘½ä»¤æ‰§è¡Œå®Œæ¯•ä¹‹åŽ
+#   å†è¾“å‡ºå‘½ä»¤çš„è¾“å‡ºå¹¶è¿”å›žå‘½ä»¤æ‰§è¡Œç»“æžœ
 #
     print_yellow( "[!] " + cmd + "\n" )
     rc = os.popen( cmd ).read( )
@@ -80,10 +80,10 @@ def lexec( cmd ) :
 
 def lexec_( cmd ) :
 #
-#   Ö´ÐÐÃüÁî
-#   ÊµÊ±Êä³öÃüÁîµÄÊä³ö
-#   µÈµ½ÃüÁîÖ´ÐÐÍê±ÏÖ®ºó
-#   ÔÙ·µ»ØÃüÁîÖ´ÐÐ½á¹û
+#   æ‰§è¡Œå‘½ä»¤
+#   å®žæ—¶è¾“å‡ºå‘½ä»¤çš„è¾“å‡º
+#   ç­‰åˆ°å‘½ä»¤æ‰§è¡Œå®Œæ¯•ä¹‹åŽ
+#   å†è¿”å›žå‘½ä»¤æ‰§è¡Œç»“æžœ
 #
     print_yellow( "[!] " + cmd + "\n" )
     rc = ""
@@ -101,11 +101,11 @@ def lexec_( cmd ) :
 
 def check_device( ) :
 #
-#   ²éÕÒ°²×¿Éè±¸£¨µ¥Ò»£©
-#   £¨È·ÈÏÊÇ·ñ´ò¿ªdebugÄ£Ê½£©
+#   æŸ¥æ‰¾å®‰å“è®¾å¤‡ï¼ˆå•ä¸€ï¼‰
+#   ï¼ˆç¡®è®¤æ˜¯å¦æ‰“å¼€debugæ¨¡å¼ï¼‰
 #
-#   ÕÒµ½ÒÑ¾­´ò¿ªdebugÄ£Ê½µÄÉè±¸Ê±·µ»ØTrue
-#   Ã»ÕÒµ½·µ»ØFalse
+#   æ‰¾åˆ°å·²ç»æ‰“å¼€debugæ¨¡å¼çš„è®¾å¤‡æ—¶è¿”å›žTrue
+#   æ²¡æ‰¾åˆ°è¿”å›žFalse
 #
     rc = lexec( "adb devices" )
     if rc.strip().replace( "devices" , "" ).find( "device" ) > 0 :
@@ -117,11 +117,11 @@ def check_device( ) :
 
 def check_root( ) :
 #
-#   Ç°Ìá£º°²×¿Éè±¸£¨µ¥Ò»£©ÒÑ¾­´ò¿ªdebugÄ£Ê½
-#   È·ÈÏÊÇ·ñÒÑ¾­root
+#   å‰æï¼šå®‰å“è®¾å¤‡ï¼ˆå•ä¸€ï¼‰å·²ç»æ‰“å¼€debugæ¨¡å¼
+#   ç¡®è®¤æ˜¯å¦å·²ç»root
 #
-#   ÒÑ¾­root·µ»ØTrue
-#   Ã»ÓÐroot·µ»ØFalse
+#   å·²ç»rootè¿”å›žTrue
+#   æ²¡æœ‰rootè¿”å›žFalse
 #
     rc = lexec ( "adb remount" ) 
     if rc.find( "succeeded" ) > 0 :
@@ -133,8 +133,8 @@ def check_root( ) :
 
 def check_fastboot_mode( ) :
 #
-#   °²×¿Éè±¸£¨µ¥Ò»£©ÈôÊÇfastbootÄ£Ê½Ôò·µ»ØTrue
-#   °²×¿Éè±¸£¨µ¥Ò»£©Èô²»ÊÇfastbootÄ£Ê½Ôò·µ»ØFalse
+#   å®‰å“è®¾å¤‡ï¼ˆå•ä¸€ï¼‰è‹¥æ˜¯fastbootæ¨¡å¼åˆ™è¿”å›žTrue
+#   å®‰å“è®¾å¤‡ï¼ˆå•ä¸€ï¼‰è‹¥ä¸æ˜¯fastbootæ¨¡å¼åˆ™è¿”å›žFalse
 #
     rc = lexec( "fastboot devices" )
     if rc.strip().find( "fastboot" ) > 0 :
@@ -146,8 +146,8 @@ def check_fastboot_mode( ) :
 
 def root_device( ) :
 #
-#   Ç°Ìá£º°²×¿Éè±¸£¨µ¥Ò»£©ÒÑ¾­´ò¿ªdebugÄ£Ê½
-#   ¶ÔÉè±¸½øÐÐroot
+#   å‰æï¼šå®‰å“è®¾å¤‡ï¼ˆå•ä¸€ï¼‰å·²ç»æ‰“å¼€debugæ¨¡å¼
+#   å¯¹è®¾å¤‡è¿›è¡Œroot
 #
     # rc = lexec( "adb root" )
     rc = lexec( "adb vivoroot" )
@@ -162,11 +162,11 @@ def root_device( ) :
  
 def reboot_fastboot( ) :    
 #
-#   Ç°Ìá£º°²×¿Éè±¸£¨µ¥Ò»£©ÒÑ¾­´ò¿ªdebugÄ£Ê½
+#   å‰æï¼šå®‰å“è®¾å¤‡ï¼ˆå•ä¸€ï¼‰å·²ç»æ‰“å¼€debugæ¨¡å¼
 #
-#   ³¢ÊÔ½øÈëfastbootÄ£Ê½
-#   ½øÈë³É¹¦·µ»ØTrue
-#   ½øÈëÊ§°Ü·µ»ØFalse
+#   å°è¯•è¿›å…¥fastbootæ¨¡å¼
+#   è¿›å…¥æˆåŠŸè¿”å›žTrue
+#   è¿›å…¥å¤±è´¥è¿”å›žFalse
 #   
     lexec( "adb reboot bootloader" )
     try_count = 14
@@ -183,16 +183,16 @@ def reboot_fastboot( ) :
 
 def check_log( log_filename , keyword , k_index_start , k_index_end ) :
 #
-#   Ê×ÏÈÈ·ÈÏlogÎÄ¼þÊÇ·ñ´æÔÚ
-#   ½ÓÔÚlogÎÄ¼þÖÐ²éÕÒÊÇ·ñº¬ÓÐ°üº¬keywordµÄÐÐ£¨logÊÇ·ñÓÐÐ§£©
+#   é¦–å…ˆç¡®è®¤logæ–‡ä»¶æ˜¯å¦å­˜åœ¨
+#   æŽ¥åœ¨logæ–‡ä»¶ä¸­æŸ¥æ‰¾æ˜¯å¦å«æœ‰åŒ…å«keywordçš„è¡Œï¼ˆlogæ˜¯å¦æœ‰æ•ˆï¼‰
 #   
-#   log_filename    :   logÎÄ¼þÃû
-#   keyword         :   ¼ÇÂ¼µÄ¹Ø¼ü×Ö
-#   k_index_start   :   keywordÔÚÃ¿Ò»ÐÐ³öÏÖµÄÆðÊ¼Î»ÖÃ
-#   k_index_end     :   keywordÔÚÃ¿Ò»ÐÐ³öÏÖµÄ½áÊøÎ»ÖÃ
+#   log_filename    :   logæ–‡ä»¶å
+#   keyword         :   è®°å½•çš„å…³é”®å­—
+#   k_index_start   :   keywordåœ¨æ¯ä¸€è¡Œå‡ºçŽ°çš„èµ·å§‹ä½ç½®
+#   k_index_end     :   keywordåœ¨æ¯ä¸€è¡Œå‡ºçŽ°çš„ç»“æŸä½ç½®
 #
-#   logÓÐÐ§·µ»ØTrue
-#   logÎÞÐ§·µ»ØFalse
+#   logæœ‰æ•ˆè¿”å›žTrue
+#   logæ— æ•ˆè¿”å›žFalse
 #
     try :
         with open( log_filename , 'r' ) as f :
@@ -208,14 +208,14 @@ def check_log( log_filename , keyword , k_index_start , k_index_end ) :
 
 def read_log( log_filename , keyword , k_index_start , k_index_end ) :
 #
-#   ÔÚlogÎÄ¼þÖÐ²éÕÒº¬ÓÐkeywordµÄÐÐ
+#   åœ¨logæ–‡ä»¶ä¸­æŸ¥æ‰¾å«æœ‰keywordçš„è¡Œ
 #   
-#   log_filename    :   logÎÄ¼þÃû
-#   keyword         :   ¼ÇÂ¼µÄ¹Ø¼ü×Ö
-#   k_index_start   :   keywordÔÚÃ¿Ò»ÐÐ³öÏÖµÄÆðÊ¼Î»ÖÃ
-#   k_index_end     :   keywordÔÚÃ¿Ò»ÐÐ³öÏÖµÄ½áÊøÎ»ÖÃ
+#   log_filename    :   logæ–‡ä»¶å
+#   keyword         :   è®°å½•çš„å…³é”®å­—
+#   k_index_start   :   keywordåœ¨æ¯ä¸€è¡Œå‡ºçŽ°çš„èµ·å§‹ä½ç½®
+#   k_index_end     :   keywordåœ¨æ¯ä¸€è¡Œå‡ºçŽ°çš„ç»“æŸä½ç½®
 #
-#   ·µ»ØÖµlog_listÖÐÎªlogÎÄ¼þÀïkeywordÎ»ÖÃÕýÈ·µÄÃ¿Ò»ÐÐ
+#   è¿”å›žå€¼log_listä¸­ä¸ºlogæ–‡ä»¶é‡Œkeywordä½ç½®æ­£ç¡®çš„æ¯ä¸€è¡Œ
 #
     log_list = []
     with open( log_filename , 'r' ) as f :
@@ -226,8 +226,8 @@ def read_log( log_filename , keyword , k_index_start , k_index_end ) :
 
 def kill_process( process_name ) :
 #
-#   Ç°Ìá£º°²×¿Éè±¸£¨µ¥Ò»£©ÒÑ¾­´ò¿ªdebugÄ£Ê½²¢ÇÒroot
-#   psÖ®ºó²éÕÒ½ø³ÌÃû²¢½áÊø
+#   å‰æï¼šå®‰å“è®¾å¤‡ï¼ˆå•ä¸€ï¼‰å·²ç»æ‰“å¼€debugæ¨¡å¼å¹¶ä¸”root
+#   psä¹‹åŽæŸ¥æ‰¾è¿›ç¨‹åå¹¶ç»“æŸ
 #
     print_green_light( "\n[+] kill process : " + process_name + "\n" )
     rc = lexec( "adb shell ps | find \"" + process_name + "\"" )
@@ -457,6 +457,52 @@ def open_source_dir( para ) :
         print_red( "[-]unknow os\n" ) ;
     return True
 
+def dump_jpeg( para ) :
+
+    jpeg_only = False
+
+    if len( para ) > 1 :
+        print_red( "[+] to much paras\n" )
+        return False
+
+    if len( para ) == 1 :
+        if para[0].lower( ) not in [ 'meta' , 'snapraw' , 'all' ] :
+            print_red( "[+] error para : " + para[0].lower( ) + "\n" )
+            return False
+    else :
+        jpeg_only = True
+        
+
+    file = []
+
+    ### dump metadata
+    if len( para ) == 1 and para[0].lower( ) in [ 'meta' , 'all' ] :
+            for f in lexec( 'adb shell ls /data | find "snapshot"' ).split() :
+                file.append( '/data/' + f )
+            for f in lexec( 'adb shell ls /data/misc/camera | findstr /c:"\.raw" /c:"\.yuv" /c:"\.bin"' ).split() :
+                file.append( '/data/misc/camera/' + f )
+
+    ### dump raw from Snapdragon Camera
+    if len( para ) == 1 and para[0].lower( ) in [ 'snapraw' , 'all' ] :
+            for f in lexec( 'adb shell ls /sdcard/DCIM/camera/raw | findstr "\.raw"' ).split() :
+                file.append( '/sdcard/DCIM/camera/raw/' + f )
+
+    ### dump photo from VivoCamera
+    for f in lexec( 'adb shell ls /sdcard/' + u'\u76f8\u673a'.encode('utf-8') ).split() :
+        file.append( '/sdcard/' + u'\u76f8\u673a'.encode('utf-8') + '/' + f )
+
+    ### pull command
+    for f in file :
+        pass
+        lexec( 'adb pull ' + f + ' .' )
+
+    ### rm files dumped
+    for f in file :
+        pass
+        lexec( 'adb shell rm ' + f )
+
+    return True
+
 def main_menu( ) :
     sys.stdout.write( ' ' + os.path.basename( sys.argv[0] ) + ' [\n' )
     sys.stdout.write( '           set_colorful [ true | false ]              \n' )
@@ -473,6 +519,7 @@ def main_menu( ) :
     sys.stdout.write( '           check_lib_log (' );print_green('cll');sys.stdout.write(')         \n' )
     sys.stdout.write( '           logcat_with_dmesg (' );print_green('ld');sys.stdout.write(')      \n' )
     sys.stdout.write( '           open_source_dir (' );print_green('osd');sys.stdout.write(')      \n' )
+    sys.stdout.write( '           dump_jpeg (' );print_green('dj');sys.stdout.write(') [ meta | snapraw | all ]     \n' )
     sys.stdout.write( '        ]\n' )
 
 def read_global_config( para ) :
@@ -515,14 +562,16 @@ qyh_f = {
     "metadata"                  : metadata , 
     "open_source_dir"           : open_source_dir ,
     "osd"                       : open_source_dir ,
+    "dump_jpeg"                 : dump_jpeg ,
+    "dj"                        : dump_jpeg ,
 }
 
 if __name__ == "__main__" :
     pass
     read_global_config( [] )
     if not len( sys.argv ) < 2 :
-        if sys.argv[1] in qyh_f :
-            if not qyh_f[sys.argv[1]]( sys.argv[2:] ) :
+        if sys.argv[1].lower() in qyh_f :
+            if not qyh_f[sys.argv[1].lower()]( sys.argv[2:] ) :
                 main_menu( )
         else :
             main_menu( )
