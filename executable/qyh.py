@@ -20,7 +20,7 @@ def print_color_test( ) :
         print "hello : " 
         print color
 
-def print_none_color( str , color ) :
+def print_none_color( str , *nouse ) :
     sys.stdout.write( str )
 
 def print_colorful( str , color ) :
@@ -40,6 +40,7 @@ def print_colorful( str , color ) :
             10 : "\033[1;32m" ,
             12 : "\033[1;31m" ,
             14 : "\033[1;33m" ,
+            15 : "\033[1;37m" ,
         }
         sys.stdout.write( color_code[color] + str + color_code["none"] )
     elif _platform == "darwin" :
@@ -66,6 +67,9 @@ def print_red( str ) :
 
 def print_yellow( str ) :
     print_color( str , 14 ) 
+
+def print_white( str ) :
+    print_color( str , 15 )
 
 def lexec( cmd ) :
 #
@@ -224,39 +228,40 @@ def read_log( log_filename , keyword , k_index_start , k_index_end ) :
                 log_list.append( line.strip() )
     return log_list
 
-def kill_process( process_name ) :
+def kill_process( *args ) :
 #
 #   前提：安卓设备（单一）已经打开debug模式并且root
 #   ps之后查找进程名并结束
 #
+    process_name = args[0]
     print_green_light( "\n[+] kill process : " + process_name + "\n" )
-    rc = lexec( "adb shell ps | find \"" + process_name + "\"" )
+    cmd_kill = 'adb shell "ps | grep ' + process_name + '"'
+    rc = lexec( cmd_kill )
     if rc.strip() == "" :
         print_red( "[-] process " + process_name + " not exist ><" + "\n" )
         return
     kill_cmd = ""
-    kill_cmd += "adb shell kill -9" + " "
-    kill_cmd += os.popen( "adb shell ps | find \"" + process_name + "\"" ).read().split()[1] + " "
+    kill_cmd += "adb shell kill -9" + " " + rc.strip().split()[1]
     lexec( kill_cmd )
     return
 
-def set_colorful( para ) :
-    if not len( para ) == 1 :
+def set_colorful( *args ) :
+    if not len( args ) == 1 :
         print_red( "[-] invalid parameters\n" )
         return False
-    if para[0].lower( ) not in [ 'true' , 'false' ] :
+    if args[0].lower( ) not in ( 'true' , 'false' ) :
         print_red( "[-] invalid parameters\n" )
         return False
     config = ConfigParser( ) 
     config.read( os.path.dirname( os.path.realpath( __file__ ) ) + '/qyh.ini' )
-    config.set( 'colorful' , 'flag' , para[0].lower( ) )
+    config.set( 'colorful' , 'flag' , args[0].lower( ) )
     with open( os.path.dirname( os.path.realpath( __file__ ) ) + '/qyh.ini' , 'wb' ) as ini_file :
         config.write( ini_file )
     flag = config.get( 'colorful' , 'flag' ).lower( )
     print_green( "[+] colorful : " + flag + "\n" )
     return True
 
-def push_lib( para ) :
+def push_lib( ) :
 
     config = ConfigParser( ) 
     config.read( os.path.dirname( os.path.realpath( __file__ ) ) + '/qyh.ini' )
@@ -283,7 +288,7 @@ def push_lib( para ) :
         lexec_( cmd_push )
     return True
 
-def flash_boot( para ) :
+def flash_boot( ) :
 
     config = ConfigParser( ) 
     config.read( os.path.dirname( os.path.realpath( __file__ ) ) + '/qyh.ini' )
@@ -311,7 +316,7 @@ def flash_boot( para ) :
     lexec_( "fastboot reboot" )
     return True
 
-def kill_camera_svr_and_clt( para ) :
+def kill_camera_svr_and_clt( ) :
 
     if not check_device( ) :
         exit( "[-] check_device() failed" )
@@ -326,7 +331,7 @@ def kill_camera_svr_and_clt( para ) :
         kill_process( process_name )
     return True
 
-def kill_camera_service( para ) :
+def kill_camera_service( ) :
 
     if not check_device( ) :
         exit( "[-] check_device() failed" )
@@ -341,7 +346,7 @@ def kill_camera_service( para ) :
         kill_process( process_name )
     return True
 
-def kill_camera_client( para ) :
+def kill_camera_client( ) :
 
     if not check_device( ) :
         exit( "[-] check_device() failed" )
@@ -356,7 +361,7 @@ def kill_camera_client( para ) :
         kill_process( process_name )
     return True
 
-def start_camera( para ) :
+def start_camera( ) :
 
     if not check_device( ) :
         exit( "[-] check_device() failed" )
@@ -367,7 +372,7 @@ def start_camera( para ) :
     lexec( cmd )
     return True
 
-def take_picture( para ) :
+def take_picture( ) :
 
     if not check_device( ) :
         exit( "[-] check_device() failed" )
@@ -378,7 +383,7 @@ def take_picture( para ) :
     lexec( cmd )
     return True
 
-def power_button( para ) :
+def power_button( ) :
 
     if not check_device( ) :
         exit( "[-] check_device() failed" )
@@ -389,7 +394,7 @@ def power_button( para ) :
     lexec( cmd )
     return True
 
-def unlock_screen( para ) :
+def unlock_screen( ) :
 
     # if not check_device( ) :
         # exit( "[-] check_device() failed" )
@@ -400,7 +405,7 @@ def unlock_screen( para ) :
     lexec( cmd )
     return True
 
-def log_fname( para ) :
+def log_fname( ) :
 
     config = ConfigParser( ) 
     config.read( os.path.dirname( os.path.realpath( __file__ ) ) + '/qyh.ini' )
@@ -409,40 +414,59 @@ def log_fname( para ) :
     print_green( "[+] flash_boot : " + config.get( "flash_boot" , "log_file" ) + "\n" )
     return True
 
-def check_lib_log( para ) :
+def check_lib_log( *args ) :
 
     config = ConfigParser( ) 
     config.read( os.path.dirname( os.path.realpath( __file__ ) ) + '/qyh.ini' )
     log_filename = config.get( 'push_lib' , 'log_file' )
 
+    no_count = False
+
+    if len( args ) > 1 :
+        print_red( "[+] to much args\n" )
+        return False
+
+    if len( args ) == 1 :
+        if args[0].lower( ) not in ( 'count' ) :
+            print_red( "[+] error args : " + args[0].lower( ) + "\n" )
+            return False
+    else :
+        no_count = True
+
     if check_log( log_filename , "Install:" , 0 , 8 ) :
         print_green_light( "[+] check lib log success" + "\n" ) ;
+        if not no_count :
+            logs = read_log( log_filename , "Install:" , 0 , 8 )
+            print_none_color( "[+] Install: " )
+            print_white( str( len( logs ) ) )
+            print_none_color( " file(s)\n" )
     else :
         print_red( "[-] check lib log failed" + "\n" ) ;
+
     return True
 
-def logcat_with_dmesg( para ) :
+def logcat_with_dmesg( ) :
 
     config = ConfigParser( ) 
     config.read( os.path.dirname( os.path.realpath( __file__ ) ) + '/qyh.ini' )
     print_yellow( config.get( "logcat_with_dmesg" , "command" ) + "\n" )
     return True
 
-def mobicat( para ) :
+def mobicat( ) :
     config = ConfigParser( ) 
     config.read( os.path.dirname( os.path.realpath( __file__ ) ) + '/qyh.ini' )
     for cmd in config.get ( "mobicat" , "command" ).split( "\"" ) :
         print_yellow( cmd + "\n" )
     return True
 
-def metadata( para ) :
+def metadata( ) :
     config = ConfigParser( ) 
     config.read( os.path.dirname( os.path.realpath( __file__ ) ) + '/qyh.ini' )
     for cmd in config.get ( "metadata" , "command" ).split( "\"" ) :
         print_yellow( cmd + "\n" )
     return True
 
-def open_source_dir( para ) :
+def open_source_dir( ) :
     if _platform == "win32" or _platform == "cygwin" :
         cmd_open = "explorer "
         cmd_open += os.path.dirname( os.path.realpath( __file__ ) )
@@ -457,17 +481,17 @@ def open_source_dir( para ) :
         print_red( "[-]unknow os\n" ) ;
     return True
 
-def dump_jpeg( para ) :
+def dump_jpeg( *args ) :
 
     jpeg_only = False
 
-    if len( para ) > 1 :
+    if len( args ) > 1 :
         print_red( "[+] to much paras\n" )
         return False
 
-    if len( para ) == 1 :
-        if para[0].lower( ) not in [ 'meta' , 'snapraw' , 'all' ] :
-            print_red( "[+] error para : " + para[0].lower( ) + "\n" )
+    if len( args ) == 1 :
+        if args[0].lower( ) not in ( 'meta' , 'snapraw' , 'all' ) :
+            print_red( "[+] error args : " + args[0].lower( ) + "\n" )
             return False
     else :
         jpeg_only = True
@@ -476,20 +500,35 @@ def dump_jpeg( para ) :
     file = []
 
     ### dump metadata
-    if len( para ) == 1 and para[0].lower( ) in [ 'meta' , 'all' ] :
-            for f in lexec( 'adb shell ls /data | find "snapshot"' ).split() :
-                file.append( '/data/' + f )
-            for f in lexec( 'adb shell ls /data/misc/camera | findstr /c:"\.raw" /c:"\.yuv" /c:"\.bin"' ).split() :
-                file.append( '/data/misc/camera/' + f )
+    if len( args ) == 1 and args[0].lower( ) in ( 'meta' , 'all' ) :
+        rc = lexec( 'adb shell ls /data' )
+        if 'snapshot' in rc : # grep condition "no such file or directory" out
+            for f in rc.split() :
+                if 'snapshot' in f : # grep other file(s) out
+                    file.append( '/data/' + f )
+        rc = lexec( 'adb shell ls /data/misc/camera' )
+        if '.raw' in rc or '.yuv' in rc or '.bin' in rc : # grep condition "no such file or directory" out
+            for f in rc.split() :
+                if '.raw' in rc or '.yuv' in rc or '.bin' in f : # grep other file(s) out
+                    file.append( '/data/misc/camera/' + f )
 
     ### dump raw from Snapdragon Camera
-    if len( para ) == 1 and para[0].lower( ) in [ 'snapraw' , 'all' ] :
+    if len( args ) == 1 and args[0].lower( ) in ( 'snapraw' , 'all' ) :
             for f in lexec( 'adb shell ls /sdcard/DCIM/camera/raw | findstr "\.raw"' ).split() :
                 file.append( '/sdcard/DCIM/camera/raw/' + f )
 
     ### dump photo from VivoCamera
-    for f in lexec( 'adb shell ls /sdcard/' + u'\u76f8\u673a'.encode('utf-8') ).split() :
-        file.append( '/sdcard/' + u'\u76f8\u673a'.encode('utf-8') + '/' + f )
+    rc = lexec( 'adb shell ls /sdcard/' + u'\u76f8\u673a'.encode('utf-8') )
+    if '.jpg' in rc : # grep condition "no such file or directory" out
+        for f in rc.split( ) :
+            if '.jpg' in f : # jpeg file only
+                file.append( '/sdcard/' + u'\u76f8\u673a'.encode('utf-8') + '/' + f )
+
+    ### tips
+    print "------ file(s) to process start ------"
+    for f in file :
+        print f 
+    print "------ file(s) to process end --------"
 
     ### pull command
     for f in file :
@@ -516,13 +555,13 @@ def main_menu( ) :
     sys.stdout.write( '           power_button (' );print_green('pb');sys.stdout.write(')           \n' )
     sys.stdout.write( '           unlock_screen (' );print_green('us');sys.stdout.write(')          \n' )
     sys.stdout.write( '           log_fname (' );print_green('lf');sys.stdout.write(')              \n' )
-    sys.stdout.write( '           check_lib_log (' );print_green('cll');sys.stdout.write(')         \n' )
+    sys.stdout.write( '           check_lib_log (' );print_green('cll');sys.stdout.write(') [ count ]        \n' )
     sys.stdout.write( '           logcat_with_dmesg (' );print_green('ld');sys.stdout.write(')      \n' )
     sys.stdout.write( '           open_source_dir (' );print_green('osd');sys.stdout.write(')      \n' )
     sys.stdout.write( '           dump_jpeg (' );print_green('dj');sys.stdout.write(') [ meta | snapraw | all ]     \n' )
     sys.stdout.write( '        ]\n' )
 
-def read_global_config( para ) :
+def read_global_config( ) :
     global print_color
     config = ConfigParser( ) 
     config.read( os.path.dirname( os.path.realpath( __file__ ) ) + '/qyh.ini' )
@@ -567,11 +606,14 @@ qyh_f = {
 }
 
 if __name__ == "__main__" :
+    # print_color_test()
+    # print sys.argv[2:]
+    # exit()
     pass
     read_global_config( [] )
     if not len( sys.argv ) < 2 :
         if sys.argv[1].lower() in qyh_f :
-            if not qyh_f[sys.argv[1].lower()]( sys.argv[2:] ) :
+            if not qyh_f[sys.argv[1].lower()]( *sys.argv[2:] ) :
                 main_menu( )
         else :
             main_menu( )
