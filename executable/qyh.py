@@ -1,7 +1,7 @@
 ﻿#!/usr/bin/env python_
 #-*- coding=utf-8 -*-
 
-import sys , os , subprocess , shlex
+import sys , os , subprocess , shlex , shutil
 from ctypes import *
 from sys import platform as _platform
 try:
@@ -9,16 +9,14 @@ try:
 except ImportError:
     from ConfigParser import ConfigParser  # ver. < 3.0
 
-
 def print_color_test( ) :
-    # from ctypes import *
     STD_OUTPUT_HANDLE_ID = c_ulong(0xfffffff5)
     windll.Kernel32.GetStdHandle.restype = c_ulong
     std_output_hdl = windll.Kernel32.GetStdHandle(STD_OUTPUT_HANDLE_ID)
     for color in xrange(16):
         windll.Kernel32.SetConsoleTextAttribute(std_output_hdl, color)
-        print "hello : " 
-        print color
+        print( "hello : " )
+        print( color )
 
 def print_none_color( str , *nouse ) :
     sys.stdout.write( str )
@@ -71,15 +69,16 @@ def print_yellow( str ) :
 def print_white( str ) :
     print_color( str , 15 )
 
-def lexec( cmd ) :
+def lexec( cmd , output = True ) :
 #
 #   执行命令
 #   等到命令执行完毕之后
-#   再输出命令的输出并返回命令执行结果
+#   (再输出命令的输)出并返回命令执行结果
 #
     print_yellow( "[!] " + cmd + "\n" )
     rc = os.popen( cmd ).read( )
-    print rc
+    if output :
+        print( rc )
     return rc
 
 def lexec_( cmd ) :
@@ -98,9 +97,9 @@ def lexec_( cmd ) :
             break
         if output:
             rc += output
-            print "[+] " + output.strip()
+            print( "[+] " + output.strip() )
     # rc = process.poll()
-    print ' '
+    print( ' ' )
     return rc
 
 def check_device( ) :
@@ -223,9 +222,7 @@ def read_log( log_filename , keyword , k_index_start , k_index_end ) :
 #
     log_list = []
     with open( log_filename , 'r' ) as f :
-        for line in f.readlines( ) :
-            if line[k_index_start:k_index_end] == keyword :
-                log_list.append( line.strip() )
+        log_list = [ line for line in f.readlines( ) if line[k_index_start:k_index_end] == keyword ]
     return log_list
 
 def kill_process( *args ) :
@@ -280,11 +277,12 @@ def push_lib( ) :
     logs = read_log( log_filename , "Install:" , 0 , 8 )
     for index , log in enumerate( logs ) :
         cmd_push = 'adb push '
-        # cmd_push += os.path.dirname( log_filename ).replace( '\\' , '/' ) + '/'
         cmd_push += log_filename[:log_filename.rfind('/')] + '/'
         cmd_push += log[log.find("out"):].strip() + ' '
         cmd_push += log[log.find("/system"):log.rfind("/")].strip() + " "
-        print( "[+] " + str( index + 1 ) + "/" + str( len( logs ) ) + " file(s) :") ;
+        print_none_color( "[+] push " )
+        print_white( str( index + 1 ) + "/" + str( len( logs ) ) )
+        print_none_color( " file(s) :\n" ) ;
         lexec_( cmd_push )
     return True
 
@@ -308,7 +306,6 @@ def flash_boot( ) :
 
     for log in read_log( log_filename , "Target boot image:" , 0 , 18 ) :
         cmd_flash = "fastboot flash boot "
-        # cmd_flash += os.path.dirname( log_filename ).replace( '\\' , '/' ) + '/'
         cmd_flash += log_filename[:log_filename.rfind('/')] + '/'
         cmd_flash += log[log.find("out"):].strip() + " "
         lexec_( cmd_flash )
@@ -396,8 +393,8 @@ def power_button( ) :
 
 def unlock_screen( ) :
 
-    # if not check_device( ) :
-        # exit( "[-] check_device() failed" )
+    if not check_device( ) :
+        exit( "[-] check_device() failed" )
 
     config = ConfigParser( ) 
     config.read( os.path.dirname( os.path.realpath( __file__ ) ) + '/qyh.ini' )
@@ -455,15 +452,13 @@ def logcat_with_dmesg( ) :
 def mobicat( ) :
     config = ConfigParser( ) 
     config.read( os.path.dirname( os.path.realpath( __file__ ) ) + '/qyh.ini' )
-    for cmd in config.get ( "mobicat" , "command" ).split( "\"" ) :
-        print_yellow( cmd + "\n" )
+    print_yellow( '\n'.join( str( f ) for f in config.get ( "mobicat" , "command" ).split( "\"" ) ) + '\n' )
     return True
 
 def metadata( ) :
     config = ConfigParser( ) 
     config.read( os.path.dirname( os.path.realpath( __file__ ) ) + '/qyh.ini' )
-    for cmd in config.get ( "metadata" , "command" ).split( "\"" ) :
-        print_yellow( cmd + "\n" )
+    print_yellow( '\n'.join( str( f ) for f in config.get ( "metadata" , "command" ).split( "\"" ) ) + '\n' )
     return True
 
 def open_source_dir( ) :
@@ -483,6 +478,9 @@ def open_source_dir( ) :
 
 def dump_jpeg( *args ) :
 
+    if not check_device( ) :
+        exit( "[-] check_device() failed" )
+
     jpeg_only = False
 
     if len( args ) > 1 :
@@ -501,40 +499,32 @@ def dump_jpeg( *args ) :
 
     ### dump metadata
     if len( args ) == 1 and args[0].lower( ) in ( 'meta' , 'all' ) :
-        rc = lexec( 'adb shell ls /data' )
-        if 'snapshot' in rc : # grep condition "no such file or directory" out
-            for f in rc.split() :
-                if 'snapshot' in f : # grep other file(s) out
-                    file.append( '/data/' + f )
-        rc = lexec( 'adb shell ls /data/misc/camera' )
-        if '.raw' in rc or '.yuv' in rc or '.bin' in rc : # grep condition "no such file or directory" out
-            for f in rc.split() :
-                if '.raw' in rc or '.yuv' in rc or '.bin' in f : # grep other file(s) out
-                    file.append( '/data/misc/camera/' + f )
+        rc = lexec( 'adb shell ls /data' , False )
+        if 'snapshot' in rc : ### grep condition "no such file or directory" out
+            file += [ '/data/' + f for f in rc.split( ) if 'snapshot' in f ]
+        rc = lexec( 'adb shell ls /data/misc/camera' , False )
+        if '.raw' in rc or '.yuv' in rc or '.bin' in rc : ### grep condition "no such file or directory" out
+            file += [ '/data/misc/camera/' + f for f in rc.split( ) if '.raw' in f or '.yuv' in f or '.bin' in f ]
 
     ### dump raw from Snapdragon Camera
     if len( args ) == 1 and args[0].lower( ) in ( 'snapraw' , 'all' ) :
-            for f in lexec( 'adb shell ls /sdcard/DCIM/camera/raw | findstr "\.raw"' ).split() :
-                file.append( '/sdcard/DCIM/camera/raw/' + f )
+        rc = lexec( 'adb shell ls /sdcard/DCIM/camera/raw' , False )
+        if '.raw' in rc : ### grep condition "no such file or directory" out
+            file += [ '/sdcard/DCIM/camera/raw/' + f for f in rc.split( ) if '.raw' in f ]
 
     ### dump photo from VivoCamera
-    rc = lexec( 'adb shell ls /sdcard/' + u'\u76f8\u673a'.encode('utf-8') )
-    if '.jpg' in rc : # grep condition "no such file or directory" out
-        for f in rc.split( ) :
-            if '.jpg' in f : # jpeg file only
-                file.append( '/sdcard/' + u'\u76f8\u673a'.encode('utf-8') + '/' + f )
+    rc = lexec( 'adb shell ls /sdcard/' + u'\u76f8\u673a'.encode('utf-8') , False )
+    if '.jpg' in rc : ### grep condition "no such file or directory" out
+        file += [ '/sdcard/' + u'\u76f8\u673a'.encode('utf-8') + '/' + f for f in rc.split( ) if '.jpg' in f ]
 
     ### tips
-    print "------ file(s) to process start ------"
-    for f in file :
-        print f 
-    print "------ file(s) to process end --------"
-
+    print( "------------------ file(s) to process start ------------------" )
+    print( '\n'.join( str( f ) for f in file ) )
+    print( "------------------ file(s) to process end --------------------" )
     ### pull command
     for f in file :
         pass
         lexec( 'adb pull ' + f + ' .' )
-
     ### rm files dumped
     for f in file :
         pass
@@ -542,9 +532,54 @@ def dump_jpeg( *args ) :
 
     return True
 
+def dump_lib( *args ) :
+
+    spe_dir = False
+
+    if len( args ) > 1 :
+        print_red( "[+] to much args\n" )
+        return False
+
+    config = ConfigParser( ) 
+    config.read( os.path.dirname( os.path.realpath( __file__ ) ) + '/qyh.ini' )
+    log_filename = config.get( 'push_lib' , 'log_file' )
+
+    if not check_log( log_filename , "Install:" , 0 , 8 ) :
+        print_red( "[-] check lib log failed" + "\n" ) ;
+        return True
+    else :
+        print_green_light( "[+] check lib log success" + "\n" ) ;
+
+    if len( args ) == 1 :
+        try :
+            os.stat( args[0] )
+        except :
+            os.makedirs( args[0] )
+        spe_dir = True
+
+    logs = read_log( log_filename , "Install:" , 0 , 8 )
+    for index , log in enumerate( logs ) :
+        fsrc = log_filename[:log_filename.rfind('/')] + '/'
+        fsrc += log[log.find("out"):].strip()
+        if not spe_dir :
+            fdst = os.getcwd( ).replace( '\\' , '/' ) + '/'
+        else :
+            fdst = args[0] + '/'
+        fdst += log[log.find("/system")+1:log.rfind("/")].strip() + "/"
+        try :
+            os.stat( fdst )
+        except :
+            os.makedirs( fdst )
+        print_none_color( "[+] copy " )
+        print_white( str( index + 1 ) + "/" + str( len( logs ) ) )
+        print_none_color( " file(s) : " + fsrc[fsrc.find('/system'):] + '\n' ) ;
+        shutil.copy( fsrc , fdst )
+
+    return True
+
 def main_menu( ) :
     sys.stdout.write( ' ' + os.path.basename( sys.argv[0] ) + ' [\n' )
-    sys.stdout.write( '           set_colorful [ true | false ]              \n' )
+    sys.stdout.write( '           set_colorful [ ' );print_yellow('true | false');sys.stdout.write(' ]              \n' )
     sys.stdout.write( '           push_lib (' );print_green('pl');sys.stdout.write(')               \n' )
     sys.stdout.write( '           flash_boot (' );print_green('fb');sys.stdout.write(')             \n' )
     sys.stdout.write( '           kill_camera_svr_and_clt (' );print_green('kc');sys.stdout.write(')\n' )
@@ -555,10 +590,11 @@ def main_menu( ) :
     sys.stdout.write( '           power_button (' );print_green('pb');sys.stdout.write(')           \n' )
     sys.stdout.write( '           unlock_screen (' );print_green('us');sys.stdout.write(')          \n' )
     sys.stdout.write( '           log_fname (' );print_green('lf');sys.stdout.write(')              \n' )
-    sys.stdout.write( '           check_lib_log (' );print_green('cll');sys.stdout.write(') [ count ]        \n' )
+    sys.stdout.write( '           check_lib_log (' );print_green('cll');sys.stdout.write(') [ ');print_yellow('count');sys.stdout.write(' ]        \n' )
     sys.stdout.write( '           logcat_with_dmesg (' );print_green('ld');sys.stdout.write(')      \n' )
     sys.stdout.write( '           open_source_dir (' );print_green('osd');sys.stdout.write(')      \n' )
-    sys.stdout.write( '           dump_jpeg (' );print_green('dj');sys.stdout.write(') [ meta | snapraw | all ]     \n' )
+    sys.stdout.write( '           dump_jpeg (' );print_green('dj');sys.stdout.write(') [ ');print_yellow('meta | snapraw | all');sys.stdout.write(' ]     \n' )
+    sys.stdout.write( '           dump_lib (' );print_green('dl');sys.stdout.write(') [ ');print_yellow('path');sys.stdout.write(' ]     \n' )
     sys.stdout.write( '        ]\n' )
 
 def read_global_config( ) :
@@ -603,14 +639,24 @@ qyh_f = {
     "osd"                       : open_source_dir ,
     "dump_jpeg"                 : dump_jpeg ,
     "dj"                        : dump_jpeg ,
+    "dump_lib"                  : dump_lib ,
+    "dl"                        : dump_lib ,
 }
 
 if __name__ == "__main__" :
     # print_color_test()
-    # print sys.argv[2:]
+    # print( sys.argv[2:] )
+    # lexec( 'dir' )
+    # li = range( 10 )
+    # print( [ t for t in li if t >= 5 ] )
+    # print( [ t if t >= 5 else 0 for t in li ] )
+    # print( '\n'.join( str( x ) if x >=5 else str( 0 ) for x in li ) )
+    # print( '-------' )
+    # print( '\n'.join( str( x ) for x in li if x >= 5 ) )
+    # print( '-------' )
     # exit()
     pass
-    read_global_config( [] )
+    read_global_config( )
     if not len( sys.argv ) < 2 :
         if sys.argv[1].lower() in qyh_f :
             if not qyh_f[sys.argv[1].lower()]( *sys.argv[2:] ) :
