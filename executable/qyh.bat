@@ -384,3 +384,16 @@ for /f "delims=" %%i in ( '!cmd_check!' ) do (
 set "%1=false"
 goto :eof
 
+
+REM 
+REM rm yuv
+REM 
+REM for /f "delims=" %%i in ( 'adb shell "ls /data/misc/camera|grep yuv"' ) do (
+    REM set "file=%%i"
+    REM set "file=/data/misc/camera/!file!"
+    REM set "file=!file:~0,-1!"
+    REM set "rm_cmd=adb shell "rm !file!""
+    REM echo !rm_cmd!
+    REM !rm_cmd!
+REM )
+
