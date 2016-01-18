@@ -1,7 +1,7 @@
 @echo off
 setlocal enabledelayedexpansion
 
-python %~dp0/qyh.py %*
+python -B %~dp0/qyh.py %*
 goto :eof
 
 if "%*" equ "" (
