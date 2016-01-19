@@ -3,6 +3,38 @@
 
 class qyh_base( object ) :
 
+    def test( self ) :
+        '''@
+        [+] callable
+        @'''
+        import socket
+        s = socket.socket( socket.AF_INET , socket.SOCK_STREAM )
+        host = 'www.guokr.com'
+        ip = socket.gethostbyname( host )
+        try :
+            s.settimeout( 3 )
+            s.connect( ( ip , 80 ) )
+        except :
+            self.error_exit( 'connect exception' )
+        s.send( "GET / HTTP/1.0\r\n\r\n" )
+        header = ( s.recv( 1000 ) )
+        print header
+        # header = header.split( "\r\n" )
+        # length , = tuple( h for h in header if "content-length" in h.lower() )
+        # length = int( length.split(":")[1].strip() )
+        # total = 0
+        # buf = ""
+        # import sys
+        # while True :
+            # buf = s.recv( 100 )
+            # total += len( buf )
+            # sys.stdout.write( buf )
+            # if len( buf ) == 0 :
+                # break
+        # print "\n" + str( total )
+        # print length
+        pass
+
     def open_source_dir( self ) :
         '''@
         [+] callable
@@ -137,6 +169,9 @@ class qyh_base( object ) :
         import sys
         income = args[0]
         standard = args[1]
+        # print type( args[0] )
+        # print args[0]
+        # raw_input()
         for arg in income :
             if arg not in standard :
                 self.error_exit( '[-] ' + sys._getframe().f_back.f_code.co_name + '() error arg : ' + arg + '\n' )
@@ -176,6 +211,66 @@ class qyh_base( object ) :
         return rc
 
 class qyh_adb( qyh_base ) :
+
+    def select_log_file( self , *args ) :
+        '''@
+        [+] callable
+        [+] visible
+        @short : slf
+        @'''
+        # select lib log file starts
+        indexes = []
+        current_file = self.read_config( "push_lib" , "log_file" )
+        current_index = -1
+        files = self.read_config( "push_lib" , "log_files" ).split("|")
+        self.print_green_light( '\ncurrent -> {}\n\n'.format( current_file ) )
+        for index,file in enumerate( files ) :
+            print "[+] {} ---> {}".format( index , file )
+            indexes.append( index )
+            if file == current_file :
+                current_index = index
+        selected = -1
+        selected_raw = raw_input( "[+] which one ?\n")
+        if selected_raw == "" :
+            selected = current_index
+        else :
+            try :
+                selected = int( selected_raw )
+            except :
+                self.error_exit( '[-] bad option {}'.format( selected_raw ) )
+        if selected not in indexes :
+            self.error_exit( '[-] bad option {}'.format( selected ) )
+        self.write_config( "push_lib" , "log_file" , files[selected] )
+        # select lib log file ends
+
+        # select bootimg log file starts
+        print( '' )
+        indexes = []
+        current_file = self.read_config( "flash_boot" , "log_file" )
+        current_index = -1
+        files = self.read_config( "flash_boot" , "log_files" ).split("|")
+        self.print_green_light( '\ncurrent -> {}\n\n'.format( current_file ) )
+        for index,file in enumerate( files ) :
+            print "[+] {} ---> {}".format( index , file )
+            indexes.append( index )
+            if file == current_file :
+                current_index = index
+        selected = -1
+        selected_raw = raw_input( "[+] which one ?\n")
+        if selected_raw == "" :
+            selected = current_index
+        else :
+            try :
+                selected = int( selected_raw )
+            except :
+                self.error_exit( '[-] bad option {}'.format( selected_raw ) )
+        if selected not in indexes :
+            self.error_exit( '[-] bad option {}'.format( selected ) )
+        self.write_config( "flash_boot" , "log_file" , files[selected] )
+        # select bootimg log file ends
+
+        self.log_file( )
+        pass
 
     def check_device( self , ) :
         rc = self.lexec( "adb devices" )
@@ -436,14 +531,14 @@ class qyh_adb( qyh_base ) :
         self.lexec( self.read_config( "unlock_screen" , "command" ) )
         return True
 
-    def log_fname( self , ) :
+    def log_file( self , ) :
         '''@
         [+] callable
         [+] visible
         @short : lf
         @'''
         self.print_green( "[+] push_lib   : " + self.read_config( "push_lib" , "log_file" ) + "\n" )
-        self.print_green( "[+] check_lib  : " + self.read_config( "check_log" , "log_file" ) + "\n" )
+        # self.print_green( "[+] check_lib  : " + self.read_config( "check_log" , "log_file" ) + "\n" )
         self.print_green( "[+] flash_boot : " + self.read_config( "flash_boot" , "log_file" ) + "\n" )
         return True
 
@@ -595,10 +690,6 @@ class qyh_adb( qyh_base ) :
 
         return True
 
-def handler( signum, frame):
-    print('Signal handler called with signal', signum)
-    raise OSError("Couldn't open device!")
-
 class qyh_svr( qyh_base ) :
     from SocketServer import TCPServer , ThreadingMixIn , BaseRequestHandler
 
@@ -609,11 +700,11 @@ class qyh_svr( qyh_base ) :
 
     class ThreadedTCPRequestHandler( BaseRequestHandler ) :
         def handle( self ) :
-            import threading 
-            data = self.request.recv( 1024 )
+            import threading , os
+            data = self.request.recv( 65536 )
             cur_thread = threading.current_thread( )
-            response = "{} : {}".format( cur_thread.name , data )
-            self.request.sendall( response )
+            # self.request.sendall( 'wrapper : {}'.format(data) )
+            self.request.sendall( '[!] ' + data + '\r\n' + os.popen( data ).read( ) )
 
     class ThreadedTCPServer( ThreadingMixIn , TCPServer ) :
         pass
@@ -626,13 +717,35 @@ class qyh_svr( qyh_base ) :
         @'''
         pid = self.svr_getpid( )
         addr = self.svr_getaddr( )
-        if pid > 0 :
-            self.print_green_light( '[+] qyh_svr daemon is running , pid & addr : {} , {}\n'.format( pid , addr ) )
+        if self.svr_check( False ) :
+            self.print_none_color( '[+] addr seted in ini file          : '.format( addr ) )
+            self.print_green_light( "{}\n".format( addr ) )
+            self.print_none_color( '[+] qyh_svr listening               : '.format( addr ) )
+            self.print_green_light( '{}\n'.format( self.svr_getaddr( ) ) )
         else :
             self.print_red( '[+] qyh_svr daemon die\n' )
             self.print_none_color( '[+] addr seted in ini file : '.format( addr ) )
             self.print_green_light( "{}\n".format( addr ) )
-        pass
+            exit()
+
+    def svr_reset( self , output = True , flag_kill = True ) :
+        '''@
+        [+] callable
+        [+] visible
+        @short : svr
+        @'''
+        from sys import platform as _platform
+        if _platform == "win32" or _platform == "cygwin" :
+            cmd_kill = "taskkill /im pythonw.exe /f"
+        elif _platform == "linux" or _platform == "linux2" :
+            cmd_kill = "pkill python"
+        elif _platform == "darwin" :
+            error_exit( 'function not implements in MacOS' )
+        else :
+            error_exit( 'Unknow Operating System' )
+        self.svr_setpid( -1 )
+        if flag_kill :
+            self.lexec( cmd_kill , output , output )
 
     def svr_set( self ) :
         '''@
@@ -657,13 +770,24 @@ class qyh_svr( qyh_base ) :
         self.print_green_light(  ':'.join(str(i) for i in addr) + '\n' )
         self.svr_setaddr( addr )
 
-    def svr_check( self ) :
+    def svr_check( self , flag_output = True ) :
         '''@
         [+] callable
-        [+] visible
         @short : svc
         @'''
-        pass
+        import socket
+        try :
+            s = socket.socket( socket.AF_INET , socket.SOCK_STREAM )
+            s.settimeout( 0.1 )
+            s.connect( self.svr_getaddr( ) )
+            s.close( )
+        except :
+            if flag_output :
+                self.print_red( '[-] remote server down\n' )
+            return False
+        if flag_output :
+            self.print_green_light( '[+] remote server alive\n' )
+        return True
 
     def svr_start( self ) :
         '''@
@@ -672,29 +796,29 @@ class qyh_svr( qyh_base ) :
         @short : svs
         @'''
         import subprocess , os , sys
-        if not self.svr_getpid( ) > 0 :
-            cmd_fwall_pass = 'netsh advfirewall firewall add rule name="qyh_svr" dir=in program="' + str( sys.executable ) + '" security=authenticate action=allow'
+        if not self.svr_check( False ) :
+            self.svr_reset( False , flag_kill = False)
+            cmd_fwall_pass = 'netsh advfirewall firewall add rule name="qyh_svr" dir=out program="' + str( sys.executable ) + '" security=authenticate action=allow'
             self.lexec( cmd_fwall_pass , False , False )
-            cmd = 'python ' + os.path.dirname( os.path.realpath( __file__ ) ).replace( '\\' , '/' ) + '/qyh.py svd'
+            cmd_fwall_pass = 'netsh advfirewall firewall add rule name="qyh_svr" protocol=TCP dir=in localport=2334 action=allow'
+            self.lexec( cmd_fwall_pass , False , False )
+            cmd = 'pythonw ' + os.path.dirname( os.path.realpath( __file__ ) ).replace( '\\' , '/' ) + '/qyh.py svd'
             process = subprocess.Popen( cmd )
         else :
-            self.err_exit( 'daemon is already running...' )
+            self.error_exit( 'daemon is already running...' )
 
     def svr_daemon( self ) :
         '''@
         [+] callable
         @short : svd
         @'''
-        import time , os , threading
+        import time , os , threading , signal
         self.svr_setpid( os.getpid() )
         server = self.ThreadedTCPServer( self.svr_addr , self.ThreadedTCPRequestHandler )
-        cmd_fwall_del = 'netsh advfirewall firewall del rul name="qyh_svr"'
-        self.lexec( cmd_fwall_del , False , False )
         server_thread = threading.Thread( target=server.serve_forever )
         server_thread.daemon = True
         server_thread.start()
         server_thread.join()
-
 
     def svr_kill( self ) :
         '''@
@@ -706,35 +830,33 @@ class qyh_svr( qyh_base ) :
         pid = self.svr_getpid( )
         if pid > 0 :
             try :
-                signal.signal(signal.SIGTERM, handler)
-                # signal.alarm(5)
                 os.kill( pid , signal.SIGTERM )
-                # signal.alarm(0)  
                 self.write_config( "svr" , "pid" , -1 )
             except :
                 self.error_exit( '!!!!!!!!!!!! os.kill exception' )
         else :
             self.error_exit( 'daemon down' )
-        # print '1'
-        # self.server.shutdown()
-        # print '2'
-        # self.server.server_close()
-        # print '3'
+        cmd_fwall_del = 'netsh advfirewall firewall del rul name="qyh_svr"'
+        self.lexec( cmd_fwall_del , False , False )
 
-    # def svr_exec( self , ip , port , message ) :
-    def svr_exec( self ) :
+    def svr_exec( self , *cmd ) :
         '''@
         [+] callable
         [+] visible
         @short : sve
+        @args : cmd - command to execute in server
         @'''
+        if len( cmd ) < 1 :
+            self.error_exit( 'sve takes at least one command to execute' )
+        if not self.svr_check( False ) :
+            self.error_exit( 'remote server down' )
         import socket 
         sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         sock.connect( self.svr_addr )
         try:
-            sock.sendall( "aaaaa" )
-            response = sock.recv(1024)
-            print "Received: {}".format(response)
+            sock.sendall( str( " ".join( cmd ) ) )
+            response = sock.recv( 65536 )
+            print "[+] result from svr_daemon : \n{}".format(response)
         finally:
             sock.close()
 
@@ -813,14 +935,15 @@ class qyh( qyh_svr , qyh_adb ) :
     def main_loop( self , *args ) :
         if len( args ) > 1 :
             funcs = tuple( f for f in dir( self ) if not f.startswith( "_" ) and self.check_callable( "self." + f ) )
-            func_map = { self.get_formated_args( "self." + f )[0] : f for f in funcs }
+            func_map = { f if self.get_formated_args( "self." + f )[0] == "" else self.get_formated_args( "self." + f )[0] : f for f in funcs }
             self.check_args( args[1:2] , tuple( s for t in func_map.items( ) for s in t ) )
-            func_name = "self." + func_map[ args[1] ] if args[1] in func_map else args[1]
-            func_args = "\""+"\",\"".join(args[2:])+"\""
+            func_name = "self." + ( func_map[ args[1] ] if args[1] in func_map else args[1] )
             if len( args ) > 2 :
-                exec( func_name + "(" + func_args + ")" ) in locals( )
+                f = eval( func_name )
+                f( *args[2:] )
             else :
-                exec( func_name + "( )" ) in locals( )
+                f = eval( func_name )
+                f( )
         else :
             self.main_menu( )
 
