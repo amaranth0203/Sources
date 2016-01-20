@@ -1,0 +1,2 @@
+( defun make-cd ( a b c d )
+  ( list :title a :artist b :rating c :ripped d ) )

@@ -1,39 +1,7 @@
-﻿#!/usr/bin/env python_
+#!/usr/bin/env python_
 #-*- coding=utf-8 -*-
 
 class qyh_base( object ) :
-
-    def test( self ) :
-        '''@
-        [+] callable
-        @'''
-        import socket
-        s = socket.socket( socket.AF_INET , socket.SOCK_STREAM )
-        host = 'www.guokr.com'
-        ip = socket.gethostbyname( host )
-        try :
-            s.settimeout( 3 )
-            s.connect( ( ip , 80 ) )
-        except :
-            self.error_exit( 'connect exception' )
-        s.send( "GET / HTTP/1.0\r\n\r\n" )
-        header = ( s.recv( 1000 ) )
-        print header
-        # header = header.split( "\r\n" )
-        # length , = tuple( h for h in header if "content-length" in h.lower() )
-        # length = int( length.split(":")[1].strip() )
-        # total = 0
-        # buf = ""
-        # import sys
-        # while True :
-            # buf = s.recv( 100 )
-            # total += len( buf )
-            # sys.stdout.write( buf )
-            # if len( buf ) == 0 :
-                # break
-        # print "\n" + str( total )
-        # print length
-        pass
 
     def open_source_dir( self ) :
         '''@
@@ -225,7 +193,7 @@ class qyh_adb( qyh_base ) :
         files = self.read_config( "push_lib" , "log_files" ).split("|")
         self.print_green_light( '\ncurrent -> {}\n\n'.format( current_file ) )
         for index,file in enumerate( files ) :
-            print "[+] {} ---> {}".format( index , file )
+            print "[+] {} ---> {}".format( index + 1 , file )
             indexes.append( index )
             if file == current_file :
                 current_index = index
@@ -235,11 +203,11 @@ class qyh_adb( qyh_base ) :
             selected = current_index
         else :
             try :
-                selected = int( selected_raw )
+                selected = int( selected_raw ) - 1
             except :
                 self.error_exit( '[-] bad option {}'.format( selected_raw ) )
         if selected not in indexes :
-            self.error_exit( '[-] bad option {}'.format( selected ) )
+            self.error_exit( '[-] bad option {}'.format( selected + 1 ) )
         self.write_config( "push_lib" , "log_file" , files[selected] )
         # select lib log file ends
 
@@ -251,7 +219,7 @@ class qyh_adb( qyh_base ) :
         files = self.read_config( "flash_boot" , "log_files" ).split("|")
         self.print_green_light( '\ncurrent -> {}\n\n'.format( current_file ) )
         for index,file in enumerate( files ) :
-            print "[+] {} ---> {}".format( index , file )
+            print "[+] {} ---> {}".format( index + 1 , file )
             indexes.append( index )
             if file == current_file :
                 current_index = index
@@ -261,11 +229,11 @@ class qyh_adb( qyh_base ) :
             selected = current_index
         else :
             try :
-                selected = int( selected_raw )
+                selected = int( selected_raw ) - 1
             except :
                 self.error_exit( '[-] bad option {}'.format( selected_raw ) )
         if selected not in indexes :
-            self.error_exit( '[-] bad option {}'.format( selected ) )
+            self.error_exit( '[-] bad option {}'.format( selected + 1 ) )
         self.write_config( "flash_boot" , "log_file" , files[selected] )
         # select bootimg log file ends
 
@@ -878,6 +846,54 @@ class qyh_svr( qyh_base ) :
 
 class qyh( qyh_svr , qyh_adb ) :
 
+    def log(text):
+        def decorator(func):
+            def wrapper(*args, **kw):
+                print('%s %s():' % (text, func.__name__))
+                return func(*args, **kw)
+            return wrapper
+        return decorator
+
+    @log('aaa')
+    def testwrapper( ) :
+        print "I'm the real function"
+
+    def test( self ) :
+        '''@
+        [+] callable
+        @'''
+        import inspect
+        print inspect.getsourcelines( eval( "self.testwrapper" ) )
+        
+        exit( )
+        import socket
+        s = socket.socket( socket.AF_INET , socket.SOCK_STREAM )
+        host = 'www.guokr.com'
+        ip = socket.gethostbyname( host )
+        try :
+            s.settimeout( 3 )
+            s.connect( ( ip , 80 ) )
+        except :
+            self.error_exit( 'connect exception' )
+        s.send( "GET / HTTP/1.0\r\n\r\n" )
+        header = ( s.recv( 1000 ) )
+        print header
+        # header = header.split( "\r\n" )
+        # length , = tuple( h for h in header if "content-length" in h.lower() )
+        # length = int( length.split(":")[1].strip() )
+        # total = 0
+        # buf = ""
+        # import sys
+        # while True :
+            # buf = s.recv( 100 )
+            # total += len( buf )
+            # sys.stdout.write( buf )
+            # if len( buf ) == 0 :
+                # break
+        # print "\n" + str( total )
+        # print length
+        pass
+
     def __init__( self ) :
         super( qyh_svr , self ).__init__( ) 
         qyh_svr.__init__( self ) 
@@ -950,8 +966,6 @@ class qyh( qyh_svr , qyh_adb ) :
 if __name__ == "__main__" :
     import sys
     qyh( ).main_loop( *sys.argv )
-
-
 
 
 
