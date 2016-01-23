@@ -352,11 +352,12 @@ class qyh_adb( qyh_base ) :
         [+] visible
         @short : pl
         @args : backup - backup lib file to current directory before push lib file to phone
+        @args : fake - print cmd_push only, not execute it
         @'''
         import datetime , os
-        self.check_args( args , ( 'backup' , ) )
-        flag_backup , =\
-            tuple( self.trans_args( args , ( 'backup' , ) ) )
+        self.check_args( args , ( 'backup' , 'fake' ) )
+        flag_backup , flag_fake =\
+            tuple( self.trans_args( args , ( 'backup' , 'fake' ) ) )
 
         log_filename = self.read_config( 'push_lib' , 'log_file' )
 
@@ -391,10 +392,13 @@ class qyh_adb( qyh_base ) :
             cmd_push += log_filename[:log_filename.rfind('/')] + '/'
             cmd_push += log[log.find("out"):].strip() + ' '
             cmd_push += log[log.find("/system"):log.rfind("/")].strip() + " "
-            self.print_none_color( "[+] push " )
-            self.print_white( str( index + 1 ) + "/" + str( len( logs ) ) )
-            self.print_none_color( " file(s) :\n" ) ;
-            self.lexec_( cmd_push )
+            if flag_fake :
+                self.print_yellow( cmd_push + "\n" )
+            else :
+                self.print_none_color( "[+] push " )
+                self.print_white( str( index + 1 ) + "/" + str( len( logs ) ) )
+                self.print_none_color( " file(s) :\n" ) ;
+                self.lexec_( cmd_push )
         return True
 
     def flash_boot( self , ) :
@@ -766,9 +770,10 @@ class qyh_svr( qyh_base ) :
         import subprocess , os , sys
         if not self.svr_check( False ) :
             self.svr_reset( False , flag_kill = False)
-            cmd_fwall_pass = 'netsh advfirewall firewall add rule name="qyh_svr" dir=out program="' + str( sys.executable ) + '" security=authenticate action=allow'
+            port = self.svr_getaddr( )[1]
+            cmd_fwall_pass = 'netsh advfirewall firewall add rule name="qyh_svr" dir=out program="' + str( sys.executable ).replace( 'python' , 'pythonw' ) + '" security=authenticate action=allow'.format( sys.executable )
             self.lexec( cmd_fwall_pass , False , False )
-            cmd_fwall_pass = 'netsh advfirewall firewall add rule name="qyh_svr" protocol=TCP dir=in localport=2334 action=allow'
+            cmd_fwall_pass = 'netsh advfirewall firewall add rule name="qyh_svr" protocol=TCP dir=in localport={} action=allow'.format( port )
             self.lexec( cmd_fwall_pass , False , False )
             cmd = 'pythonw ' + os.path.dirname( os.path.realpath( __file__ ) ).replace( '\\' , '/' ) + '/qyh.py svd'
             process = subprocess.Popen( cmd )
@@ -966,5 +971,3 @@ class qyh( qyh_svr , qyh_adb ) :
 if __name__ == "__main__" :
     import sys
     qyh( ).main_loop( *sys.argv )
-
-
