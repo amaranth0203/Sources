@@ -48,3 +48,14 @@
 	( if artist   ( equal ( getf cd :artist) artist) t )
 	( if rating   ( equal ( getf cd :rating) rating) t )
 	( if ripped-p ( equal ( getf cd :ripped) ripped) t ) ) ) )
+
+( defun update ( &key a b )
+  ( mapcar
+    #'( lambda ( row ) row ) *db* ) )
+
+( defun make-comparison-expr( field value )
+  `( equal ( getf cd , field ) , value ) )
+
+( defun make-comparisons-list( fields )
+  ( loop while fields
+	 collecting( make-comparison-expr( pop fields )(pop fields))))
