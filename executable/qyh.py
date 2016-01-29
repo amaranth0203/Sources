@@ -552,6 +552,13 @@ class qyh_adb( qyh_base ) :
         self.print_yellow( self.read_config( "logcat_with_dmesg" , "command" ) + "\n" )
         return True
 
+    def up_privilege( self , ) :
+        '''@
+        [+] callable
+        @'''
+        self.print_yellow( '\n'.join( str( f ) for f in self.read_config( "up_privilege" , "command" ).split( "\"" ) ) + '\n' )
+        return True
+
     def mobicat( self , ) :
         '''@
         [+] callable
