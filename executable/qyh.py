@@ -3,6 +3,17 @@
 
 class qyh_base( object ) :
 
+    def tick( self , msg = "[+] ticking..." ) :
+        '''@
+        [+] callable
+        [+] visible
+        @short : t
+        @args : msg - message to show
+        @'''
+        cmd_tick = 'msg "%username%" '
+        cmd_tick += msg
+        self.lexec( cmd_tick , False , False )
+
     def open_source_dir( self ) :
         '''@
         [+] callable
@@ -156,7 +167,7 @@ class qyh_base( object ) :
     def lexec( self , cmd , output = True , tips = True ) :
         import os
         if tips :
-            self.print_yellow( "[!] " + cmd + "\n" )
+            self.print_yellow( "[!] " + str( cmd ) + "\n" )
         rc = os.popen( cmd ).read( )
         if output :
             print( rc )
@@ -164,7 +175,7 @@ class qyh_base( object ) :
 
     def lexec_( self , cmd ) :
         import subprocess , shlex
-        self.print_yellow( "[!] " + cmd + "\n" )
+        self.print_yellow( "[!] " + str( cmd ) + "\n" )
         rc = ""
         process = subprocess.Popen( shlex.split( cmd ), stdout=subprocess.PIPE )
         while True:
@@ -353,11 +364,12 @@ class qyh_adb( qyh_base ) :
         @short : pl
         @args : backup - backup lib file to current directory before push lib file to phone
         @args : fake - print cmd_push only, not execute it
+        @args : dump_first - push multiple files in a directory acts faster than push one by one
         @'''
         import datetime , os
-        self.check_args( args , ( 'backup' , 'fake' ) )
-        flag_backup , flag_fake =\
-            tuple( self.trans_args( args , ( 'backup' , 'fake' ) ) )
+        self.check_args( args , ( 'backup' , 'fake' , 'dump_first' ) )
+        flag_backup , flag_fake , flag_dump_first =\
+            tuple( self.trans_args( args , ( 'backup' , 'fake' , 'dump_first' ) ) )
 
         log_filename = self.read_config( 'push_lib' , 'log_file' )
 
@@ -366,16 +378,16 @@ class qyh_adb( qyh_base ) :
         self.check_root( )
 
         if flag_backup :
-            folder_name = "backup_lib_" + str( datetime.datetime.now() ).split('.')[0].replace( '-' , '' ).replace( ':' , '' ).replace( ' ' , '_' )
+            folder_name_backup = "backup_lib_" + str( datetime.datetime.now() ).split('.')[0].replace( '-' , '' ).replace( ':' , '' ).replace( ' ' , '_' )
             try :
-                os.stat( folder_name )
+                os.stat( folder_name_backup )
             except :
-                os.makedirs( folder_name )
+                os.makedirs( folder_name_backup )
 
         logs = self.read_log( log_filename , "Install:" , 0 , 8 )
         if flag_backup :
             for index , log in enumerate( logs ) :
-                dir = folder_name + log[log.find("/system"):log.rfind("/")].strip()
+                dir = folder_name_backup + log[log.find("/system"):log.rfind("/")].strip()
                 try :
                     os.stat( dir )
                 except :
@@ -387,18 +399,33 @@ class qyh_adb( qyh_base ) :
                 self.print_white( str( index + 1 ) + "/" + str( len( logs ) ) )
                 self.print_none_color( " file(s) :\n" ) ;
                 self.lexec_( cmd_pull )
-        for index , log in enumerate( logs ) :
-            cmd_push = 'adb push '
-            cmd_push += log_filename[:log_filename.rfind('/')] + '/'
-            cmd_push += log[log.find("out"):].strip() + ' '
-            cmd_push += log[log.find("/system"):log.rfind("/")].strip() + " "
+        if flag_dump_first :
             if flag_fake :
-                self.print_yellow( cmd_push + "\n" )
+                self.lexec( "qyh pl fake" ) 
             else :
-                self.print_none_color( "[+] push " )
-                self.print_white( str( index + 1 ) + "/" + str( len( logs ) ) )
-                self.print_none_color( " file(s) :\n" ) ;
-                self.lexec_( cmd_push )
+                import shutil
+                folder_name_tmp = "tmp_lib_" + str( datetime.datetime.now() ).split('.')[0].replace( '-' , '' ).replace( ':' , '' ).replace( ' ' , '_' )
+                try :
+                    os.stat( folder_name_tmp )
+                except :
+                    os.makedirs( folder_name_tmp )
+                import subprocess
+                self.dump_lib( folder_name_tmp ) ;
+                self.lexec_( "adb push " + folder_name_tmp + " /" ) ;
+                shutil.rmtree( folder_name_tmp , True )
+        else :
+            for index , log in enumerate( logs ) :
+                cmd_push = 'adb push '
+                cmd_push += log_filename[:log_filename.rfind('/')] + '/'
+                cmd_push += log[log.find("out"):].strip() + ' '
+                cmd_push += log[log.find("/system"):log.rfind("/")].strip() + " "
+                if flag_fake :
+                    self.print_yellow( cmd_push + "\n" )
+                else :
+                    self.print_none_color( "[+] push " )
+                    self.print_white( str( index + 1 ) + "/" + str( len( logs ) ) )
+                    self.print_none_color( " file(s) :\n" ) ;
+                    self.lexec_( cmd_push )
         return True
 
     def flash_boot( self , ) :
@@ -679,7 +706,7 @@ class qyh_svr( qyh_base ) :
 
     class ThreadedTCPRequestHandler( BaseRequestHandler ) :
         def handle( self ) :
-            import threading , os
+            import threading , os , subprocess
             data = self.request.recv( 65536 )
             cur_thread = threading.current_thread( )
             # self.request.sendall( 'wrapper : {}'.format(data) )
@@ -687,6 +714,36 @@ class qyh_svr( qyh_base ) :
 
     class ThreadedTCPServer( ThreadingMixIn , TCPServer ) :
         pass
+
+    def svr_set_timer( self , *args ) :
+        '''@
+        [+] callable
+        [+] visible
+        @short : svst
+        @'''
+        import subprocess
+        if self.svr_check( False ) :
+            # self.print_green( 'starting timer...\n' )
+            self.svr_exec( False , "qyh svr_set_timer_real " + ' '.join( args ) )
+        else :
+            self.error_exit( "qyh_svr daemon down" )
+
+    def svr_set_timer_real( self , *args ) :
+        '''@
+        [+] callable
+        @short : svstr
+        @args : time - timer's time
+        @args : msg - message to show
+        @'''
+        from threading import Timer
+        if len( args ) != 2 :
+            self.error_exit( 'take two args : time msg' )
+        try :
+            split = int( args[0] )
+        except :
+            self.error_exit( 'take integer time as seconds to set' )
+
+        Timer( split , self.tick , ( (args[1],) ) ).start( )
 
     def svr_info( self ) :
         '''@
@@ -702,7 +759,7 @@ class qyh_svr( qyh_base ) :
             self.print_none_color( '[+] qyh_svr listening               : '.format( addr ) )
             self.print_green_light( '{}\n'.format( self.svr_getaddr( ) ) )
         else :
-            self.print_red( '[+] qyh_svr daemon die\n' )
+            self.print_red( '[-] qyh_svr daemon die\n' )
             self.print_none_color( '[+] addr seted in ini file : '.format( addr ) )
             self.print_green_light( "{}\n".format( addr ) )
             exit()
@@ -819,7 +876,7 @@ class qyh_svr( qyh_base ) :
         cmd_fwall_del = 'netsh advfirewall firewall del rul name="qyh_svr"'
         self.lexec( cmd_fwall_del , False , False )
 
-    def svr_exec( self , *cmd ) :
+    def svr_exec( self , wait_result = True , *cmd ) :
         '''@
         [+] callable
         [+] visible
@@ -835,8 +892,9 @@ class qyh_svr( qyh_base ) :
         sock.connect( self.svr_addr )
         try:
             sock.sendall( str( " ".join( cmd ) ) )
-            response = sock.recv( 65536 )
-            print "[+] result from svr_daemon : \n{}".format(response)
+            if wait_result :
+                response = sock.recv( 65536 )
+                print "[+] result from svr_daemon : \n{}".format(response)
         finally:
             sock.close()
 
