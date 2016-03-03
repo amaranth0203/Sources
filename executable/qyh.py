@@ -883,6 +883,8 @@ class qyh_svr( qyh_base ) :
         @short : sve
         @args : cmd - command to execute in server
         @'''
+        print cmd
+        exit()
         if len( cmd ) < 1 :
             self.error_exit( 'sve takes at least one command to execute' )
         if not self.svr_check( False ) :
@@ -1018,18 +1020,23 @@ class qyh( qyh_svr , qyh_adb ) :
             self.print_none_color( "\n" )
         print "        ]"
 
+    def call_log( self , func_name ) :
+        try :
+            pre_count = self.read_config( "read_config" , func_name )
+        except :
+            pre_count = 0
+            self.write_config( "read_config" , func_name , pre_count )
+        self.write_config( "read_config" , func_name , int(pre_count) + 1 )
+
     def main_loop( self , *args ) :
         if len( args ) > 1 :
             funcs = tuple( f for f in dir( self ) if not f.startswith( "_" ) and self.check_callable( "self." + f ) )
             func_map = { f if self.get_formated_args( "self." + f )[0] == "" else self.get_formated_args( "self." + f )[0] : f for f in funcs }
             self.check_args( args[1:2] , tuple( s for t in func_map.items( ) for s in t ) )
             func_name = "self." + ( func_map[ args[1] ] if args[1] in func_map else args[1] )
-            if len( args ) > 2 :
-                f = eval( func_name )
-                f( *args[2:] )
-            else :
-                f = eval( func_name )
-                f( )
+            self.call_log( func_name[5:] )
+            f = eval( func_name )
+            f( *args[2:] )
         else :
             self.main_menu( )
 
