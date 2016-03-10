@@ -1,0 +1,13 @@
+gcc 版本
+python 版本
+保持一致（只试用过32bit的）
+
+编译
+ - gcc -shared -o mydll.dll mydll.c
+调用
+>>> import ctypes
+>>> dll = ctypes.cdll.LoadLibrary( "mydll.dll" )
+>>> dll.hello()
+Hello World!
+0
+>>>
