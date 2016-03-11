@@ -1,0 +1,4 @@
+编译(注意扩展名是pyd不是dll)
+gcc -g -shared -o spam.pyd spammodule.c -I d:\executable\Python27\include -L d:\executable\Python27\libs -lpython27
+64位
+gcc -D MS_WIN64 -g -shared -o spam.pyd spammodule.c -I D:\executable\Python27_64bit\include -L D:\executable\Python27_64bit\libs -lpython27

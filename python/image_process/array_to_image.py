@@ -1,9 +1,50 @@
 import numpy as np
 import struct
 import timeit
+import sys
+sys.path.insert( 0 , './funcs' )
+import funcs
 from PIL import Image
 
 filename = "3l8.raw"
+
+if __name__ == "__main__" :
+    w , h = 7 , 4
+    # w , h = 4208 , 3120
+    time_start = timeit.default_timer( ) ####
+    with open( filename , "rb" ) as f :
+        pass
+        raw = f.read( w * h * 2 )
+    print timeit.default_timer( ) - time_start ####
+# raw to array
+    # array_int = []
+    # for i in range( 0 , len( raw ) / 2 ) :
+        # array_int.append( ( ord( raw[i*2] ) | ( ord( raw[i*2+1] ) << 8 ) ) * 256 / 1024 ) 
+    # print timeit.default_timer( ) - time_start ####
+    # print array_int
+    # print bytearray( raw )
+    array_int2 = [] 
+    print ( ord( raw[6] ) ) | ( ord( raw[7] ) << 8 )
+    print raw
+    funcs.str_to_int_array(  raw , array_int2 )
+    print raw
+    exit()
+# raw to array end
+# pack array to numpy
+    r = np.array( array_int , dtype=np.uint8 )
+    g = r
+    b = r
+    data = np.column_stack( ( r , g , b ) )
+    data = data.reshape( h , w , 3 )
+    print timeit.default_timer( ) - time_start ####
+# pack array to numpy end
+# save and show image
+    img = Image.fromarray( data , 'RGB' )
+    img.save( "test.bmp" )
+    time_h = timeit.default_timer( ) ####
+    print timeit.default_timer( ) - time_start ####
+# save and show image end
+
 
 def demosaic( data , w , h ) :
     for i in range( 1 , h-1 ) :
@@ -23,41 +64,3 @@ def demosaic( data , w , h ) :
                         data[i,j,0] = ( data[i-1,j,0] + data[i+1,j,0] ) / 2 # this point's R
                         data[i,j,2] = ( data[i,j-1,2] + data[i,j+1,2] ) / 2 # this point's B
     return data
-
-if __name__ == "__main__" :
-    # w , h = 7 , 4
-    w , h = 4208 , 3120
-    time_start = timeit.default_timer( )
-    with open( filename , "rb" ) as f :
-        pass
-        raw = f.read( w * h * 2 )
-        time_a = timeit.default_timer( ) ####
-        r_array = []
-        for i in range( 0 , len( raw ) / 2 ) :
-            r_array.append( ( ord( raw[i*2] ) | ( ord( raw[i*2+1] ) << 8 ) ) * 256 / 1024 ) 
-        time_b = timeit.default_timer( ) ####
-        r = np.array( r_array , dtype=np.uint8 )
-        time_c = timeit.default_timer( ) ####
-        g = r
-        b = r
-        data = np.column_stack( ( r , g , b ) )
-        time_d = timeit.default_timer( ) ####
-    data = data.reshape( h , w , 3 )
-    time_e = timeit.default_timer( ) ####
-    # data = demosaic( data , w , h )
-    time_f = timeit.default_timer( ) ####
-    img = Image.fromarray( data , 'RGB' )
-    time_g = timeit.default_timer( ) ####
-    img.save( "test.bmp" )
-    img.show()
-    time_h = timeit.default_timer( ) ####
-    print "%d , %d , %d , %d , %d , %d , %d , %d" % (
-        time_a - time_start ,
-        time_b - time_start ,
-        time_c - time_start ,
-        time_d - time_start ,
-        time_e - time_start ,
-        time_f - time_start ,
-        time_g - time_start ,
-        time_h - time_start ,
-    )

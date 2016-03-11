@@ -1,9 +1,9 @@
 gcc 版本
 python 版本
-保持一致（只试用过32bit的）
+保持一致（32bit 64bit）
 
 编译
- - gcc -shared -o mydll.dll mydll.c
+gcc -D MS_WIN64 -g -shared -o mydll.dll mydll.c
 调用
 >>> import ctypes
 >>> dll = ctypes.cdll.LoadLibrary( "mydll.dll" )
