@@ -9,19 +9,25 @@ from PIL import Image
 filename = "3l8.raw"
 
 if __name__ == "__main__" :
-    # w , h = 7 , 4
-    w , h = 4208 , 3120
+    w , h = 7 , 4
+    # w , h = 4208 , 3120
     time_start = timeit.default_timer( ) ####
     with open( filename , "rb" ) as f :
         pass
         raw = f.read( w * h * 2 )
     print timeit.default_timer( ) - time_start ####
 # raw to array
-    array_int = []
-    funcs.str_to_int_array(  raw , len( raw ), array_int )
+    raw_list = []
+    funcs.str_to_int_array(  raw , len( raw ), raw_list )
+    print timeit.default_timer( ) - time_start ####
 # raw to array end
+# demosaic
+    r_list , g_list , b_list = [] , [] , []
+    funcs.demosaic( raw_list , r_list , g_list , b_list , w , h ) ;
+    exit()
+# demosaic end
 # pack array to numpy
-    r = np.array( array_int , dtype=np.uint8 )
+    r = np.array( raw_list , dtype=np.uint8 )
     g = r
     b = r
     data = np.column_stack( ( r , g , b ) )
@@ -31,7 +37,6 @@ if __name__ == "__main__" :
 # save and show image
     img = Image.fromarray( data , 'RGB' )
     img.save( "test.bmp" )
-    time_h = timeit.default_timer( ) ####
     print timeit.default_timer( ) - time_start ####
 # save and show image end
 

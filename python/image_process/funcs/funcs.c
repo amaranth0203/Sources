@@ -24,20 +24,37 @@ funcs_str_to_int_array( PyObject* self , PyObject* args ) {
     int raw_size ;
     PyObject* raw_obj ;
     Py_buffer raw_buffer ;
-    PyObject* list_int ;
+    PyObject* raw_list ;
 
-    if( !PyArg_ParseTuple( args , "OiO" , &raw_obj , &raw_size , &list_int ) )
+    if( !PyArg_ParseTuple( args , "OiO" , &raw_obj , &raw_size , &raw_list ) )
         return NULL ;
     PyObject_GetBuffer(raw_obj, &raw_buffer, PyBUF_SIMPLE) ;
     raw = (char*)raw_buffer.buf ;
 
-    str_to_int_array( raw , raw_size , list_int ) ;
+    str_to_int_array( raw , raw_size , raw_list ) ;
+    Py_RETURN_NONE ;
+}
+
+static PyObject*
+funcs_demosaic( PyObject* self , PyObject* args ) { 
+    PyObject* raw_list ;
+    PyObject* r_list ;
+    PyObject* g_list ;
+    PyObject* b_list ;
+    int w , h ;
+    
+
+    if( !PyArg_ParseTuple( args , "OOOOii" , &raw_list , &r_list , &g_list , &b_list , &w , &h ) )
+        return NULL ;
+
+    demosaic( raw_list , r_list , g_list , b_list , w , h ) ;
     Py_RETURN_NONE ;
 }
 
 static PyMethodDef FuncsMethods[] = {
     { "system" , funcs_system , METH_VARARGS , "Execute a shell command." } ,
     { "str_to_int_array" , funcs_str_to_int_array , METH_VARARGS , "convert bytes from str to int array" } ,
+    { "demosaic" , funcs_demosaic , METH_VARARGS , "Do demosaic" } ,
     { NULL , NULL , 0 , NULL }
 } ;
 
