@@ -18,3 +18,9 @@ clean:
 
 
 # from http://stackoverflow.com/questions/2481269/how-to-make-simple-c-makefile
+# gcc -g -D MS_WIN64 -shared -c -I D:\executable\Python27_64bit\include -o funcs_brighten.o funcs_brighten.c                 
+# gcc -g -D MS_WIN64 -shared -c -I D:\executable\Python27_64bit\include -o funcs_demosaic.o funcs_demosaic.c                 
+# gcc -g -D MS_WIN64 -shared -c -I D:\executable\Python27_64bit\include -o funcs_str_to_int_array.o funcs_str_to_int_array.c 
+# gcc -g -D MS_WIN64 -shared -c -I D:\executable\Python27_64bit\include -o funcs.o funcs.c                                   
+# gcc -g -D MS_WIN64 -shared    -I D:\executable\Python27_64bit\include -o funcs.pyd funcs.o funcs_brighten.o funcs_demosaic.o funcs_str_to_int_array.o -L D:\executable\Python27_64bit\libs -lpython27 
+

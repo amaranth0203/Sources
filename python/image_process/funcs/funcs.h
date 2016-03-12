@@ -1,7 +1,7 @@
+#ifndef _FUNCS_H_
+#define _FUNCS_H_
+
 #include <Python.h>
-#include "funcs_str_to_int_array.c"
-#include "funcs_demosaic.c"
-#include "funcs_brighten.c"
 
 void str_to_int_array( 
     const unsigned char* raw , 
@@ -21,3 +21,6 @@ void brighten(
     PyObject* g_list , 
     PyObject* b_list , 
     float strength ) ;
+
+#endif
+

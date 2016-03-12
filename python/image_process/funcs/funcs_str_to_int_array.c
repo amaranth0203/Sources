@@ -1,5 +1,6 @@
 #include <Python.h>
 #include <stdio.h>
+#include "funcs.h"
 
 void 
 str_to_int_array( 
