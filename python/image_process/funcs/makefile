@@ -1,7 +1,7 @@
 CC=gcc
 RM=rm -f
 ifeq ($(OS),Windows_NT)
-    CPPFLAGS=-D MS_WIN64 -g -shared -I D:\executable\Python27_64bit\include -L D:\executable\Python27_64bit\libs -lpython27 
+    CPPFLAGS=-D MS_WIN64 -g -shared -I $(PYTHON_HOME)\include -L $(PYTHON_HOME)\libs -lpython27 
 else
 	CPPFLAGS=-g $(shell root-config --cflags)
 	LDFLAGS=-g $(shell root-config --ldflags)

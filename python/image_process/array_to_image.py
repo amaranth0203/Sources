@@ -9,26 +9,16 @@ from PIL import Image
 filename = "3l8.raw"
 
 if __name__ == "__main__" :
-    w , h = 7 , 4
-    # w , h = 4208 , 3120
+    # w , h = 7 , 4
+    w , h = 4208 , 3120
     time_start = timeit.default_timer( ) ####
     with open( filename , "rb" ) as f :
         pass
         raw = f.read( w * h * 2 )
     print timeit.default_timer( ) - time_start ####
 # raw to array
-    # array_int = []
-    # for i in range( 0 , len( raw ) / 2 ) :
-        # array_int.append( ( ord( raw[i*2] ) | ( ord( raw[i*2+1] ) << 8 ) ) * 256 / 1024 ) 
-    # print timeit.default_timer( ) - time_start ####
-    # print array_int
-    # print bytearray( raw )
-    array_int2 = [] 
-    print ( ord( raw[6] ) ) | ( ord( raw[7] ) << 8 )
-    print raw
-    funcs.str_to_int_array(  raw , array_int2 )
-    print raw
-    exit()
+    array_int = []
+    funcs.str_to_int_array(  raw , len( raw ), array_int )
 # raw to array end
 # pack array to numpy
     r = np.array( array_int , dtype=np.uint8 )

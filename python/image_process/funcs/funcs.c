@@ -20,22 +20,18 @@ funcs_system( PyObject* self , PyObject* args ) {
 
 static PyObject*
 funcs_str_to_int_array( PyObject* self , PyObject* args ) { 
-    const char* raw ;
+    const unsigned char* raw ;
+    int raw_size ;
     PyObject* raw_obj ;
     Py_buffer raw_buffer ;
     PyObject* list_int ;
 
-    if( !PyArg_ParseTuple( args , "OO" , &raw_obj , &list_int ) )
+    if( !PyArg_ParseTuple( args , "OiO" , &raw_obj , &raw_size , &list_int ) )
         return NULL ;
-    printf( "[+] %d\n" , PyObject_CheckBuffer( raw_obj ) ) ;
     PyObject_GetBuffer(raw_obj, &raw_buffer, PyBUF_SIMPLE) ;
     raw = (char*)raw_buffer.buf ;
-    printf( "[+] %d\n" , raw_buffer.len ) ;
-    int i ; for( i = 0 ; i < 56 ; i ++ ) printf( "%c" , raw[i] ) ;
-    printf( "\n%c%c" , raw[4],raw[5]);
-    printf( "\n%d" , raw[6] | raw[7] << 8 ) ;
 
-    // str_to_int_array( raw , list_int ) ;
+    str_to_int_array( raw , raw_size , list_int ) ;
     Py_RETURN_NONE ;
 }
 
