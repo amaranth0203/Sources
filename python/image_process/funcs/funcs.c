@@ -51,10 +51,25 @@ funcs_demosaic( PyObject* self , PyObject* args ) {
     Py_RETURN_NONE ;
 }
 
+static PyObject*
+funcs_brighten( PyObject* self , PyObject* args ) { 
+    PyObject* r_list ;
+    PyObject* g_list ;
+    PyObject* b_list ;    
+    float strength ;
+
+    if( !PyArg_ParseTuple( args , "OOOf" , &r_list , &g_list , &b_list , &strength ) )
+        return NULL ;
+
+    brighten( r_list , g_list , b_list , strength ) ;
+    Py_RETURN_NONE ;
+}
+
 static PyMethodDef FuncsMethods[] = {
     { "system" , funcs_system , METH_VARARGS , "Execute a shell command." } ,
     { "str_to_int_array" , funcs_str_to_int_array , METH_VARARGS , "convert bytes from str to int array" } ,
     { "demosaic" , funcs_demosaic , METH_VARARGS , "Do demosaic" } ,
+    { "brighten" , funcs_brighten , METH_VARARGS , "Do brighten" } ,
     { NULL , NULL , 0 , NULL }
 } ;
 

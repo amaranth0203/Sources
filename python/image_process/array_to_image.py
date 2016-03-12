@@ -7,55 +7,47 @@ import funcs
 from PIL import Image
 
 filename = "3l8.raw"
+time_last = timeit.default_timer( )
+
+def print_time( str ) :
+    global time_last
+    time_cur = timeit.default_timer( )
+    print "[+] {:4f} after {} ".format( time_cur - time_last , str )
+    time_last = time_cur  
+    
 
 if __name__ == "__main__" :
-    w , h = 7 , 4
-    # w , h = 4208 , 3120
-    time_start = timeit.default_timer( ) ####
+    # w , h = 6 , 4
+    w , h = 4208 , 3120
     with open( filename , "rb" ) as f :
         pass
         raw = f.read( w * h * 2 )
-    print timeit.default_timer( ) - time_start ####
-# raw to array
+    print_time( "open file" )
+
+    # raw to array
     raw_list = []
     funcs.str_to_int_array(  raw , len( raw ), raw_list )
-    print timeit.default_timer( ) - time_start ####
-# raw to array end
-# demosaic
-    r_list , g_list , b_list = [] , [] , []
-    funcs.demosaic( raw_list , r_list , g_list , b_list , w , h ) ;
-    exit()
-# demosaic end
-# pack array to numpy
-    r = np.array( raw_list , dtype=np.uint8 )
-    g = r
-    b = r
+    r_list , g_list , b_list = raw_list[:] , raw_list[:] , raw_list[:]
+    print_time( "raw to array" )
+    # raw to array end
+
+    # image processing
+    # funcs.demosaic( raw_list , r_list , g_list , b_list , w , h ) ;
+    funcs.brighten( r_list , g_list , b_list , 2.5 ) ;
+    print_time( "image processing" )
+    # image processing end
+
+    # packed array to numpy
+    r = np.array( r_list , dtype=np.uint8 )
+    g = np.array( g_list , dtype=np.uint8 )
+    b = np.array( b_list , dtype=np.uint8 )
     data = np.column_stack( ( r , g , b ) )
     data = data.reshape( h , w , 3 )
-    print timeit.default_timer( ) - time_start ####
-# pack array to numpy end
-# save and show image
+    print_time( "packed array to numpy" )
+    # packed array to numpy end
+
+    # save image
     img = Image.fromarray( data , 'RGB' )
     img.save( "test.bmp" )
-    print timeit.default_timer( ) - time_start ####
-# save and show image end
-
-
-def demosaic( data , w , h ) :
-    for i in range( 1 , h-1 ) :
-        for j in range( 1 , w-1 ) :
-            if i % 2 == 0 :
-                if j % 2 == 0 :
-                        data[i,j,0] = ( data[i,j-1,0] + data[i,j+1,0] ) / 2 # this point's R
-                        data[i,j,2] = ( data[i-1,j,2] + data[i+1,j,2] ) / 2 # this point's B
-                else :
-                        data[i,j,1] = ( data[i,j-1,1] + data[i,j+1,1] + data[i-1,j,1] + data[i+1,j,1] ) / 4 # this point's G
-                        data[i,j,2] = ( data[i-1,j-1,2] + data[i-1,j+1,2] + data[i+1,j-1,2] + data[i+1,j+1,2] ) / 4 # this point's B
-            else :
-                if j % 2 == 0 :
-                        data[i,j,0] = ( data[i-1,j-1,0] + data[i-1,j+1,0] + data[i+1,j-1,0] + data[i+1,j+1,0] ) / 4 # this point's R
-                        data[i,j,1] = ( data[i,j-1,1] + data[i,j+1,1] + data[i-1,j,1] + data[i+1,j,1] ) / 4 # this point's G
-                else :
-                        data[i,j,0] = ( data[i-1,j,0] + data[i+1,j,0] ) / 2 # this point's R
-                        data[i,j,2] = ( data[i,j-1,2] + data[i,j+1,2] ) / 2 # this point's B
-    return data
+    print_time( "save image" )
+    # save image end
