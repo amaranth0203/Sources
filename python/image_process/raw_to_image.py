@@ -32,7 +32,7 @@ if __name__ == "__main__" :
     # raw to array end
 
     # image processing
-    # funcs.demosaic( raw_list , r_list , g_list , b_list , w , h ) ;
+    funcs.demosaic( raw_list , r_list , g_list , b_list , w , h ) ;
     funcs.brighten( r_list , g_list , b_list , 2.5 ) ;
     print_time( "image processing" )
     # image processing end

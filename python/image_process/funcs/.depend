@@ -1,0 +1,4 @@
+funcs.o: funcs.c funcs.h
+funcs_str_to_int_array.o: funcs_str_to_int_array.c funcs.h
+funcs_demosaic.o: funcs_demosaic.c funcs.h
+funcs_brighten.o: funcs_brighten.c funcs.h
