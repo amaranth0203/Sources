@@ -1,0 +1,13 @@
+pixel type
+ - GR
+   BG
+bit type
+ - 10 bit
+image size
+ - H x V  =  4208 x 3120
+
+rawImage.push( buffer[i*2] | ( buffer[i*2+1]<<8 ) )
+
+awb : 
+   rg = 1.12314
+   bg = 1.27129

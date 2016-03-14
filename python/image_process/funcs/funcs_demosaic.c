@@ -10,7 +10,9 @@ demosaic(
     PyObject* b_list , 
     int w ,
     int h ) {
+
     int i , j , r_value , g_value , b_value ;
+
     for( i = 0 ; i < h ; i ++ ) {
         for( j = 0 ; j < w ; j ++ ) {
             r_value = g_value = b_value = 0 ;
@@ -277,13 +279,15 @@ demosaic(
                     b_value >>= 1 ;
                 }
             } // end of if edge
-            g_value >>= 1 ;
+            // g_value >>= 1 ;
             PyList_SetItem( r_list , i*w+j , PyInt_FromLong( r_value ) ) ;
             PyList_SetItem( g_list , i*w+j , PyInt_FromLong( g_value ) ) ;
             PyList_SetItem( b_list , i*w+j , PyInt_FromLong( b_value ) ) ;
         } // end of for j
     } // end of for i
+
     return ;
+
 }
 
 

@@ -33,8 +33,10 @@ if __name__ == "__main__" :
 
     # image processing
     funcs.demosaic( raw_list , r_list , g_list , b_list , w , h ) ;
-    funcs.brighten( r_list , g_list , b_list , 2.5 ) ;
+    funcs.awb( r_list , g_list , b_list ) ;
+    funcs.brighten( r_list , g_list , b_list , 1.09 ) ;
     print_time( "image processing" )
+    # exit( )
     # image processing end
 
     # packed array to numpy

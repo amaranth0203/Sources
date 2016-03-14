@@ -22,5 +22,10 @@ void brighten(
     PyObject* b_list , 
     float strength ) ;
 
+void awb(   
+    PyObject* r_list , 
+    PyObject* g_list , 
+    PyObject* b_list ) ;
+
 #endif
 
