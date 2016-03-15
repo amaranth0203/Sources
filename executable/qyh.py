@@ -800,8 +800,8 @@ class qyh_svr( qyh_base ) :
         if len( port_ ) > 0 :
             port = int( port_ )
         addr = ( ip , port )
-        if socket.socket( socket.AF_INET , socket.SOCK_STREAM ).connect_ex( addr ) == 0 :
-            self.error_exit( '[-] addr : ' + ':'.join(str(i) for i in addr) + ' not available\n' )
+        # if socket.socket( socket.AF_INET , socket.SOCK_STREAM ).connect_ex( addr ) == 0 :
+            # self.error_exit( '[-] addr : ' + ':'.join(str(i) for i in addr) + ' not available\n' )
         self.print_none_color( '[+] set addr as : ' )
         self.print_green_light(  ':'.join(str(i) for i in addr) + '\n' )
         self.svr_setaddr( addr )

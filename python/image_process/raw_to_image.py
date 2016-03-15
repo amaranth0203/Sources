@@ -1,3 +1,5 @@
+#!/usr/bin/env python_
+
 import numpy as np
 import struct
 import timeit
