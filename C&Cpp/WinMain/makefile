@@ -1,6 +1,7 @@
 CC=gcc
 CXX=g++
 RM=rm -f
+CPPFLAGS = -g
 ifeq ($(OS),Windows_NT) 
     ifeq ($(PROCESSOR_ARCHITECTURE),AMD64)
         # CPPFLAGS += -D AMD64
@@ -31,8 +32,8 @@ else
     LDFLAGS=$(shell root-config --ldflags)
     LDLIBS=$(shell root-config --libs)
 endif
-SRCS=wmain.c
-TARGET=wmain.exe
+SRCS=test.c
+TARGET=test.exe
 
 OBJS=$(subst .c,.o,$(SRCS))
 
@@ -68,4 +69,3 @@ dist-clean : clean
 include .depend
 
 # from http://stackoverflow.com/questions/2481269/how-to-make-simple-c-makefile
-

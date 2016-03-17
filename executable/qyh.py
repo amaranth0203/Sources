@@ -3,6 +3,26 @@
 
 class qyh_base( object ) :
 
+    def change_background_color( self , *args ) :
+        '''@
+        [+] callable
+        @short : cbc
+        @'''
+        if len( args ) != 1 :
+            exit( )
+        from ctypes import c_ulong , windll
+        STD_OUTPUT_HANDLE_ID = c_ulong(0xfffffff5)
+        windll.Kernel32.GetStdHandle.restype = c_ulong
+        std_output_hdl = windll.Kernel32.GetStdHandle(STD_OUTPUT_HANDLE_ID)
+        windll.Kernel32.SetConsoleTextAttribute(std_output_hdl, int( args[0] ) )
+        # windll.Kernel32.SetConsoleTextAttribute(std_output_hdl, 128 )
+        # print 'aaaa128'
+        # windll.Kernel32.SetConsoleTextAttribute(std_output_hdl, 384 )
+        # print 'aaaa384'
+        # for i in range ( 0 , 512 , 16 ) :
+            # windll.Kernel32.SetConsoleTextAttribute(std_output_hdl, i )
+            # print 'aaaa' + str( i )
+
     def tick( self , msg = "[+] ticking..." ) :
         '''@
         [+] callable
