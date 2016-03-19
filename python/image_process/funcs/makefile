@@ -31,7 +31,7 @@ else
     LDFLAGS=$(shell root-config --ldflags)
     LDLIBS=$(shell root-config --libs)
 endif
-CPPFLAGS+=-I $(PYTHON_HOME)\include 
+CPPFLAGS+=-I $(PYTHON_HOME)\include
 LDFLAGS+=-shared  
 LDLIBS+=-L $(PYTHON_HOME)\libs -lpython27
 SRCS=funcs.c funcs_str_to_int_array.c funcs_demosaic.c funcs_brighten.c funcs_awb.c

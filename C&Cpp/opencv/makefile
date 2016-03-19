@@ -1,9 +1,8 @@
-SRCS=morewindows.c
+SRCS=test.c
 TARGET=test.exe
 CC=gcc
 CXX=g++
 RM=rm -f
-CPPFLAGS = -g
 ifeq ($(OS),Windows_NT) 
     ifeq ($(PROCESSOR_ARCHITECTURE),AMD64)
         # CPPFLAGS += -D AMD64
@@ -34,7 +33,11 @@ else
     LDFLAGS=$(shell root-config --ldflags)
     LDLIBS=$(shell root-config --libs)
 endif
-LDLIBS=-lgdi32
+CPPFLAGS+=-I "D:\OpenCv\build\include" -I "D:\opencv\build\include\opencv" -I "D:\opencv\build\include\opencv2"
+LDLIBS+=-L "D:\opencv\build\x64\vc12\bin" -L "D:\opencv\build\x64\vc12" -L "D:\opencv\build\x64\vc12\lib" -lopencv_calib3d2410 -lopencv_contrib2410 -lopencv_core2410 -lopencv_features2d2410 -lopencv_flann2410 -lopencv_gpu2410 -lopencv_highgui2410 -lopencv_imgproc2410 -lopencv_legacy2410 -lopencv_ml2410 -lopencv_objdetect2410 -lopencv_video2410
+# CPPFLAGS+=-I "C:\opencv\build\include" -I "C:\opencv\build\include\opencv" -I "C:\opencv\build\include\opencv2"
+# LDLIBS+=-L "C:\opencv\build\x64\vc12\bin" -L "C:\opencv\build\x64\vc12" -L "C:\opencv\build\x64\vc12\lib" -lopencv_world310 -lopencv_ffmpeg310_64 -lopencv_world310d
+# LDFLAGS+=-shared  
 
 OBJS=$(subst .c,.o,$(SRCS))
 

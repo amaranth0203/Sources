@@ -19,8 +19,8 @@ def print_time( str ) :
     
 
 if __name__ == "__main__" :
-    # w , h = 6 , 4
-    w , h = 4208 , 3120
+    w , h = 6 , 4
+    # w , h = 4208 , 3120
     with open( filename , "rb" ) as f :
         pass
         raw = f.read( w * h * 2 )
@@ -31,6 +31,8 @@ if __name__ == "__main__" :
     funcs.str_to_int_array(  raw , len( raw ), raw_list )
     r_list , g_list , b_list = raw_list[:] , raw_list[:] , raw_list[:]
     print_time( "raw to array" )
+    print raw_list
+    exit()
     # raw to array end
 
     # image processing

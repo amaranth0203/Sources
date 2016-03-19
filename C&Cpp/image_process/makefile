@@ -1,3 +1,7 @@
+SRCS=funcs_read_raw_to_array.c
+SRCS+=main_window.c
+#SRCS+=test.c
+TARGET=test.exe
 CC=gcc
 CXX=g++
 RM=rm -f
@@ -31,8 +35,7 @@ else
     LDFLAGS=$(shell root-config --ldflags)
     LDLIBS=$(shell root-config --libs)
 endif
-SRCS=test.c
-TARGET=test.exe
+LDLIBS=-lgdi32
 
 OBJS=$(subst .c,.o,$(SRCS))
 
@@ -68,4 +71,3 @@ dist-clean : clean
 include .depend
 
 # from http://stackoverflow.com/questions/2481269/how-to-make-simple-c-makefile
-

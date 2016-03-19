@@ -15,13 +15,6 @@ class qyh_base( object ) :
         windll.Kernel32.GetStdHandle.restype = c_ulong
         std_output_hdl = windll.Kernel32.GetStdHandle(STD_OUTPUT_HANDLE_ID)
         windll.Kernel32.SetConsoleTextAttribute(std_output_hdl, int( args[0] ) )
-        # windll.Kernel32.SetConsoleTextAttribute(std_output_hdl, 128 )
-        # print 'aaaa128'
-        # windll.Kernel32.SetConsoleTextAttribute(std_output_hdl, 384 )
-        # print 'aaaa384'
-        # for i in range ( 0 , 512 , 16 ) :
-            # windll.Kernel32.SetConsoleTextAttribute(std_output_hdl, i )
-            # print 'aaaa' + str( i )
 
     def tick( self , msg = "[+] ticking..." ) :
         '''@
@@ -33,6 +26,52 @@ class qyh_base( object ) :
         cmd_tick = 'msg "%username%" '
         cmd_tick += msg
         self.lexec( cmd_tick , False , False )
+
+    def mount_net_drive( self ) :
+        '''@
+        [+] callable
+        [+] visible
+        @short : mnd
+        @'''
+        import os
+        from sys import platform as _platform
+        if _platform == "win32" or _platform == "cygwin" :
+            self.lexec( self.read_config( "mount_net_device" , "command" ) )
+        elif _platform == "linux" or _platform == "linux2" :
+            self.print_green( "[+] Wow, this is Linux, this function is under construction\n" ) ;
+        elif _platform == "darwin" :
+            self.print_green( "[+] Wow, this is Mac OS\n" ) ;
+        else :
+            self.print_red( "[-]unknow os\n" ) ;
+        return True
+
+    def change_to_source_dir( self ) :
+        '''@
+        [+] callable
+        [+] visible
+        @short : csd
+        @'''
+        import os
+        from sys import platform as _platform
+        if _platform == "win32" :
+            cmd = "cd /d "
+            cmd += os.path.dirname( os.path.realpath( __file__ ) ) 
+            import win32com.client
+            shell = win32com.client.Dispatch("WScript.Shell")
+            shell.SendKeys( cmd )
+            # shell.SendKeys("^a") # CTRL+A may "select all" depending on which window's focused
+            # shell.SendKeys("{DELETE}") # Delete selected text?  Depends on context. :P
+            # shell.SendKeys("{TAB}") #Press tab... to change focus or whateverfrom subprocess import Popen, PIPE
+
+        elif _platform == "cygwin" :
+            self.print_green( "[+] Wow, this is cygwin, why not use command which\n" ) ;
+        elif _platform == "linux" or _platform == "linux2" :
+            self.print_green( "[+] Wow, this is Linux, why not use command which\n" ) ;
+        elif _platform == "darwin" :
+            self.print_green( "[+] Wow, this is Mac OS\n" ) ;
+        else :
+            self.print_red( "[-]unknow os\n" ) ;
+        return True
 
     def open_source_dir( self ) :
         '''@
