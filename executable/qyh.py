@@ -27,16 +27,54 @@ class qyh_base( object ) :
         cmd_tick += msg
         self.lexec( cmd_tick , False , False )
 
-    def mount_net_drive( self ) :
+    def run_putty_pub( self ) :
         '''@
         [+] callable
-        [+] visible
-        @short : mnd
+        @short : putty_pub
+        @'''
+        import os , subprocess
+        from sys import platform as _platform
+        if _platform == "win32" or _platform == "cygwin" :
+            subprocess.Popen( self.read_config( "putty_pub" , "command" ) )
+        else :
+            self.print_red( "[-] only run in windows\n" ) ;
+        return True
+
+    def run_putty_priv( self ) :
+        '''@
+        [+] callable
+        @short : putty_priv
+        @'''
+        import os , subprocess
+        from sys import platform as _platform
+        if _platform == "win32" or _platform == "cygwin" :
+            subprocess.Popen( self.read_config( "putty_priv" , "command" ) )
+        else :
+            self.print_red( "[-] only run in windows\n" ) ;
+        return True
+
+    def run_vmware_background( self ) :
+        '''@
+        [+] callable
+        @short : vm_run
         @'''
         import os
         from sys import platform as _platform
         if _platform == "win32" or _platform == "cygwin" :
-            self.lexec( self.read_config( "mount_net_device" , "command" ) )
+            self.lexec_( self.read_config( "run_vmware_background" , "command" ) )
+        else :
+            self.print_red( "[-] only run in windows\n" ) ;
+        return True
+
+    def mount_vmware_drive( self ) :
+        '''@
+        [+] callable
+        @short : vm_mount
+        @'''
+        import os
+        from sys import platform as _platform
+        if _platform == "win32" or _platform == "cygwin" :
+            self.lexec( self.read_config( "mount_vmware_drive" , "command" ) )
         elif _platform == "linux" or _platform == "linux2" :
             self.print_green( "[+] Wow, this is Linux, this function is under construction\n" ) ;
         elif _platform == "darwin" :
