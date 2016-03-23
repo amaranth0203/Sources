@@ -94,6 +94,18 @@ class qyh_base( object ) :
         if _platform == "win32" :
             import win32com.client
             shell = win32com.client.Dispatch("WScript.Shell")
+            shell.SendKeys( "cd /d e:\\notes " )
+            shell.SendKeys( "{ENTER}" )
+            shell.SendKeys( "git status" )
+            shell.SendKeys( "{ENTER}" )
+            shell.SendKeys( "git add ." )
+            shell.SendKeys( "{ENTER}" )
+            shell.SendKeys( "git commit -m \"routine push\" " )
+            shell.SendKeys( "{ENTER}" )
+            shell.SendKeys( "git push origin master " )
+            shell.SendKeys( "{ENTER}" )
+            shell.SendKeys( "11002298" )
+            shell.SendKeys( "{ENTER}" )
             shell.SendKeys( "cd /d e:\Sources " )
             shell.SendKeys( "{ENTER}" )
             shell.SendKeys( "git status" )
