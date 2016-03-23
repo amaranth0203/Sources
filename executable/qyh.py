@@ -87,7 +87,7 @@ class qyh_base( object ) :
         '''@
         [+] callable
         [+] visible
-        @short : test_
+        @short : rp
         @'''
         import os
         from sys import platform as _platform
@@ -145,6 +145,7 @@ class qyh_base( object ) :
             import win32com.client
             shell = win32com.client.Dispatch("WScript.Shell")
             shell.SendKeys( cmd )
+            shell.SendKeys( "{ENTER}" )
             # shell.SendKeys("^a") # CTRL+A may "select all" depending on which window's focused
             # shell.SendKeys("{DELETE}") # Delete selected text?  Depends on context. :P
             # shell.SendKeys("{TAB}") #Press tab... to change focus or whateverfrom subprocess import Popen, PIPE
