@@ -92,6 +92,7 @@ class qyh_base( object ) :
         import os
         from sys import platform as _platform
         if _platform == "win32" :
+            pwd = str( os.getcwd() )
             import win32com.client
             shell = win32com.client.Dispatch("WScript.Shell")
             shell.SendKeys( "cd /d e:\\notes " )
@@ -118,14 +119,12 @@ class qyh_base( object ) :
             shell.SendKeys( "{ENTER}" )
             shell.SendKeys( "11002298" )
             shell.SendKeys( "{ENTER}" )
-            # shell.SendKeys("^a") # CTRL+A may "select all" depending on which window's focused
-            # shell.SendKeys("{DELETE}") # Delete selected text?  Depends on context. :P
-            # shell.SendKeys("{TAB}") #Press tab... to change focus or whateverfrom subprocess import Popen, PIPE
-
+            shell.SendKeys( "cd /d " + pwd )
+            shell.SendKeys( "{ENTER}" )
         elif _platform == "cygwin" :
-            self.print_green( "[+] Wow, this is cygwin, why not use command which\n" ) ;
+            self.print_green( "[+] Wow, this is cygwin\n" ) ;
         elif _platform == "linux" or _platform == "linux2" :
-            self.print_green( "[+] Wow, this is Linux, why not use command which\n" ) ;
+            self.print_green( "[+] Wow, this is Linux\n" ) ;
         elif _platform == "darwin" :
             self.print_green( "[+] Wow, this is Mac OS\n" ) ;
         else :
