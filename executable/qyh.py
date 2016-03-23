@@ -471,8 +471,9 @@ class qyh_adb( qyh_base ) :
         log_filename = self.read_config( 'push_lib' , 'log_file' )
 
         self.check_log( log_filename , "Install:" , 0 , 8 ) 
-        self.check_device( ) 
-        self.check_root( )
+        if not flag_fake : 
+            self.check_device( ) 
+            self.check_root( )
 
         if flag_backup :
             folder_name_backup = "backup_lib_" + str( datetime.datetime.now() ).split('.')[0].replace( '-' , '' ).replace( ':' , '' ).replace( ' ' , '_' )
@@ -620,11 +621,79 @@ class qyh_adb( qyh_base ) :
     def unlock_screen( self , ) :
         '''@
         [+] callable
-        [+] visible
         @short : us
         @'''
         self.check_device( )
         self.lexec( self.read_config( "unlock_screen" , "command" ) )
+        return True
+
+    def screen_on( self , ) :
+        '''@
+        [+] callable
+        [+] visible
+        @short : s_on
+        @'''
+        '''
+            adb shell dumpsys window policy :
+                        mAwake  mShowingLockscreen
+            screen_off  false   true
+            screen_lock true    true
+            on          true    false
+        '''
+        self.check_device( )
+        rc = self.lexec( "adb shell dumpsys window policy" , False , False )
+        flags = [ line.split( '=' )[1] for line in rc.split( ) if line[0:6] == "mAwake" or line[0:18] == "mShowingLockscreen" ]
+        status = {
+            "falsetrue" : "screen_off" ,
+            "truetrue"  : "screen_lock" ,
+            "truefalse" : "screen_on" ,
+        }
+        if status[ ''.join( flags ) ] == "screen_off" :
+            self.print_green_light( '\n[+] detected screen status : off\n' )
+            self.lexec( self.read_config( "power_button" , "command" ) )
+            self.lexec( self.read_config( "unlock_screen" , "command" ) )
+        elif status[ ''.join( flags ) ] == "screen_lock" :
+            self.print_green_light( '\n[+] detected screen status : lock\n' )
+            self.lexec( self.read_config( "unlock_screen" , "command" ) )
+        elif status[ ''.join( flags ) ] == "screen_on" :
+            self.print_green_light( '\n[+] detected screen status : on\n' )
+            self.print_green_light( '\n[+] Screen already on\n' )
+        else :
+            self.error_exit( 'unknow status' )
+        return True
+
+    def screen_off( self , ) :
+        '''@
+        [+] callable
+        [+] visible
+        @short : s_off
+        @'''
+        '''
+            adb shell dumpsys window policy :
+                        mAwake  mShowingLockscreen
+            screen_off  false   true
+            screen_lock true    true
+            on          true    false
+        '''
+        self.check_device( )
+        rc = self.lexec( "adb shell dumpsys window policy" , False , False )
+        flags = [ line.split( '=' )[1] for line in rc.split( ) if line[0:6] == "mAwake" or line[0:18] == "mShowingLockscreen" ]
+        status = {
+            "falsetrue" : "screen_off" ,
+            "truetrue"  : "screen_lock" ,
+            "truefalse" : "screen_on" ,
+        }
+        if status[ ''.join( flags ) ] == "screen_off" :
+            self.print_green_light( '\n[+] detected screen status : off\n' )
+            self.print_green_light( '\n[+] Screen already off\n' )
+        elif status[ ''.join( flags ) ] == "screen_lock" :
+            self.print_green_light( '\n[+] detected screen status : lock\n' )
+            self.lexec( self.read_config( "power_button" , "command" ) )
+        elif status[ ''.join( flags ) ] == "screen_on" :
+            self.print_green_light( '\n[+] detected screen status : on\n' )
+            self.lexec( self.read_config( "power_button" , "command" ) )
+        else :
+            self.error_exit( 'unknow status' )
         return True
 
     def log_file( self , ) :

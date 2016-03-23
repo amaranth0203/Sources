@@ -1,0 +1,1426 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+    <title>VIVOSCM配置管理系统</title>
+    <meta http-equiv="Cache-Control" content="no-store" />
+<meta http-equiv="Pragma" content="no-cache" />
+<meta http-equiv="Expires" content="0" />
+<meta name="author" content="" />
+
+ 
+   <link href="/smartsys/admin/styles/cms.css" rel="stylesheet" type="text/css" />
+     <link href="/smartsys/admin/styles/jquery-ui.css" rel="stylesheet" type="text/css" />
+     <link href="/smartsys/admin/styles/uploadify.css" rel="stylesheet" type="text/css" />
+     <link href="/smartsys/admin/scripts/layer/skin/layer.css" rel="stylesheet" type="text/css" />
+     <link href="/smartsys/admin/styles/chosen.css" rel="stylesheet" type="text/css" />
+     <link href="/smartsys/admin/styles/jquery.jqplot.css" rel="stylesheet" type="text/css" />
+    <script src="/smartsys/admin/scripts/ajax.js"></script>
+    <script  src="/smartsys/admin/scripts/jquery.js"></script>
+    <script src="/smartsys/admin/scripts/jquery-ui.js"></script>
+    <script type="text/javascript" src="/smartsys/admin/scripts/chosen.jquery.js"></script>
+    <script type="text/javascript" src="/smartsys/admin/scripts/jquery.freezeheader.js"></script>
+    <script type="text/javascript" src="/smartsys/admin/scripts/jquery.wresize.js"></script>
+    <script type="text/javascript" src="/smartsys/admin/scripts/ajaxfileupload.js"></script>
+    <script language="javascript"  src="/smartsys/admin/scripts/layer/layer.min.js"></script>
+    <script type="text/javascript" src="/smartsys/admin/scripts/common.js"></script>
+    <script type="text/javascript" src="/smartsys/admin/scripts/form_commons.js"></script>
+    <script type="text/javascript" src="/smartsys/admin/scripts/formValidator.js"></script>
+    <script type="text/javascript" src="/smartsys/admin/scripts/formValidatorRegex.js"></script>
+    <script type="text/javascript" src="/smartsys/admin/scripts/validator.js"></script>
+    <script type="text/javascript" src="/smartsys/admin/scripts/validator.js"></script>
+    <script type="text/javascript" src="/smartsys/admin/scripts/zeroclipboard/ZeroClipboard.js"></script>  
+    <script language="javascript" type="text/javascript" src="/smartsys/admin/scripts/datepicker/WdatePicker.js"></script>
+</head>
+
+
+<link href="/smartsys/admin/styles/CRselectBox.css" rel="stylesheet" type="text/css" />
+<link href="/smartsys/admin/styles/divcontent.css" rel="stylesheet" type="text/css" />
+<link href="/smartsys/admin/styles/open_act.css" rel="stylesheet" type="text/css" />
+
+<style type="text/css">
+.actGotop{position:fixed;_position:absolute;bottom:100px;right:50px;width:150px;height:195px;display:none;}
+.actGotop a,.actGotop a:link{width:150px;height:195px;display:inline-block;background:url(/smartsys/admin/images/blog7year_gotop.png) no-repeat;_background:url(/smartsys/admin/images/blog7year_gotop.gif) no-repeat;outline:none;}
+.actGotop a:hover{background:url(/smartsys/admin/images/blog7year_gotopd.gif) no-repeat;outline:none;}
+</style>
+<script type="text/javascript">  
+$(function(){	
+	$(window).scroll(function() {		
+		if($(window).scrollTop() >= 100){
+			$('.actGotop').fadeIn(300); 
+		}else{    
+			$('.actGotop').fadeOut(300);    
+		}  
+	});
+	$('.actGotop').click(function(){
+	$('html,body').animate({scrollTop: '0px'}, 800);});	
+	$("tr").mouseover(function() {      
+          $(this).addClass("trlight");             
+	 });
+	$("tr").mouseout(function() {      
+		  $(this).removeClass("trlight");           
+	});
+	 for(i=1;i<9;i++){
+		 var phonesystd=$("#phonesystd"+i).text();
+		  if(!isEmpty(phonesystd)){
+		    $("#phonesystr"+i).show();
+		 } 
+	}
+	  $.each([{"id":1599,"project":"PD1516A","project_id":"240","carrier_info":"","carrier_id":""}],function(index,list){
+	            var carrier_id=list.carrier_id;
+	            var carrier_info=list.carrier_info;
+	           if(!isEmpty(carrier_id) ){
+	                   $("#carrier_id"+carrier_id).html('<img src="/smartsys/admin/images/check2.gif" border="0"/>'); 
+ 	           }
+ 	            if(carrier_id==15){
+	                   $("#down_going").val(carrier_info);
+	            }
+	             else if(carrier_id==14){
+	                  $("#up_going").val(carrier_info);
+	            }
+	   }); 
+	   var shortlisted="C,A,A";
+	   if(!isEmpty(shortlisted)){
+	       var tmpShortlistedList=new Array();
+	       tmpShortlistedList=shortlisted.split(",");
+	       var  shortlisted_STR="";
+	        if(0==tmpShortlistedList[0]){
+	 	 		 shortlisted_STR="(移动:无  )";
+	 	    }
+	 	    else{
+	 	        shortlisted_STR="&nbsp;&nbsp;(移动:"+tmpShortlistedList[0]+")";
+	 	    }
+	 	    if(0==tmpShortlistedList[1]){
+	 	 		  shortlisted_STR+="&nbsp;&nbsp;(联通:无)";
+	 	    }
+	 	    else{
+	 	         shortlisted_STR+="&nbsp;&nbsp;(联通:"+tmpShortlistedList[1]+")";
+	 	    }
+	 	    if(0==tmpShortlistedList[2]){
+	 	 		  shortlisted_STR+="&nbsp;&nbsp;(电信:无 )";
+	 	    }
+	 	    else{
+	 	       shortlisted_STR+="&nbsp;&nbsp;(电信:"+tmpShortlistedList[2]+")";
+	 	    }
+	 	    $("#shortlisted_tag").html(shortlisted_STR);
+	   }
+	    $("input:radio[name='shortlisted1']").each(function() {
+		 var id = $(this).val();
+	 		 if(id==tmpShortlistedList[0]){
+	 	 		 $(this).attr("checked", true); 
+	 	    }
+	 });
+	  $("input:radio[name='shortlisted2']").each(function() {
+		 var id = $(this).val();
+	 		 if(id==tmpShortlistedList[1]){
+	 	 		 $(this).attr("checked", true); 
+	 	    }
+	 });
+	  $("input:radio[name='shortlisted3']").each(function() {
+		 var id = $(this).val();
+	 		 if(id==tmpShortlistedList[2]){
+	 	 		 $(this).attr("checked", true); 
+	 	    }
+	 });
+});
+function propleType(){
+ 	$("#tag").val("1");
+	qryparm.action="externalInfoProject.action"; 
+	qryparm.submit();
+}
+function correlType(){
+ 	$("#tag").val("2");
+	qryparm.action="externalInfoProject.action"; 
+	qryparm.submit();
+}
+  function Exec(tag){   
+    $("#AP").select();   	
+    window.clipboardData.clearData();
+　　window.clipboardData.setData("Text", $("#AP").val());
+   // document.execCommand("copy")
+  }
+ </script>  
+<body>
+<form id="qryparm" name="qryparm" action="externalProject.action" method="post" >
+<input type="hidden" name="idx" id="idx" value="240"/>
+<input type="hidden" name="tag" id="tag" />
+  
+<body>
+<!--头部start-->
+<div class="ie6_out">
+  <div class="ie6_in">
+    <div class="header">
+      <div class="top2">
+        <div class="indextop2box">
+          <div class="oc">
+          </div> 
+           <div class="logininfo" style="margin-right:50px;"> 
+                       <a href="javascript:void(0);" onclick="javascript:window.location='externalProject.action?findtype=unifiedProject&queryValue=PD1516A&rom_version2=';" >返回上级</a>&nbsp;&nbsp; 
+              </div>
+        </div>
+      </div>
+      <div class="top3">
+        <div class="tl"><img src="/smartsys/admin/images/pic01.jpg"/></div>
+        <div class="tr"><img src="/smartsys/admin/images/pic02.jpg"/>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>    
+</body>
+</html>
+  <div class="actGotop"><a href="javascript:;" title="返回顶部"></a></div>
+	<div class="mainbox clearfix apm_search">
+		<div class="cha_content" id="ul_allphoto">
+			
+
+<div class="eb0">
+  <ul class="menu">
+    <li class="cur"><a href="externalInfoProject.action?idx=240&project_id=&tag=0&project=PD1516A&hdversion=PD1516AMA"><img src="/smartsys/admin/images/ico16.gif" border="0"/>所有信息</a></li>
+    <li class="no" ><a href="externalInfoProject.action?idx=240&project_id=&tag=1&project=PD1516A&hdversion=PD1516AMA"><img src="/smartsys/admin/images/ico17.gif" border="0"/>人员信息</a></li>
+    <li class="no"><a href="externalInfoProject.action?idx=240&project_id=&tag=2&project=PD1516A&hdversion=PD1516AMA"><img src="/smartsys/admin/images/ico17.gif" border="0"/>项目计划</a></li>
+    <li class="no"><a href="externalInfoProject.action?idx=240&project_id=&tag=3&project=PD1516A&hdversion=PD1516AMA"><img src="/smartsys/admin/images/ico17.gif" border="0"/>基本配置</a></li>
+    <li class="no"><a href="externalInfoProject.action?idx=240&project_id=&tag=4&project=PD1516A&hdversion=PD1516AMA"><img src="/smartsys/admin/images/ico17.gif" border="0"/>配置信息</a></li> 
+    <li class="no"><a href="externalInfoProject.action?idx=240&project_id=&tag=5&project=PD1516A&hdversion=PD1516AMA"><img src="/smartsys/admin/images/ico17.gif" border="0"/>在线升级</a></li>
+  </ul>
+</div>
+			<h4 class="com_title_y">
+				项目信息
+			</h4>
+			<div class="cha_fline">
+				<table width="100%" border="0" cellspacing="0" cellpadding="0" class="com_table mt10">
+					<tr>
+						<th>
+							软件开发状态：
+						</th>
+						<td>
+							   
+			                        <span style="font-size:30px">开发中项目</span>
+			                   
+			                        <span style="font-size:30px"></span>
+			                   
+			                        <span style="font-size:30px"></span>
+			                   
+			                        <span style="font-size:30px"></span>
+			                   
+			                        <span style="font-size:30px"></span>
+			                   
+						</td>
+					</tr>
+					<tr>
+						<th width="200">
+							服务提供商：
+						</th>
+						<td>
+							 QCOM
+						</td>
+					</tr>
+					<tr>
+						<th>
+							平台名称：
+						</th>
+						<td>
+							 MSM8996 
+						</td>
+					</tr>
+					<tr>
+						<th>
+							内部机型名：
+						</th>
+						<td>
+					    	PD1516A
+						</td>
+					</tr>
+					<tr>
+						<th>
+							应用配置名：
+						</th>
+						<td>
+					    	PD1516A
+						</td>
+					</tr>
+					<tr>
+						<th>
+							外部机型名：
+						</th>
+						<td>
+					    	Xplay5S
+						</td>
+					</tr>
+					<tr>
+						<th>
+							外部发布机型名：
+						</th>
+						<td>
+					    	 vivo Xplay5S
+						</td>
+					</tr>
+					<tr>
+						<th>
+							Android_version：
+						</th>
+						<td>
+							  6.0
+						</td>
+					</tr>
+							<tr>
+						<th>
+							ROM版本：
+						</th>
+						<td>
+							   
+			                        
+			                   
+			                        
+			                   
+			                        
+			                   
+			                        
+			                   
+			                        
+			                   
+			                        
+			                   
+			                        
+			                   
+			                        
+			                   
+			                        
+			                   
+			                        
+			                   
+			                        
+			                   
+			                        
+			                   
+			                        
+			                   
+			                        
+			                   
+			                        
+			                   
+			                        
+			                   
+			                        
+			                   
+			                        
+			                   
+			                        
+			                   
+			                        
+			                   
+			                        
+			                   
+			                        
+			                   
+			                        
+			                   
+			                        
+			                   
+			                        
+			                   
+			                        ROM_2.6
+			                   
+			                        
+			                   
+						</td>
+					</tr>
+					 <tr>
+						<th>
+							计划量产时间：
+						</th>
+						<td>
+							  2016-03-21
+						</td>
+					</tr>
+						 <tr>
+						<th>
+							项目立项时间：
+						</th>
+						<td>
+							  2015-09-22
+						</td>
+					</tr>
+					<tr>
+						<th>
+							项目特殊说明：
+						</th>
+						<td>
+							  新平台，AndroidM
+						</td>
+					</tr>
+					
+				</table>
+			</div>
+			<h4 class="com_title_y">
+				人员信息
+			</h4>
+			<div class="cha_fline">
+				<table width="100%" border="0" cellspacing="0" cellpadding="0" class="com_table mt10">
+				   <tr>
+						<th>
+							软件leader：
+						</th>
+						<td>
+						    
+						        
+						             杨秀英
+								
+								
+						   
+						</td>
+					</tr>
+					<tr>
+						<th>
+							系统工程师：
+						</th>
+						<td>
+						     刘绪森
+						</td>
+					</tr>
+					 <tr>
+						<th width="200">
+							投诉单负责人：
+						</th>
+						<td>
+							 乐永
+						</td>
+					</tr>
+					<tr>
+						<th width="200">
+							配置工程师：
+						</th>
+						<td>
+						     
+						        
+						             黄静
+								
+								
+						   
+						</td>
+					</tr>
+					<tr>
+						<th>
+							驱动代表：
+						</th>
+						<td>
+							  周玉林
+						</td>
+					</tr>
+						<tr>
+						<th width="200">
+							SQA：
+						</th>
+						<td>
+							 蔡兰兰
+						</td>
+					</tr>
+					<tr>
+						<th>
+							软件模块工程师：
+						</th>
+						<td>
+						 <textarea  class="textareastyle"  rows="15"> 应用一组  唐文丽
+应用二组   邓建伟
+应用三组  杨伟康 
+应用四组   罗剑华
+应用五组   胡双双
+应用六组   赵彬
+多媒体组   肖小峰
+通信一组   刘凯
+通信二组   刘辽谱
+预研组    马瑞兵                    
+服务器组    陈文娟
+互联网应用组  刘善国
+云服务器    庞方明
+PC工具组   杨维
+拍照应用组   陈永强
+拍照系统组   方超
+稳定性组    谢纪元
+性能组    王文杰
+框架组    陈辉                
+                          
+                              
+                              
+                              
+                              
+                              
+                              
+                              
+                              
+                              
+                              
+                              
+                              
+                              
+                              
+                              
+                              
+                              
+                              
+                              
+                              
+                              
+                              
+  </textarea>   
+						</td>
+					</tr>
+					<tr>
+						<th>
+							项目其他成员：
+						</th>
+						<td>
+						 <textarea  class="textareastyle"  rows="15">项目经理 雷向顺
+电子代表 李迪湘
+电子射频 刘彬彬
+电子leader  李乾锋
+
+软件系统工程师 刘绪森
+驱动代表   周玉林
+配置工程师  黄静
+CCM效果（前置、后置、AF--严思志、陈满生、刘永国
+LCM  滕孝军
+TW   陈棚、邱贵福
+BSP  朱宗伟 
+WCN  闫文 、黄新元
+重力、陀螺仪、GPS、红外---赖志隆、郝思融
+音频驱动 陈金泉
+电源    邵超杰  陈超鑫
+指纹  唐纯杰 魏天雷
+网络适应(RF通路，网络适应性，QCN，网络设置) —张兵，宋健，丁艳辉，刘凯</textarea>   
+						</td>
+					</tr>
+					<tr>
+						<th>
+							外销模块分工表：
+						</th>
+						<td>
+						<a href="http://smartphone/repositories/DocsAndTools/Docs/Qualcomm/IntelnalTraining/SoftWareDocs/Studies/ExportTeam/分组.xlsx">http://smartphone/repositories/DocsAndTools/Docs/Qualcomm/IntelnalTraining/SoftWareDocs/Studies/ExportTeam/分组.xlsx</a>
+						</td>
+					</tr>
+					<tr>
+						<th>
+							内销模块分工表：
+						</th>
+						<td>
+							<a href="http://smartphone/repositories/DocsAndTools/Docs/MTKSVN/SW_STA_DOC/人员分工/软件模块人员分工.xls">http://smartphone/repositories/DocsAndTools/Docs/MTKSVN/SW_STA_DOC/人员分工/软件模块人员分工.xls</a>
+						</td>
+					</tr>
+					<tr>
+						<th>
+							代码审核权限：
+						</th>
+						<td>
+						<a href="http://smartphone/repositories/DocsAndTools/Docs/MTKSVN/SW_STA_DOC/人员分工/Vivo平台代码仓库Owner以及审核分工表.xls">http://smartphone/repositories/DocsAndTools/Docs/MTKSVN/SW_STA_DOC/人员分工/Vivo平台代码仓库Owner以及审核分工表.xls</a>
+						</td>
+					</tr>
+					<tr>
+						<th>
+							样机分配表：
+						</th>
+						<td>
+							   <a href="http://smartphone/repositories/DocsAndTools/Docs/MTKSVN/SW_STA_DOC/人员分工/软件领域借机明细.xlsx">http://smartphone/repositories/DocsAndTools/Docs/MTKSVN/SW_STA_DOC/人员分工/软件领域借机明细.xlsx</a>
+						</td>
+					</tr>
+				</table>
+			</div>
+			<h4 class="com_title_y">
+				项目计划
+			</h4>
+			<div class="cha_fline">
+				<table width="100%" border="0" cellspacing="0" cellpadding="0" class="com_table mt10">
+				 <tr>
+						<th  width="200">
+							 软件发布计划：
+						</th>
+						<td>
+						 <textarea  class="textareastyle"  rows="15"> 集成测试第一版   11.25  
+第一版系统测试   11月30
+第二版系统测试   12月9  
+第三版系统测试   12月17号
+第四版系统测试   12月25
+第五版系统测试   2016年1月2
+第六版系统测试   2016年1月9
+第七版系统测试   2016年1月15
+第八版系统测试  1月22号
+第九版系统测试  1月28号
+第十版系统测试  2月4号</textarea>
+ 						</td>
+					</tr>
+					<tr>
+						<th  width="200">
+							 项目节点：
+						</th>
+						<td>
+						 <textarea  class="textareastyle"  rows="15"> 启动  9.4
+立项  9.14
+CNC  10.12
+试模 11.13  11.28
+试产  16.1.23
+试产闭环  16.2.22
+首量  16.3.10
+批量  2016.3.21</textarea>
+ 						</td>
+					</tr>
+				</table>
+			</div>
+			<h4 class="com_title_y">
+				项目基本配置
+			</h4>
+			<div class="cha_fline">
+				<table width="100%" border="0" cellspacing="0" cellpadding="0" class="com_table mt10">
+					<tr>
+						<th>
+							功能集：
+						</th>
+						<td>
+					    	   <a href="rom3.0">rom3.0</a>
+						</td>
+					</tr>
+					<tr>
+						<th>
+							策划文档：
+						</th>
+						<td>
+					    	  <a href=""></a>
+						</td>
+					</tr>
+					<tr>
+						<th>
+							软硬件配置表：
+						</th>
+						<td>
+						 <a href="http://smartphone/repositories/DocsAndTools/Docs/Qualcomm/PD1516A/SW_Data/ST_SW_Data/PD1516A软件与硬件对照表V00.xlsx">http://smartphone/repositories/DocsAndTools/Docs/Qualcomm/PD1516A/SW_Data/ST_SW_Data/PD1516A软件与硬件对照表V00.xlsx</a>
+						</td>
+					</tr>
+					<tr>
+						<th>
+							修改记录总表：
+						</th>
+						<td>
+						 <a href=""></a>
+						</td>
+					</tr>
+					<tr>
+						<th>
+							软件项目启动会：
+						</th>
+						<td>
+					    	 http://smartphone/repositories/DocsAndTools/Docs/Qualcomm/PD1516A/SW_Data/ST_SW_Data/PD1516A软件项目启动会 - 公开版.ppt
+						</td>
+					</tr>
+				   <tr>
+						<th width="200">
+							 CPU信息：
+						</th>
+						<td>
+							 4核 
+						</td>
+					</tr>
+				  <tr>
+						<th width="200">
+							 主频信息：
+						</th>
+						<td>
+							 2.0
+						</td>
+					</tr>
+					 <tr>
+						<th width="200">
+							单双卡：
+						</th>
+						<td>
+						      
+					          双卡
+						</td>
+					</tr>
+					 <tr>
+						<th width="200">
+							配置热插拔中断脚：
+						</th>
+						<td>
+						      是
+					          
+						</td>
+					</tr>
+					 <tr>
+						<th width="200">
+							电池类型：
+						</th>
+						<td>
+						      电池内置
+					          
+						</td>
+					</tr>
+					<tr>
+						<th>
+							是否支持TF卡：
+						</th>
+						<td>
+					    	    
+					        	不支持
+						</td>
+					</tr>
+					<tr>
+						<th>
+							是否支持VoLTE：
+						</th>
+						<td>
+					    	    支持
+					        	
+						</td>
+					</tr>
+					 <tr>
+						<th>
+							 RAM+ROM：
+						</th>
+						<td>
+						       4+128
+ 						</td>
+					</tr>
+					<tr>
+						<th>
+							分辨率模式：
+						</th>
+						<td>
+							 QDHD 
+						</td>
+					</tr>
+					<tr>
+						<th>
+							 分辨率：
+						</th>
+
+						<td>
+							 2560×1440
+						</td>
+					</tr>
+					<tr>
+						<th width="200">
+							前置摄像头：
+						</th>
+						<td>
+							 800
+						</td>
+					</tr>
+					<tr>
+						<th>
+							后置摄像头：
+						</th>
+						<td>
+							 1600 
+						</td>
+					</tr>
+					<tr>
+						<th>
+							电池容量及厂家：
+						</th>
+						<td>
+					    	3500
+						</td>
+					</tr>
+					<tr>
+						<th>
+							WCN：
+						</th>
+						<td>
+					    	 waln、bt
+						</td>
+					</tr>
+					<tr>
+						<th>
+							传感支持：
+						</th>
+						<td>
+					    	 重力、陀螺仪、红外光敏
+						</td>
+					</tr>
+					<tr>
+						<th>
+							新功能新器件：
+						</th>
+						<td>
+					    	 双天线 mimo ufs 紫水晶 双子座
+						</td>
+					</tr>
+					<tr>
+						<th>
+							运营商入围需求：
+						</th>
+						<td id="shortlisted_tag">
+					    	 
+						</td>
+					</tr>
+					<tr>
+						<th>
+							网络制式频段信息：
+						</th>
+					</tr>
+					<tr style="display:none" id="phonesystr1">
+						<th style="font-size:10px">
+							2G GSM：
+						</th>
+						<td id="phonesystd1">
+					    	 
+                                  
+			                     &nbsp;850MHz(B5)&nbsp; 
+			                      
+			                 
+                                  
+			                     &nbsp;900MHz(B8)&nbsp; 
+			                      
+			                 
+                                  
+			                     &nbsp;1800MHz(B3)&nbsp; 
+			                      
+			                 
+                                  
+			                     &nbsp;1900MHz(B2)&nbsp; 
+			                      
+			                 
+                                  
+			                 
+                                  
+			                 
+                                  
+			                 
+                                  
+			                 
+                                  
+			                 
+                                  
+			                 
+                                  
+			                 
+                                  
+			                 
+                                  
+			                 
+                                  
+			                 
+                                  
+			                 
+                                  
+			                 
+                                  
+			                 
+                                  
+			                 
+                                  
+			                 
+                                  
+			                 
+                                  
+			                 
+                                  
+			                 
+                                  
+			                   
+						</td>
+					</tr>
+					<tr style="display:none" id="phonesystr2">
+						<th style="font-size:10px;">
+							2G CDMA：
+						</th>
+						<td id="phonesystd2">
+					    	 
+                                  
+			                 
+                                  
+			                 
+                                  
+			                 
+                                  
+			                 
+                                  
+			                      &nbsp;800MHz(BC0)&nbsp; 
+			                      
+			                 
+                                  
+			                 
+                                  
+			                 
+                                  
+			                 
+                                  
+			                 
+                                  
+			                 
+                                  
+			                 
+                                  
+			                 
+                                  
+			                 
+                                  
+			                 
+                                  
+			                 
+                                  
+			                 
+                                  
+			                 
+                                  
+			                 
+                                  
+			                 
+                                  
+			                 
+                                  
+			                 
+                                  
+			                 
+                                  
+			                 
+						</td>
+					</tr>
+					<tr style="display:none" id="phonesystr3">
+						<th style="font-size:10px;">
+							3G CDMA EvDo：
+						</th>
+						<td id="phonesystd3">
+					    	
+                                  
+			                
+                                  
+			                
+                                  
+			                
+                                  
+			                
+                                  
+			                
+                                  
+			                     &nbsp;800MHz(BC0)&nbsp; 
+			                      
+			                
+                                  
+			                
+                                  
+			                
+                                  
+			                
+                                  
+			                
+                                  
+			                
+                                  
+			                
+                                  
+			                
+                                  
+			                
+                                  
+			                
+                                  
+			                
+                                  
+			                
+                                  
+			                
+                                  
+			                
+                                  
+			                
+                                  
+			                
+                                  
+			                
+                                  
+			                
+						</td>
+					</tr>
+					<tr style="display:none" id="phonesystr4">
+						<th style="font-size:10px">
+						    3G WCDMA：
+						 </th>   
+						<td id="phonesystd4">
+					    	 
+                                  
+			                  
+                                  
+			                  
+                                  
+			                  
+                                  
+			                  
+                                  
+			                  
+                                  
+			                  
+                                  
+			                     &nbsp;850MHz(B5)&nbsp; 
+			                      
+			                  
+                                  
+			                     &nbsp;900MHz(B8)&nbsp; 
+			                      
+			                  
+                                  
+			                     &nbsp;1900MHz(B2)&nbsp; 
+			                      
+			                  
+                                  
+			                     &nbsp;2100MHz(B1)&nbsp; 
+			                      
+			                  
+                                  
+			                  
+                                  
+			                  
+                                  
+			                  
+                                  
+			                  
+                                  
+			                  
+                                  
+			                  
+                                  
+			                  
+                                  
+			                  
+                                  
+			                  
+                                  
+			                  
+                                  
+			                  
+                                  
+			                  
+                                  
+			                  
+						</td>
+					</tr>
+					<tr style="display:none" id="phonesystr5">
+						<th style="font-size:10px;">
+							3G TD-SCDMA：
+						</th>
+						<td id="phonesystd5">
+					    	
+                                  
+			                
+                                  
+			                
+                                  
+			                
+                                  
+			                
+                                  
+			                
+                                  
+			                
+                                  
+			                
+                                  
+			                
+                                  
+			                
+                                  
+			                
+                                  
+			                      &nbsp;B34(A)&nbsp; 
+			                      
+			                
+                                  
+			                      &nbsp;B39(F)&nbsp; 
+			                      
+			                
+                                  
+			                
+                                  
+			                
+                                  
+			                
+                                  
+			                
+                                  
+			                
+                                  
+			                
+                                  
+			                
+                                  
+			                
+                                  
+			                
+                                  
+			                
+                                  
+			                
+						</td>
+					</tr>
+					<tr style="display:none"  id="phonesystr6">
+						<th style="font-size:10px;">
+							4G TD-LTE：
+						</th>
+						<td id="phonesystd6" >
+					    	
+                                  
+			               
+                                  
+			               
+                                  
+			               
+                                  
+			               
+                                  
+			               
+                                  
+			               
+                                  
+			               
+                                  
+			               
+                                  
+			               
+                                  
+			               
+                                  
+			               
+                                  
+			               
+                                  
+			                     &nbsp;2600MHz(B38)&nbsp; 
+			                      
+			               
+                                  
+			                     &nbsp;1900MHz(B39)&nbsp; 
+			                      
+			               
+                                  
+			                     &nbsp;2300MHz(B40)&nbsp; 
+			                      
+			               
+                                  
+			                     &nbsp;2500MHz(B41)&nbsp; 
+			                      
+			               
+                                  
+			               
+                                  
+			               
+                                  
+			               
+                                  
+			               
+                                  
+			               
+                                  
+			               
+                                  
+			               
+						</td>
+					</tr>
+					<tr style="display:none" id="phonesystr7">
+						<th style="font-size:10px">
+							4G FDD-LTE：
+						</th>
+						<td id="phonesystd7">
+					     
+                                  
+			             
+                                  
+			             
+                                  
+			             
+                                  
+			             
+                                  
+			             
+                                  
+			             
+                                  
+			             
+                                  
+			             
+                                  
+			             
+                                  
+			             
+                                  
+			             
+                                  
+			             
+                                  
+			             
+                                  
+			             
+                                  
+			             
+                                  
+			             
+                                  
+			                      &nbsp;2100MHz(B1)&nbsp; 
+			                      
+			             
+                                  
+			                      &nbsp;1900MHz(B2)&nbsp; 
+			                      
+			             
+                                  
+			                      &nbsp;1800MHz(B3)&nbsp; 
+			                      
+			             
+                                  
+			                      &nbsp;1700MHz(B4)&nbsp; 
+			                      
+			             
+                                  
+			                      &nbsp;850MHz(B5)&nbsp; 
+			                      
+			             
+                                  
+			                      &nbsp;2600MHz(B7)&nbsp; 
+			                      
+			             
+                                  
+			                      &nbsp;900MHz(B8)&nbsp; 
+			                      
+			             
+						</td>
+					</tr>
+						<tr>
+						<th>
+							CA载波聚合支持：
+						</th>
+						<td>
+					    	  <table width="710" border="1" cellspacing="0" cellpadding="0" class="com_table mt10">
+						  <tr>
+						    <td width="82" rowspan="15" style="vertical-align:middle">载波聚合支持</td>
+						    <td width="134" rowspan="14" style="vertical-align:middle">载波聚合下行</td>
+						    <td width="107" rowspan="5" style="vertical-align:middle">中国移动定制</td>
+						    <td width="359"><span id="carrier_id1"  name="carrier_id" value="2"><img src="/smartsys/admin/images/closeimg.gif" border="0"/></span>&nbsp;B38带内连续两载波聚合</td>
+						  </tr>
+						  <tr>
+						    <td><span id="carrier_id2"><img src="/smartsys/admin/images/closeimg.gif" border="0"/></span>&nbsp;B39带内连续两载波聚合（最大聚合宽度30MH2）</td>
+						  </tr>
+						  <tr>
+						    <td><span id="carrier_id3"><img src="/smartsys/admin/images/closeimg.gif" border="0"/></span>&nbsp;B40带内连续两载波聚合</td>
+						  </tr>
+						  <tr>
+						    <td><span id="carrier_id4"><img src="/smartsys/admin/images/closeimg.gif" border="0"/></span>&nbsp;B41带内连续两载波聚合</td>
+						  </tr>
+						  <tr>
+						    <td><span id="carrier_id5"><img src="/smartsys/admin/images/closeimg.gif" border="0"/></span>&nbsp;B39+B41带间两载波聚合</td>
+						  </tr>
+						  <tr>
+						    <td rowspan="6" style="vertical-align:middle">中国联通定制</td>
+						    <td><span id="carrier_id6"><img src="/smartsys/admin/images/closeimg.gif" border="0"/></span>&nbsp;B3带内连续两载波聚合</td>
+						  </tr>
+						  <tr>
+						    <td><span id="carrier_id7"><img src="/smartsys/admin/images/closeimg.gif" border="0"/></span>&nbsp;B1+B3带内两载波聚合</td>
+						  </tr>
+						  <tr>
+						    <td><span id="carrier_id8"><img src="/smartsys/admin/images/closeimg.gif" border="0"/></span>&nbsp;B1+B41带间两载波聚合</td>
+						  </tr>
+						  <tr>
+						    <td><span id="carrier_id9"><img src="/smartsys/admin/images/closeimg.gif" border="0"/></span>&nbsp;B1+B3+B3带间三载波聚合</td>
+						  </tr>
+						  <tr>
+						    <td><span id="carrier_id10"><img src="/smartsys/admin/images/closeimg.gif" border="0"/></span>&nbsp;B1+B3+B41带间三载波聚合</td>
+						  </tr>
+						  <tr>
+						    <td><span id="carrier_id11"><img src="/smartsys/admin/images/closeimg.gif" border="0"/></span>&nbsp;B1+B3+B8带间三载波聚合</td>
+						  </tr>
+						  <tr>
+						    <td rowspan="2" style="vertical-align:middle">中国电信定制</td>
+						    <td><span id="carrier_id12"><img src="/smartsys/admin/images/closeimg.gif" border="0"/></span>&nbsp;B1+B3带间两载波聚合</td>
+						  </tr>
+						  <tr>
+						    <td><span id="carrier_id13"><img src="/smartsys/admin/images/closeimg.gif" border="0"/></span>&nbsp;B1+B3+B26带间三载波聚合（最大聚合宽度50MH2）</td>
+						  </tr>
+						  <tr>
+						    <td>其他</td>
+						    <td><input type="text" id="down_going" name="allprojectinfo.down_going" disabled =disabled  style="border:0px;"/></td>
+						  </tr>
+						  <tr>
+						    <td>载波聚合上行</td>
+						    <td>其他</td>
+						    <td><input type="text" id="up_going" name="allprojectinfo.up_going" disabled =disabled  style="border:0px;"/></td>
+						  </tr>
+						</table>
+						</td>
+					</tr>
+				</table>
+				
+			</div>
+			<h4 class="com_title_y">
+				 配置信息
+			</h4>
+			<div class="cha_fline">
+				<table width="100%" border="0" cellspacing="0" cellpadding="0" class="com_table mt10">
+					<tr>
+						<th width="200">
+							销售方式：
+						</th>
+						<td>
+						   
+		                        内销 
+		                   
+		                         
+		                   
+						</td>
+					</tr>
+					 <tr>
+						<th>
+							编译服务器名：
+						</th>
+						<td>
+							 compiler01101 
+						</td>
+					</tr>
+					<tr>
+						<th>
+							屏幕密度类型：
+						</th>
+						<td>
+							 xxxhdpi 
+						</td>
+					</tr>
+					<tr>
+						<th>
+							VIVOSDK选项：
+						</th>
+						<td>
+							 无
+						</td>
+					</tr>
+					<tr>
+						<th>
+							硬件版本号：
+						</th>
+						<td>
+					    	 PD1516AMA
+						</td>
+					</tr>
+					<tr>
+						<th>
+							AP路径
+						</th>
+						<td>
+						<!-- <a href="#" onClick="Exec(AP);"><img src="/smartsys/admin/images/icon018a16.gif" border="0"/></a> -->
+					     <input type="text" class="inputclean" style="width:100%" value="repo init -u ssh://$USER@smartgit:29418/VivoCode/manifest -m qcom/vivo_qcom_LA.HB.1.1.1.C2.06.00.00.204.049-8x96.0_msm8996.xml" name="AP" id="AP" readonly />
+ 						</td>
+					</tr>
+					<tr>
+						<th>
+							MP路径
+						</th>
+						<td>
+						<!-- <a href="#" onClick="Exec(AP);"><img src="/smartsys/admin/images/icon018a16.gif" border="0"/></a> -->
+					     <input type="text" class="inputclean" style="width:100%" value="repo init -u ssh://$USER@smartgit:29418/VivoCode/manifest -m qcom/vivo_qcom_LA.HB.1.1.1.C2.06.00.00.204.049-8x96.0_msm8996_modem.xml" name="AP" id="AP" readonly />
+ 						</td>
+					</tr>
+					<tr>
+						<th>
+							Android_budilID：
+						</th>
+						<td>
+							 MRA58K
+						</td>
+					</tr>
+				
+					<tr>
+						<th>
+							屏尺寸：
+						</th>
+						<td>
+						    5.5
+ 						</td>
+					</tr>
+					<tr>
+						<th>
+							DMSSID：
+						</th>
+						<td>
+						    MPSS.TH.2.0.c1.3-00018-M8996FAAAANAZM-1
+ 						</td>
+					</tr>
+					<tr>
+						<th>
+							AMSSID：
+						</th>
+						<td>
+						    LA.HB.1.1.1.c2-03800-8x96.0-1
+ 						</td>
+					</tr>
+					<tr>
+						<th>
+							编译选项：
+						</th>
+						<td>
+						    msm8996
+ 						</td>
+					</tr>
+					<tr>
+						<th>
+							项目配置方式：
+						</th>
+						<td>
+						     
+			                          
+			                  
+			                         GIT 
+			                  
+			                          
+			                  
+ 						</td>
+					</tr>
+					 <tr>
+						<th>
+							 支持定制列表：
+						</th>
+						<td>
+						       N
+ 						</td>
+					</tr>
+					 <tr>
+						<th>
+							  当前配置bsp分支地址：
+						</th>
+						<td>
+						 <a href="repo init -u ssh://$USER@smartgit:29418/VivoCode/manifest -m  qcom/vivo_qcom_LA.HB.1.1.1.C2.06.00.00.204.049-8x96.0_msm8996_bsp.xml/">repo init -u ssh://$USER@smartgit:29418/VivoCode/manifest -m  qcom/vivo_qcom_LA.HB.1.1.1.C2.06.00.00.204.049-8x96.0_msm8996_bsp.xml</a>
+ 						</td>
+					</tr>
+					 <tr>
+						<th>
+							  代码版本：
+						</th>
+						<td>
+						  
+ 						</td>
+					</tr>
+					 <tr>
+						<th>
+							 框架代码路径：
+						</th>
+						<td>
+						 <a href="repo init -u ssh://$USER@smartgit:29418/VivoCode/manifest -m qcom/vivo_qcom_LA.HB.1.1.1.C2.06.00.00.204.049-8x96.0_msm8996.xml/">repo init -u ssh://$USER@smartgit:29418/VivoCode/manifest -m qcom/vivo_qcom_LA.HB.1.1.1.C2.06.00.00.204.049-8x96.0_msm8996.xml</a>
+ 						</td>
+					</tr>
+					 <tr>
+						<th>
+							 分支代码使用信息文件：
+						</th>
+						<td>
+						 <a href="/"></a>
+ 						</td>
+					</tr>
+					 <tr>
+						<th>
+							  框架及App的配置名称：
+						</th>
+						<td>
+						 <a href="PD1516A/">PD1516A</a>
+ 						</td>
+					</tr>
+				</table>
+			</div>
+			</div>
+	</div>
+		<div class="mt25 center" style="padding-top:0px">
+		 <img src="/smartsys/admin/images/page_end.jpg"/>
+       </div>
+ </form>      
+</body>
+</html>
