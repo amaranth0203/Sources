@@ -83,6 +83,43 @@ class qyh_base( object ) :
             self.print_red( "[-]unknow os\n" ) ;
         return True
 
+    def routine_push( self ) :
+        '''@
+        [+] callable
+        [+] visible
+        @short : test_
+        @'''
+        import os
+        from sys import platform as _platform
+        if _platform == "win32" :
+            import win32com.client
+            shell = win32com.client.Dispatch("WScript.Shell")
+            shell.SendKeys( "cd /d e:\Sources " )
+            shell.SendKeys( "{ENTER}" )
+            shell.SendKeys( "git status" )
+            shell.SendKeys( "{ENTER}" )
+            shell.SendKeys( "git add ." )
+            shell.SendKeys( "{ENTER}" )
+            shell.SendKeys( "git commit -m \"routine push\" " )
+            shell.SendKeys( "{ENTER}" )
+            shell.SendKeys( "git push origin master " )
+            shell.SendKeys( "{ENTER}" )
+            shell.SendKeys( "11002298" )
+            shell.SendKeys( "{ENTER}" )
+            # shell.SendKeys("^a") # CTRL+A may "select all" depending on which window's focused
+            # shell.SendKeys("{DELETE}") # Delete selected text?  Depends on context. :P
+            # shell.SendKeys("{TAB}") #Press tab... to change focus or whateverfrom subprocess import Popen, PIPE
+
+        elif _platform == "cygwin" :
+            self.print_green( "[+] Wow, this is cygwin, why not use command which\n" ) ;
+        elif _platform == "linux" or _platform == "linux2" :
+            self.print_green( "[+] Wow, this is Linux, why not use command which\n" ) ;
+        elif _platform == "darwin" :
+            self.print_green( "[+] Wow, this is Mac OS\n" ) ;
+        else :
+            self.print_red( "[-]unknow os\n" ) ;
+        return True
+
     def change_to_source_dir( self ) :
         '''@
         [+] callable
