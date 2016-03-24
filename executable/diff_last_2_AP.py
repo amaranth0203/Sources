@@ -9,4 +9,7 @@ def get_last_two_record( ) :
 
 if __name__ == "__main__" :
     last , current = get_last_two_record( )[0] , get_last_two_record( )[1]
-    print last.strip() == current.strip()
+    if last.strip() == current.strip() :
+        print '[+] pass'
+    else :
+        print '[*] >>>>>>>>>>>>>>>>>>>>>>>> AP address updated <<<<<<<<<<<<<<<<<<<<<<<<<<<<'

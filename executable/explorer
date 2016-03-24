@@ -1,0 +1,17 @@
+#!/bin/bash
+# 使用lexec explorer 代替
+
+SVR_IP=172.20.134.137
+
+pwd_=$(pwd) 
+if [ $# -eq 0 ] ; then
+#    echo $pwd_ | sed -e 's/\//\\/g' | sed -e 's/\\opt\\qiyunhu/z:/' | tee "$(dirname $0)/flag"
+    target=$(echo $pwd_ | sed -e 's/\//\\/g' | sed -e 's/\\opt\\qiyunhu/z:/')
+else
+#    readlink -f $1 | sed -e 's/\//\\/g' | sed -e 's/\\opt\\qiyunhu/z:/' | tee "$(dirname $0)/flag"
+    target=$(readlink -f $1 | sed -e 's/\//\\/g' | sed -e 's/\\opt\\qiyunhu/z:/')
+fi
+
+
+target=$( echo $target | sed -e 's/\\/\\/g' )
+qyh $SVR_IP explorer $target
