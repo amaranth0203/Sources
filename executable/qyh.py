@@ -108,6 +108,7 @@ class qyh_base( object ) :
                     11002298{ENTER}
                     '''
             cmd += "cd /d " + pwd + "{ENTER}"
+            cmd = ''.join( [ line.strip() for line in cmd.split('\n') ] )
             import win32com.client
             shell = win32com.client.Dispatch("WScript.Shell")
             shell.SendKeys( cmd )
