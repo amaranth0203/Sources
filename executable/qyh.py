@@ -93,8 +93,25 @@ class qyh_base( object ) :
         from sys import platform as _platform
         if _platform == "win32" :
             pwd = str( os.getcwd() )
+            cmd =   '''
+                    cd /d e:\\notes{ENTER}
+                    git status{ENTER}
+                    git add .{ENTER}
+                    git commit -m "routine push"{ENTER}
+                    git push origin master{ENTER}
+                    11002298{ENTER}
+                    cd /d e:\Sources{ENTER}
+                    git status{ENTER}
+                    git add .{ENTER}
+                    git commit -m "routine push"{ENTER}
+                    git push origin master{ENTER}
+                    11002298{ENTER}
+                    '''
+            cmd += "cd /d " + pwd + "{ENTER}"
             import win32com.client
             shell = win32com.client.Dispatch("WScript.Shell")
+            shell.SendKeys( cmd )
+            exit()
             shell.SendKeys( "cd /d e:\\notes " )
             shell.SendKeys( "{ENTER}" )
             shell.SendKeys( "git status" )
