@@ -83,62 +83,55 @@ class qyh_base( object ) :
             self.print_red( "[-]unknow os\n" ) ;
         return True
 
-    def routine_push( self ) :
+    def git_routine( self , *args ) :
         '''@
         [+] callable
         [+] visible
-        @short : rp
+        @short : gt
+        @args : push - push codes to origin
+        @args : pull - pull codes from origin
         @'''
         import os
         from sys import platform as _platform
         if _platform == "win32" :
+            self.check_args( args , ( 'push' , 'pull' ) )
+            flag_push , flag_pull =\
+                tuple( self.trans_args( args , ( 'push' , 'pull' ) ) )
             pwd = str( os.getcwd() )
-            cmd =   '''
-                    cd /d e:\\notes{ENTER}
-                    git status{ENTER}
-                    git add .{ENTER}
-                    git commit -m "routine push"{ENTER}
-                    git push origin master{ENTER}
-                    11002298{ENTER}
-                    cd /d e:\Sources{ENTER}
-                    git status{ENTER}
-                    git add .{ENTER}
-                    git commit -m "routine push"{ENTER}
-                    git push origin master{ENTER}
-                    11002298{ENTER}
-                    '''
-            cmd += "cd /d " + pwd + "{ENTER}"
-            cmd = ''.join( [ line.strip() for line in cmd.split('\n') ] )
-            import win32com.client
-            shell = win32com.client.Dispatch("WScript.Shell")
-            shell.SendKeys( cmd )
-            exit()
-            shell.SendKeys( "cd /d e:\\notes " )
-            shell.SendKeys( "{ENTER}" )
-            shell.SendKeys( "git status" )
-            shell.SendKeys( "{ENTER}" )
-            shell.SendKeys( "git add ." )
-            shell.SendKeys( "{ENTER}" )
-            shell.SendKeys( "git commit -m \"routine push\" " )
-            shell.SendKeys( "{ENTER}" )
-            shell.SendKeys( "git push origin master " )
-            shell.SendKeys( "{ENTER}" )
-            shell.SendKeys( "11002298" )
-            shell.SendKeys( "{ENTER}" )
-            shell.SendKeys( "cd /d e:\Sources " )
-            shell.SendKeys( "{ENTER}" )
-            shell.SendKeys( "git status" )
-            shell.SendKeys( "{ENTER}" )
-            shell.SendKeys( "git add ." )
-            shell.SendKeys( "{ENTER}" )
-            shell.SendKeys( "git commit -m \"routine push\" " )
-            shell.SendKeys( "{ENTER}" )
-            shell.SendKeys( "git push origin master " )
-            shell.SendKeys( "{ENTER}" )
-            shell.SendKeys( "11002298" )
-            shell.SendKeys( "{ENTER}" )
-            shell.SendKeys( "cd /d " + pwd )
-            shell.SendKeys( "{ENTER}" )
+            if flag_push :
+                cmd =   '''
+                        cd /d e:\\notes{ENTER}
+                        git status{ENTER}
+                        git add .{ENTER}
+                        git commit -m "routine push"{ENTER}
+                        git push origin master{ENTER}
+                        11002298{ENTER}
+                        cd /d e:\Sources{ENTER}
+                        git status{ENTER}
+                        git add .{ENTER}
+                        git commit -m "routine push"{ENTER}
+                        git push origin master{ENTER}
+                        11002298{ENTER}
+                        '''
+                cmd += "cd /d " + pwd + "{ENTER}"
+                cmd = ''.join( [ line.strip() for line in cmd.split('\n') ] )
+                import win32com.client
+                shell = win32com.client.Dispatch("WScript.Shell")
+                shell.SendKeys( cmd )
+            if flag_pull :
+                cmd =   '''
+                        cd /d e:\\notes{ENTER}
+                        git pull origin master{ENTER}
+                        11002298{ENTER}
+                        cd /d e:\Sources{ENTER}
+                        git pull origin master{ENTER}
+                        11002298{ENTER}
+                        '''
+                cmd += "cd /d " + pwd + "{ENTER}"
+                cmd = ''.join( [ line.strip() for line in cmd.split('\n') ] )
+                import win32com.client
+                shell = win32com.client.Dispatch("WScript.Shell")
+                shell.SendKeys( cmd )
         elif _platform == "cygwin" :
             self.print_green( "[+] Wow, this is cygwin\n" ) ;
         elif _platform == "linux" or _platform == "linux2" :
@@ -225,8 +218,8 @@ class qyh_base( object ) :
         [+] callable
         [+] visible
         @short : scf
-        @args : "true" - use colorful print
-        @args : "false" - not use colorful print
+        @args : true - use colorful print
+        @args : false - not use colorful print
         @'''
         if not len( args ) == 1 :
             self.print_red( "[-] invalid parameters\n" )
@@ -779,8 +772,8 @@ class qyh_adb( qyh_base ) :
         [+] callable
         [+] visible
         @short : cll
-        @args : "count" - print amount of lib files to be installed
-        @args : "list" - list all lib files to be installed
+        @args : count - print amount of lib files to be installed
+        @args : list - list all lib files to be installed
         @'''
         log_filename = self.read_config( 'push_lib' , 'log_file' )
 
@@ -838,10 +831,10 @@ class qyh_adb( qyh_base ) :
         [+] callable
         [+] visible
         @short : dj
-        @args : "all" - dump VivoCamera's jpeg & snapdragonCamera's raw & metadata
-        @args : "meta" - dump VivoCamera's jpeg & metadata
-        @args : "snapraw" - dump VivoCamera's jpeg & snapdragonCamera's raw
-        @args : "del_only" - only delete file, not dump
+        @args : all - dump VivoCamera's jpeg & snapdragonCamera's raw & metadata
+        @args : meta - dump VivoCamera's jpeg & metadata
+        @args : snapraw - dump VivoCamera's jpeg & snapdragonCamera's raw
+        @args : del_only - only delete file, not dump
         @'''
         self.check_args( args , ( 'meta' , 'snapraw' , 'all' , 'del_only' ) )
 
