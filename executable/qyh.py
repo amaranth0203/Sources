@@ -1328,6 +1328,7 @@ class qyh( qyh_svr , qyh_adb ) :
             func_map = { f if self.get_formated_args( "self." + f )[0] == "" else self.get_formated_args( "self." + f )[0] : f for f in funcs }
             self.check_args( args[1:2] , tuple( s for t in func_map.items( ) for s in t ) )
             func_name = "self." + ( func_map[ args[1] ] if args[1] in func_map else args[1] )
+            self.call_log( func_name[5:] )
             if len( args ) > 2 :
                 f = eval( func_name )
                 f( *args[2:] )
