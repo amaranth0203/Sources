@@ -127,7 +127,8 @@ class qyh_base( object ) :
                 cmd += 'git add .{ENTER}'
                 cmd += 'git commit -m "routine push"{ENTER}'
                 cmd += 'git push origin master{ENTER}'
-                cmd += '11002298{ENTER}'
+                cmd += passphrase
+                cmd += '{ENTER}'
                 cmd += 'cd /d ' + pwd + '{ENTER}'
                 import win32com.client
                 shell = win32com.client.Dispatch("WScript.Shell")
@@ -143,7 +144,8 @@ class qyh_base( object ) :
                 cmd += sources_path
                 cmd +='{ENTER}'
                 cmd += 'git pull origin master{ENTER}'
-                cmd += '11002298{ENTER}'
+                cmd += passphrase
+                cmd += '{ENTER}'
                 cmd += 'cd /d ' + pwd + '{ENTER}'
                 import win32com.client
                 shell = win32com.client.Dispatch("WScript.Shell")
