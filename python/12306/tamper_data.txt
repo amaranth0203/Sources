@@ -1,0 +1,23 @@
+22:18:46.679[125ms][total 125ms] Status: 200[OK]
+POST http://192.168.2.125:8080/smartsys/userlogin.action Load Flags[LOAD_BACKGROUND  LOAD_BYPASS_LOCAL_CACHE  ] Content Size[-1] Mime Type[application/x-unknown-content-type]
+   Request Headers:
+      Host[192.168.2.125:8080]
+      User-Agent[Mozilla/5.0 (Windows NT 6.1; WOW64; rv:45.0) Gecko/20100101 Firefox/45.0]
+      Accept[application/json, text/javascript, */*; q=0.01]
+      Accept-Language[zh-CN,zh;q=0.8,en-US;q=0.5,en;q=0.3]
+      Accept-Encoding[gzip, deflate]
+      Content-Type[application/x-www-form-urlencoded; charset=UTF-8]
+      X-Requested-With[XMLHttpRequest]
+      Referer[http://192.168.2.125:8080/smartsys/]
+      Content-Length[39]
+      Cookie[JSESSIONID=F14E846832A4854714E57E481ABA9D1C]
+      Connection[keep-alive]
+   Post Data:
+      uid[qiyunhu]
+      password[python]
+      siteno[main]
+   Response Headers:
+      Server[Apache-Coyote/1.1]
+      Transfer-Encoding[chunked]
+      Date[Mon, 28 Mar 2016 14:18:45 GMT]
+
