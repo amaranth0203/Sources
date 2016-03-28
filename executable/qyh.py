@@ -1109,7 +1109,7 @@ class qyh_svr( qyh_base ) :
         @'''
         import subprocess , os , sys
         cmd = 'pythonw ' + os.path.dirname( os.path.realpath( __file__ ) ).replace( '\\' , '/' ) + '/qyh.py depress_surveillance'
-        process = subprocess.Popen( cmd )
+        #process = subprocess.Popen( cmd )
         if not self.svr_check( False ) :
             self.svr_reset( False , flag_kill = False)
             port = self.svr_getaddr( )[1]
