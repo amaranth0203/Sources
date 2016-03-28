@@ -94,41 +94,59 @@ class qyh_base( object ) :
         import os
         from sys import platform as _platform
         if _platform == "win32" :
+            identity = os.getenv( 'identity' ) 
+            if identity == 'Shadow' :
+                print 'pass'
+                sources_path = 'E:\\Source'
+                notes_path = 'E:\\Stay\\txt_and_more\\notes'
+                passphrase = 'python'
+            elif identity == 'vivo_work' :
+                sources_path = 'E:\\Sources'
+                notes_path = 'E:\\notes'
+                passphrase = '11002298'
+            else :
+                self.error_exit( 'unknown computer' ) ;
             self.check_args( args , ( 'push' , 'pull' ) )
             flag_push , flag_pull =\
                 tuple( self.trans_args( args , ( 'push' , 'pull' ) ) )
             pwd = str( os.getcwd() )
             if flag_push :
-                cmd =   '''
-                        cd /d e:\\notes{ENTER}
-                        git status{ENTER}
-                        git add .{ENTER}
-                        git commit -m "routine push"{ENTER}
-                        git push origin master{ENTER}
-                        11002298{ENTER}
-                        cd /d e:\Sources{ENTER}
-                        git status{ENTER}
-                        git add .{ENTER}
-                        git commit -m "routine push"{ENTER}
-                        git push origin master{ENTER}
-                        11002298{ENTER}
-                        '''
-                cmd += "cd /d " + pwd + "{ENTER}"
-                cmd = ''.join( [ line.strip() for line in cmd.split('\n') ] )
+                cmd = 'cd /d '
+                cmd += notes_path
+                cmd += '{ENTER}'
+                cmd += 'git status{ENTER}'
+                cmd += 'git add .{ENTER}'
+                cmd += 'git commit -m "routine push"{ENTER}'
+                cmd += 'git push origin master{ENTER}'
+                cmd += passphrase
+                cmd += '{ENTER}'
+                cmd += 'cd /d '
+                cmd += sources_path
+                cmd +='{ENTER}'
+                cmd += 'git status{ENTER}'
+                cmd += 'git add .{ENTER}'
+                cmd += 'git commit -m "routine push"{ENTER}'
+                cmd += 'git push origin master{ENTER}'
+                cmd += passphrase
+                cmd += '{ENTER}'
+                cmd += 'cd /d ' + pwd + '{ENTER}'
                 import win32com.client
                 shell = win32com.client.Dispatch("WScript.Shell")
                 shell.SendKeys( cmd )
             if flag_pull :
-                cmd =   '''
-                        cd /d e:\\notes{ENTER}
-                        git pull origin master{ENTER}
-                        11002298{ENTER}
-                        cd /d e:\Sources{ENTER}
-                        git pull origin master{ENTER}
-                        11002298{ENTER}
-                        '''
-                cmd += "cd /d " + pwd + "{ENTER}"
-                cmd = ''.join( [ line.strip() for line in cmd.split('\n') ] )
+                cmd = 'cd /d '
+                cmd += notes_path
+                cmd += '{ENTER}'
+                cmd += 'git pull origin master{ENTER}'
+                cmd += passphrase
+                cmd += '{ENTER}'
+                cmd += 'cd /d '
+                cmd += sources_path
+                cmd +='{ENTER}'
+                cmd += 'git pull origin master{ENTER}'
+                cmd += passphrase
+                cmd += '{ENTER}'
+                cmd += 'cd /d ' + pwd + '{ENTER}'
                 import win32com.client
                 shell = win32com.client.Dispatch("WScript.Shell")
                 shell.SendKeys( cmd )
@@ -1310,6 +1328,7 @@ class qyh( qyh_svr , qyh_adb ) :
             func_map = { f if self.get_formated_args( "self." + f )[0] == "" else self.get_formated_args( "self." + f )[0] : f for f in funcs }
             self.check_args( args[1:2] , tuple( s for t in func_map.items( ) for s in t ) )
             func_name = "self." + ( func_map[ args[1] ] if args[1] in func_map else args[1] )
+            self.call_log( func_name[5:] )
             if len( args ) > 2 :
                 f = eval( func_name )
                 f( *args[2:] )
