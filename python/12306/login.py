@@ -35,13 +35,15 @@ def test( ) :
     import ssl
     pass
     headers = {
-        "Host": "kyfw.12306.cn",
-        "User-Agent" : "Mozilla/5.0 (Windows NT 6.1; WOW64; rv:45.0) Gecko/20100101 Firefox/45.0" , 
-        "Accept": "text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8",
-        "Accept-Language": "zh-CN,zh;q=0.8,en-US;q=0.5,en;q=0.3",
-        "Accept-Encoding": "gzip, deflate, br",
-        "Cookie": "JSESSIONID=0A01E81A98656CDBD9D1AD5F8145A2C3DCB6ACF5AC; __NRF=236AFC49CC2A32C859AE16A8CB6E6B38; BIGipServerotn=451412234.38945.0000; current_captcha_type=Z" ,
-        "Connection": "keep-alive",
+        "Host" : "kyfw.12306.cn" ,
+        "User-Agent" : "Mozilla/5.0 (Windows NT 6.1; WOW64; rv:45.0) Gecko/20100101 Firefox/45.0" ,
+        "Accept" : "text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8" ,
+        "Accept-Language" : "zh-CN,zh;q=0.8,en-US;q=0.5,en;q=0.3" ,
+        "Accept-Encoding" : "gzip, deflate, br" ,
+        "Referer" : "https://kyfw.12306.cn/otn/index/initMy12306" ,
+        "Cookie" : "JSESSIONID=0A01E81BFC374B1186CB2B99C4E35C30FD3A7AAE07; __NRF=180D3D788B8C0D10608BA75A920E7AC0; BIGipServerotn=468189450.64545.0000; current_captcha_type=Z" ,
+        "Connection" : "keep-alive" ,
+        "Cache-Control" : "max-age=0" ,
     }
     # data = {
         # "uid" : "qiyunhu" ,
@@ -54,31 +56,144 @@ def test( ) :
     opener = urllib2.build_opener(urllib2.HTTPCookieProcessor(cj))
     # opener.open(url1, data)
     resp = opener.open("https://kyfw.12306.cn/otn/login/init")
+    print '[+] 1 : {}'.format( resp.getcode( ) )
 
-
+    # 2 获取图片验证码 - start
     headers = {
-        "Host": "kyfw.12306.cn",
-        "User-Agent" : "Mozilla/5.0 (Windows NT 6.1; WOW64; rv:45.0) Gecko/20100101 Firefox/45.0" , 
-        "Accept": "image/png,image/*;q=0.8,*/*;q=0.5",
-        "Accept-Language": "zh-CN,zh;q=0.8,en-US;q=0.5,en;q=0.3",
-        "Accept-Encoding": "gzip, deflate, br",
-        "Referer" : "https://kyfw.12306.cn/otn/login/init" , 
-        "Cookie": "JSESSIONID=0A02F02AC423C3EC66D310E21432E15325C108D71B; __NRF=560249D67A1CFF6E4D13819EA38A5898; BIGipServerotn=720372234.50210.0000; current_captcha_type=Z" ,
-        "Connection": "keep-alive",
+        "Host" : "kyfw.12306.cn" ,
+        "User-Agent" : "Mozilla/5.0 (Windows NT 6.1; WOW64; rv:45.0) Gecko/20100101 Firefox/45.0" ,
+        "Accept" : "image/png,image/*;q=0.8,*/*;q=0.5" ,
+        "Accept-Language" : "zh-CN,zh;q=0.8,en-US;q=0.5,en;q=0.3" ,
+        "Accept-Encoding" : "gzip, deflate, br" ,
+        "Referer" : "https://kyfw.12306.cn/otn/login/init" ,
+        "Cookie" : "JSESSIONID=0A01E81BFCC787B2E5A5F51570A05E87C0DF6A182A; __NRF=180D3D788B8C0D10608BA75A920E7AC0; BIGipServerotn=468189450.64545.0000; current_captcha_type=Z" ,
+        "Connection" : "keep-alive" ,
         "Cache-Control" : "max-age=0" ,
     }
     httplib.HTTPSConnection.connect = connect
     cj = cookielib.CookieJar()
     opener = urllib2.build_opener(urllib2.HTTPCookieProcessor(cj))
     resp = opener.open("https://kyfw.12306.cn/otn/passcodeNew/getPassCodeNew?module=login&rand=sjrand&0.4838378324749879")
+    print '[+] 2 : {}'.format( resp.getcode( ) )
     with open('Verification.jpg','wb') as f :
         f.write(resp.read())
+    # 2 获取图片验证码 - end
+
+    # 手动输入选项，生成randCode - start
+    import coordinate
+    coor = raw_input( 'coor?' )
+    args = [ int( i ) for i in coor.split( ) ]
+    randCode = coordinate.get_randCode( *args )
+    # 手动输入选项，生成randCode - end
+
+    # 3 提交验证码 - start
+    headers = {
+        "Host" : "kyfw.12306.cn" ,
+        "User-Agent" : "Mozilla/5.0 (Windows NT 6.1; WOW64; rv:45.0) Gecko/20100101 Firefox/45.0" ,
+        "Accept" : "*/*" ,
+        "Accept-Language" : "zh-CN,zh;q=0.8,en-US;q=0.5,en;q=0.3" ,
+        "Accept-Encoding" : "gzip, deflate, br" ,
+        "Content-Type" : "application/x-www-form-urlencoded; charset=UTF-8" ,
+        "X-Requested-With" : "XMLHttpRequest" ,
+        "Referer" : "https://kyfw.12306.cn/otn/login/init" ,
+        "Content-Length" : "30" ,
+        "Cookie" : "JSESSIONID=0A01E81BFC3863DA6E23D55FB9F8FA26E8908D64A4; __NRF=180D3D788B8C0D10608BA75A920E7AC0; BIGipServerotn=468189450.64545.0000; current_captcha_type=Z" ,
+        "Connection" : "keep-alive" ,
+    }
+    data = {
+        "randCode" : randCode ,
+        "rand" : "sjrand" ,
+    }
+    data = urllib.urlencode(data) 
+    httplib.HTTPSConnection.connect = connect
+    cj = cookielib.CookieJar()
+    opener = urllib2.build_opener(urllib2.HTTPCookieProcessor(cj))
+    resp = opener.open("https://kyfw.12306.cn/otn/passcodeNew/checkRandCodeAnsyn", data)
+    print '[+] 3 : {}'.format( resp.getcode( ) )
+    # resp = opener.open("https://kyfw.12306.cn/otn/passcodeNew/checkRandCodeAnsyn")
+    # 3 提交验证码 - end
+
+    # 4 使用提交的验证码登陆 - start
+    headers = {
+        "Host" : "kyfw.12306.cn" ,
+        "User-Agent" : "Mozilla/5.0 (Windows NT 6.1; WOW64; rv:45.0) Gecko/20100101 Firefox/45.0" ,
+        "Accept" : "*/*" ,
+        "Accept-Language" : "zh-CN,zh;q=0.8,en-US;q=0.5,en;q=0.3" ,
+        "Accept-Encoding" : "gzip, deflate, br" ,
+        "Content-Type" : "application/x-www-form-urlencoded; charset=UTF-8" ,
+        "X-Requested-With" : "XMLHttpRequest" ,
+        "Referer" : "https://kyfw.12306.cn/otn/login/init" ,
+        "Content-Length" : "88" ,
+        "Cookie" : "JSESSIONID=0A01E81BFC3863DA6E23D55FB9F8FA26E8908D64A4; __NRF=180D3D788B8C0D10608BA75A920E7AC0; BIGipServerotn=468189450.64545.0000; current_captcha_type=Z" ,
+        "Connection" : "keep-alive" ,
+    }
+    data = {
+        "loginUserDTO.user_name" : "845687884%40qq.com" ,
+        "userDTO.password" : "Echo920805" ,
+        "randCode" : randCode ,
+    }
+    data = urllib.urlencode(data) 
+    httplib.HTTPSConnection.connect = connect
+    cj = cookielib.CookieJar()
+    opener = urllib2.build_opener(urllib2.HTTPCookieProcessor(cj))
+    resp = opener.open("https://kyfw.12306.cn/otn/login/loginAysnSuggest")
+    print '[+] 4 : {}'.format( resp.getcode( ) )
+    # resp = opener.open("https://kyfw.12306.cn/otn/login/loginAysnSuggest")
+    # 4 使用提交的验证码登陆 - end
+
+    # 5 json check - start
+    headers = {
+        "Host" : "kyfw.12306.cn" ,
+        "User-Agent" : "Mozilla/5.0 (Windows NT 6.1; WOW64; rv:45.0) Gecko/20100101 Firefox/45.0" ,
+        "Accept" : "text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8" ,
+        "Accept-Language" : "zh-CN,zh;q=0.8,en-US;q=0.5,en;q=0.3" ,
+        "Accept-Encoding" : "gzip, deflate, br" ,
+        "Referer" : "https://kyfw.12306.cn/otn/login/init" ,
+        "Cookie" : "JSESSIONID=0A01E81BFC3863DA6E23D55FB9F8FA26E8908D64A4; __NRF=180D3D788B8C0D10608BA75A920E7AC0; BIGipServerotn=468189450.64545.0000; current_captcha_type=Z" ,
+        "Connection" : "keep-alive" ,
+    }
+    data = {
+        "_json_att" : "" ,
+    }
+    data = urllib.urlencode(data) 
+    httplib.HTTPSConnection.connect = connect
+    cj = cookielib.CookieJar()
+    opener = urllib2.build_opener(urllib2.HTTPCookieProcessor(cj))
+    resp = opener.open("https://kyfw.12306.cn/otn/login/userLogin", data)
+    print '[+] 5 : {}'.format( resp.getcode( ) )
+    # resp = opener.open("https://kyfw.12306.cn/otn/login/userLogin")
+    # 5 json check - end
+
+    # 6 获取登陆后的页面 - start
+    headers = {
+        "Host" : "kyfw.12306.cn" ,
+        "User-Agent" : "Mozilla/5.0 (Windows NT 6.1; WOW64; rv:45.0) Gecko/20100101 Firefox/45.0" ,
+        "Accept" : "text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8" ,
+        "Accept-Language" : "zh-CN,zh;q=0.8,en-US;q=0.5,en;q=0.3" ,
+        "Accept-Encoding" : "gzip, deflate, br" ,
+        "Referer" : "https://kyfw.12306.cn/otn/login/init" ,
+        "Cookie" : "JSESSIONID=0A01E81BFC3863DA6E23D55FB9F8FA26E8908D64A4; __NRF=180D3D788B8C0D10608BA75A920E7AC0; BIGipServerotn=468189450.64545.0000; current_captcha_type=Z" ,
+        "Connection" : "keep-alive" ,
+    }
+    # data = {
+        # "loginUserDTO.user_name" : "845687884%40qq.com" ,
+        # "userDTO.password" : "Echo920805" ,
+        # "randCode" : randCode ,
+    # }
+    # data = urllib.urlencode(data) 
+    httplib.HTTPSConnection.connect = connect
+    cj = cookielib.CookieJar()
+    opener = urllib2.build_opener(urllib2.HTTPCookieProcessor(cj))
+    # opener.open(url1, data)
+    resp = opener.open("https://kyfw.12306.cn/otn/index/initMy12306")
+    # 6 获取登陆后的页面 - end
+    return resp.read().strip()
 
 
 
     # return resp.read().strip()
 
 if __name__ == "__main__" :
-    # open_htmlcode_in_browser( test( ) )
-    test( )
+    open_htmlcode_in_browser( test( ) )
+    # test( )
 

@@ -844,6 +844,13 @@ class qyh_adb( qyh_base ) :
         self.print_yellow( '\n'.join( str( f ) for f in self.read_config( "metadata" , "command" ).split( "\"" ) ) + '\n' )
         return True
 
+    def awb_log( self , ) :
+        '''@
+        [+] callable
+        @'''
+        self.print_yellow( '\n'.join( str( f ) for f in self.read_config( "awb_log" , "command" ).split( "\"" ) ) + '\n' )
+        return True
+
     def dump_jpeg( self , *args ) :
         '''@
         [+] callable
