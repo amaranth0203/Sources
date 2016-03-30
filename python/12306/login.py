@@ -56,7 +56,12 @@ def test( ) :
     opener = urllib2.build_opener(urllib2.HTTPCookieProcessor(cj))
     # opener.open(url1, data)
     resp = opener.open("https://kyfw.12306.cn/otn/login/init")
-    print '[+] 1 : {}'.format( resp.getcode( ) )
+    print '[+] 1 : \n{} \n{} \n{}'.format( resp.getcode( ) , resp.url , resp.geturl( ) )
+    # print resp.headers.getheaders('set-cookie')
+    cookie = resp.headers.getheaders('set-cookie')
+    cookie = '; '.join( cookie )
+    # print cookie
+    # exit()
 
     # 2 获取图片验证码 - start
     headers = {
@@ -66,15 +71,16 @@ def test( ) :
         "Accept-Language" : "zh-CN,zh;q=0.8,en-US;q=0.5,en;q=0.3" ,
         "Accept-Encoding" : "gzip, deflate, br" ,
         "Referer" : "https://kyfw.12306.cn/otn/login/init" ,
-        "Cookie" : "JSESSIONID=0A01E81BFCC787B2E5A5F51570A05E87C0DF6A182A; __NRF=180D3D788B8C0D10608BA75A920E7AC0; BIGipServerotn=468189450.64545.0000; current_captcha_type=Z" ,
+        "Cookie" : cookie ,
         "Connection" : "keep-alive" ,
         "Cache-Control" : "max-age=0" ,
     }
+    # headers['Cookie'] = cookie
     httplib.HTTPSConnection.connect = connect
     cj = cookielib.CookieJar()
     opener = urllib2.build_opener(urllib2.HTTPCookieProcessor(cj))
-    resp = opener.open("https://kyfw.12306.cn/otn/passcodeNew/getPassCodeNew?module=login&rand=sjrand&0.4838378324749879")
-    print '[+] 2 : {}'.format( resp.getcode( ) )
+    resp = opener.open("https://kyfw.12306.cn/otn/passcodeNew/getPassCodeNew?module=login&rand=sjrand&0.4838378324749877")
+    print '[+] 2 : \n{} \n{} \n{}'.format( resp.getcode( ) , resp.url , resp.geturl( ) )
     with open('Verification.jpg','wb') as f :
         f.write(resp.read())
     # 2 获取图片验证码 - end
@@ -88,17 +94,17 @@ def test( ) :
 
     # 3 提交验证码 - start
     headers = {
-        "Host" : "kyfw.12306.cn" ,
+        # "Host" : "kyfw.12306.cn" ,
         "User-Agent" : "Mozilla/5.0 (Windows NT 6.1; WOW64; rv:45.0) Gecko/20100101 Firefox/45.0" ,
         "Accept" : "*/*" ,
-        "Accept-Language" : "zh-CN,zh;q=0.8,en-US;q=0.5,en;q=0.3" ,
+        # "Accept-Language" : "zh-CN,zh;q=0.8,en-US;q=0.5,en;q=0.3" ,
         "Accept-Encoding" : "gzip, deflate, br" ,
         "Content-Type" : "application/x-www-form-urlencoded; charset=UTF-8" ,
         "X-Requested-With" : "XMLHttpRequest" ,
         "Referer" : "https://kyfw.12306.cn/otn/login/init" ,
-        "Content-Length" : "30" ,
-        "Cookie" : "JSESSIONID=0A01E81BFC3863DA6E23D55FB9F8FA26E8908D64A4; __NRF=180D3D788B8C0D10608BA75A920E7AC0; BIGipServerotn=468189450.64545.0000; current_captcha_type=Z" ,
-        "Connection" : "keep-alive" ,
+        # "Content-Length" : "30" ,
+        "Cookie" : cookie ,
+        # "Connection" : "keep-alive" ,
     }
     data = {
         "randCode" : randCode ,
@@ -109,9 +115,12 @@ def test( ) :
     cj = cookielib.CookieJar()
     opener = urllib2.build_opener(urllib2.HTTPCookieProcessor(cj))
     resp = opener.open("https://kyfw.12306.cn/otn/passcodeNew/checkRandCodeAnsyn", data)
-    print '[+] 3 : {}'.format( resp.getcode( ) )
+    print '[+] 3 : \n{} \n{} \n{}'.format( resp.getcode( ) , resp.url , resp.geturl( ) )
+    print resp.read()
+    # print resp.headers.getheaders('set-cookie')
     # resp = opener.open("https://kyfw.12306.cn/otn/passcodeNew/checkRandCodeAnsyn")
     # 3 提交验证码 - end
+    exit()
 
     # 4 使用提交的验证码登陆 - start
     headers = {
@@ -137,7 +146,7 @@ def test( ) :
     cj = cookielib.CookieJar()
     opener = urllib2.build_opener(urllib2.HTTPCookieProcessor(cj))
     resp = opener.open("https://kyfw.12306.cn/otn/login/loginAysnSuggest")
-    print '[+] 4 : {}'.format( resp.getcode( ) )
+    print '[+] 4 : \n{} \n{} \n{}'.format( resp.getcode( ) , resp.url , resp.geturl( ) )
     # resp = opener.open("https://kyfw.12306.cn/otn/login/loginAysnSuggest")
     # 4 使用提交的验证码登陆 - end
 
@@ -160,7 +169,7 @@ def test( ) :
     cj = cookielib.CookieJar()
     opener = urllib2.build_opener(urllib2.HTTPCookieProcessor(cj))
     resp = opener.open("https://kyfw.12306.cn/otn/login/userLogin", data)
-    print '[+] 5 : {}'.format( resp.getcode( ) )
+    print '[+] 5 : \n{} \n{} \n{}'.format( resp.getcode( ) , resp.url , resp.geturl( ) )
     # resp = opener.open("https://kyfw.12306.cn/otn/login/userLogin")
     # 5 json check - end
 
