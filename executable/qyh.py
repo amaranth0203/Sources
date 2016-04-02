@@ -96,7 +96,6 @@ class qyh_base( object ) :
         if _platform == "win32" :
             identity = os.getenv( 'identity' ) 
             if identity == 'Shadow' :
-                print 'pass'
                 sources_path = 'E:\\Source'
                 notes_path = 'E:\\Stay\\txt_and_more\\notes'
                 passphrase = 'python'
