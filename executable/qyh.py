@@ -720,6 +720,10 @@ class qyh_adb( qyh_base ) :
         self.check_device( )
         rc = self.lexec( "adb shell dumpsys window policy" , False , False )
         flags = [ line.split( '=' )[1] for line in rc.split( ) if line[0:6] == "mAwake" or line[0:18] == "mShowingLockscreen" ]
+        # for mtk
+        if len( flags ) > 2 :
+            flags = flags[0:2]
+        # for mtk end
         status = {
             "falsetrue" : "screen_off" ,
             "truetrue"  : "screen_lock" ,
@@ -755,6 +759,10 @@ class qyh_adb( qyh_base ) :
         self.check_device( )
         rc = self.lexec( "adb shell dumpsys window policy" , False , False )
         flags = [ line.split( '=' )[1] for line in rc.split( ) if line[0:6] == "mAwake" or line[0:18] == "mShowingLockscreen" ]
+        # for mtk
+        if len( flags ) > 2 :
+            flags = flags[0:2]
+        # for mtk end
         status = {
             "falsetrue" : "screen_off" ,
             "truetrue"  : "screen_lock" ,
