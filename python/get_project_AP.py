@@ -41,5 +41,18 @@ def getAP( html ) :
     results = html.xpath( "//input[@id='AP']" )
     return results[0].value
 
+def print_and_log_to_file( AP_addr ) :
+    import datetime
+    log_file_name = "AP.log"
+    print AP_addr
+    #print datetime.datetime.now( )
+    with open( log_file_name , "a+" ) as f :
+        f.write( "\r\n" )
+        f.write( str( datetime.datetime.now( ) ).split( '.' )[0] ) 
+        f.write( "\r\n" )
+        f.write( AP_addr )
+        f.write( "\r\n" )
+
 if __name__ == "__main__" :
-    print getAP( test( ) ) 
+    #print getAP( test( ) ) 
+    print_and_log_to_file( getAP( test( ) ) )

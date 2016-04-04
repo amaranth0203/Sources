@@ -3,6 +3,32 @@
 
 class qyh_base( object ) :
 
+    def dictionary_youdao( self , *args ) :
+        '''@
+        [+] visible
+        [+] callable
+        @short : dy
+        @args : keyword - keyword to translate
+        @'''
+        from sys import platform as _platform
+        if not _platform == "win32" :
+            print '[-] not windows ><'
+            exit( )
+        if len( args ) < 1 :
+            self.error_exit( 'takes keyword to translate' )
+        import urllib  
+        import urllib2  
+        import cookielib  
+        import lxml.html
+        url = "http://dict.youdao.com/w/" + urllib.quote( ' '.join( args ).decode( 'gbk' ).encode( 'utf-8' ) )
+        opener = urllib2.build_opener()
+        resp = opener.open(url)
+        html = lxml.html.fromstring( resp.read().strip() )
+        results = html.xpath( "//div[@class='trans-container']" )
+        try :
+            print " ".join( results[0].getchildren()[0].getchildren()[0].text_content().split( ) )
+        except :
+            print "-"
     def change_background_color( self , *args ) :
         '''@
         [+] callable

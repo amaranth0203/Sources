@@ -1,22 +1,22 @@
 #!/usr/bin/env python_
 #-*- coding=utf-8 -*-
 
-import webbrowser 
 import urllib  
 import urllib2  
-import os  
 import sys  
 import requests  
 import json  
 import httplib  
 import cookielib  
-import time
 from BeautifulSoup import BeautifulSoup
 
 def test_output( ) :
     print "[+] function : " + test_output.__name__
 
 def open_htmlcode_in_browser( html ) :
+    import webbrowser 
+    import os  
+    import time
     # print html
     tmp_file_name = "__temp__.html"
     webbrowser.register('firefox', None, webbrowser.GenericBrowser('firefox'), 1)
