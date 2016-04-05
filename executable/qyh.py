@@ -1014,13 +1014,26 @@ class qyh_svr( qyh_base ) :
 
     class ThreadedTCPRequestHandler( BaseRequestHandler ) :
         def handle( self ) :
-            import threading , os , subprocess
+            import threading , os , subprocess , sys
             svr = qyh_svr( )
             data = self.request.recv( 65536 )
             cur_thread = threading.current_thread( )
-            # self.request.sendall( 'wrapper : {}'.format(data) )
             if svr.check_white_list( self.client_address[0] ) :
-                self.request.sendall( '[!] ' + data + '\r\n' + os.popen( data ).read( ) )
+
+
+                import shlex , select
+                process = subprocess.Popen( shlex.split( data ), shell=True, stdout=subprocess.PIPE, stderr=subprocess.STDOUT )
+                while True:
+                    output = process.stdout.readline()
+                    if output == '' and process.poll() is not None:
+                        break
+                    if output:
+                        # print output
+                        sys.stdout.write(output)
+                        sys.stdout.flush()
+                        self.request.sendall( output )
+
+                # self.request.sendall( '[!] ' + data + '\r\n' + os.popen( data ).read( ) )
             else :
                 svr.log_rejection( self.client_address[0] , self.client_address[1] , data )
 
