@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="utf-8"?>
+<config>
+    <GMean_thL>111</GMean_thL>
+    <GMean_thH>190</GMean_thH>
+    <GDecay_th>0.65</GDecay_th>
+    <ColorDiff_th>0.05</ColorDiff_th>
+    <flash_lab_tha>4</flash_lab_tha>
+    <flash_lab_thb>8</flash_lab_thb>
+    <flash_colorDiff_th>30</flash_colorDiff_th>
+    <blackShading_th>20</blackShading_th>
+    <mtf50>0.06</mtf50>
+    <rg_min>1.1</rg_min>
+    <rg_max>1.24</rg_max>
+    <bg_min>0.67</bg_min>
+    <bg_max>1</bg_max>    
+</config>

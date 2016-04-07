@@ -1,0 +1,10 @@
+﻿apk -> /system/app/AutoTestCamera/
+.so -> /system/app/AutoTestCamera/lib/arm/
+xml -> /sdcard/ATCamera/
+
+
+√ 1 check root
+√ 2 check remount
+√ 3 check dir if not mkdir
+√ 4 push
+√ 5 adb reboot
