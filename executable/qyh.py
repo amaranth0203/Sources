@@ -819,6 +819,15 @@ class qyh_adb( qyh_base ) :
             self.error_exit( 'unknow status' )
         return True
 
+    def adb_back( self , ) :
+        '''@
+        [+] callable
+        @short : ab
+        @'''
+        self.check_device( )
+        self.lexec( self.read_config( "adb_back" , "command" ) )
+        return True
+
     def log_file( self , ) :
         '''@
         [+] callable
