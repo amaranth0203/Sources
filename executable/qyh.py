@@ -109,6 +109,54 @@ class qyh_base( object ) :
             self.print_red( "[-]unknow os\n" ) ;
         return True
 
+    def git_routine_entity( self , flag , identity ) :
+        pass
+        infos = {
+            "Shadow" : {
+                "passphrase" : "python" ,
+                "paths" : [ 
+                    'E:\\Source' , 
+                    'E:\\Stay\\txt_and_more\\notes' ,
+                ]
+            } ,
+            "vivo_work" : {
+                "passphrase" : "11002298" ,
+                "paths" : [
+                    'E:\\Sources' ,
+                    'E:\\notes' ,
+                ]
+            } ,
+        }
+        import os
+        pwd = str( os.getcwd() )
+        info = infos[identity]
+        cmd = ""
+        if flag == "push" :
+            for path in info["paths"] :
+                cmd += 'cd /d '
+                cmd += path
+                cmd += '{ENTER}'
+                cmd += 'git status{ENTER}'
+                cmd += 'git add .{ENTER}'
+                cmd += 'git commit -m "routine push"{ENTER}'
+                cmd += 'git push origin master{ENTER}'
+                cmd += info["passphrase"]
+                cmd += '{ENTER}'
+            cmd += 'cd /d ' + pwd + '{ENTER}'
+        if flag == "pull" :
+            for path in info["paths"] :
+                cmd += 'cd /d '
+                cmd += path
+                cmd += '{ENTER}'
+                cmd += 'git pull origin master{ENTER}'
+                cmd += info["passphrase"]
+                cmd += '{ENTER}'
+            cmd += 'cd /d ' + pwd + '{ENTER}'
+        import win32com.client
+        shell = win32com.client.Dispatch("WScript.Shell")
+        shell.SendKeys( cmd )
+        return True
+
     def git_routine( self , *args ) :
         '''@
         [+] callable
@@ -136,45 +184,9 @@ class qyh_base( object ) :
                 tuple( self.trans_args( args , ( 'push' , 'pull' ) ) )
             pwd = str( os.getcwd() )
             if flag_push :
-                cmd = 'cd /d '
-                cmd += notes_path
-                cmd += '{ENTER}'
-                cmd += 'git status{ENTER}'
-                cmd += 'git add .{ENTER}'
-                cmd += 'git commit -m "routine push"{ENTER}'
-                cmd += 'git push origin master{ENTER}'
-                cmd += passphrase
-                cmd += '{ENTER}'
-                cmd += 'cd /d '
-                cmd += sources_path
-                cmd +='{ENTER}'
-                cmd += 'git status{ENTER}'
-                cmd += 'git add .{ENTER}'
-                cmd += 'git commit -m "routine push"{ENTER}'
-                cmd += 'git push origin master{ENTER}'
-                cmd += passphrase
-                cmd += '{ENTER}'
-                cmd += 'cd /d ' + pwd + '{ENTER}'
-                import win32com.client
-                shell = win32com.client.Dispatch("WScript.Shell")
-                shell.SendKeys( cmd )
+                self.git_routine_entity( "push" , identity )
             if flag_pull :
-                cmd = 'cd /d '
-                cmd += notes_path
-                cmd += '{ENTER}'
-                cmd += 'git pull origin master{ENTER}'
-                cmd += passphrase
-                cmd += '{ENTER}'
-                cmd += 'cd /d '
-                cmd += sources_path
-                cmd +='{ENTER}'
-                cmd += 'git pull origin master{ENTER}'
-                cmd += passphrase
-                cmd += '{ENTER}'
-                cmd += 'cd /d ' + pwd + '{ENTER}'
-                import win32com.client
-                shell = win32com.client.Dispatch("WScript.Shell")
-                shell.SendKeys( cmd )
+                self.git_routine_entity( "pull" , identity )
         elif _platform == "cygwin" :
             self.print_green( "[+] Wow, this is cygwin\n" ) ;
         elif _platform == "linux" or _platform == "linux2" :
@@ -1021,19 +1033,19 @@ class qyh_svr( qyh_base ) :
             if svr.check_white_list( self.client_address[0] ) :
 
 
-                import shlex , select
-                process = subprocess.Popen( shlex.split( data ), shell=True, stdout=subprocess.PIPE, stderr=subprocess.STDOUT )
-                while True:
-                    output = process.stdout.readline()
-                    if output == '' and process.poll() is not None:
-                        break
-                    if output:
-                        # print output
-                        sys.stdout.write(output)
-                        sys.stdout.flush()
-                        self.request.sendall( output )
+                # import shlex , select
+                # process = subprocess.Popen( shlex.split( data ), shell=True, stdout=subprocess.PIPE, stderr=subprocess.STDOUT )
+                # while True:
+                    # output = process.stdout.readline()
+                    # if output == '' and process.poll() is not None:
+                        # break
+                    # if output:
+                        # # print output
+                        # sys.stdout.write(output)
+                        # sys.stdout.flush()
+                        # self.request.sendall( output )
 
-                # self.request.sendall( '[!] ' + data + '\r\n' + os.popen( data ).read( ) )
+                self.request.sendall( '[!] ' + data + '\r\n' + os.popen( data ).read( ) )
             else :
                 svr.log_rejection( self.client_address[0] , self.client_address[1] , data )
 
