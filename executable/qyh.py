@@ -1061,6 +1061,32 @@ class qyh_svr( qyh_base ) :
     class ThreadedTCPServer( ThreadingMixIn , TCPServer ) :
         pass
 
+    def svr_check_time( self ) :
+        '''@
+        [+] callable
+        @'''
+        import datetime , threading , os
+        from sys import platform as _platform
+        if not _platform == "win32" :
+            print '[-] not windows ><'
+        hold = [
+            '0650' , '0720' , '0750' , '0840' , '0935' , '1025' , '1115' ,
+            '1440' , '1535' , '1625' ,
+            '1830' , '1930' , '2000' , '2055' , '2150' ,
+        ]
+        loosen = [
+            '0740' , '0830' , '0920' , '1015' , '1105' , '1155' ,
+            '1520' , '1615' , '1705' ,
+            '1950' , '2045' , '2140' , '2230' ,
+        ]
+        print "checking..."
+        now = ''.join( str( datetime.datetime.now( )).split( )[1].split( '.' )[0].split( ':' ) )[0:4]
+        if now in hold : 
+            os.popen( 'msg %username% "hold"' )
+        if now in loosen :
+            os.popen( 'msg %username% "loosen"' )
+        threading.Timer( 44 , self.svr_check_time ).start( )
+
     def svr_set_timer( self , *args ) :
         '''@
         [+] callable
@@ -1209,6 +1235,8 @@ class qyh_svr( qyh_base ) :
             self.lexec( cmd_fwall_pass , False , False )
             cmd_fwall_pass = 'netsh advfirewall firewall add rule name="qyh_svr" protocol=TCP dir=in localport={} action=allow'.format( port )
             self.lexec( cmd_fwall_pass , False , False )
+            cmd = 'pythonw ' + os.path.dirname( os.path.realpath( __file__ ) ).replace( '\\' , '/' ) + '/qyh.py svr_check_time'
+            process = subprocess.Popen( cmd )
             cmd = 'pythonw ' + os.path.dirname( os.path.realpath( __file__ ) ).replace( '\\' , '/' ) + '/qyh.py svd'
             process = subprocess.Popen( cmd )
         else :
@@ -1234,15 +1262,15 @@ class qyh_svr( qyh_base ) :
         @short : svk
         @'''
         import signal , os , psutil
-        pid = self.svr_getpid( )
-        if pid > 0 :
-            try :
-                process_name = "pythonw.exe"
-                print os.popen( 'taskkill /F /IM ' + process_name + ' /T' ).read( )
-                os.kill( pid , signal.SIGTERM )
-                self.write_config( "svr" , "pid" , -1 )
-            except :
-                pass
+        # pid = self.svr_getpid( )
+        # if pid > 0 :
+        try :
+            process_name = "pythonw.exe"
+            print os.popen( 'taskkill /F /IM ' + process_name + ' /T' ).read( )
+            os.kill( pid , signal.SIGTERM )
+            self.write_config( "svr" , "pid" , -1 )
+        except :
+            pass
                 # self.error_exit( '!!!!!!!!!!!! os.kill exception' )
         # else :
             # self.error_exit( 'daemon down' )import psutil
