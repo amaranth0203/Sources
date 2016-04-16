@@ -1065,7 +1065,7 @@ class qyh_svr( qyh_base ) :
         '''@
         [+] callable
         @'''
-        import datetime , threading , os
+        import datetime , time , os
         from sys import platform as _platform
         if not _platform == "win32" :
             print '[-] not windows ><'
@@ -1083,9 +1083,13 @@ class qyh_svr( qyh_base ) :
         now = ''.join( str( datetime.datetime.now( )).split( )[1].split( '.' )[0].split( ':' ) )[0:4]
         if now in hold : 
             os.popen( 'msg %username% "hold"' )
+            self.log_rejection( 'a' , 'hold' , str( datetime.datetime.now( ) ) )
         if now in loosen :
             os.popen( 'msg %username% "loosen"' )
-        threading.Timer( 44 , self.svr_check_time ).start( )
+            self.log_rejection( 'b' , 'loosen' , str( datetime.datetime.now( ) ) )
+        self.log_rejection( 'c' , 'check' , str( datetime.datetime.now( ) ) )
+        time.sleep( 44 )
+        self.svr_check_time( )
 
     def svr_set_timer( self , *args ) :
         '''@
