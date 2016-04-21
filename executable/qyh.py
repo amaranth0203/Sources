@@ -1065,7 +1065,7 @@ class qyh_svr( qyh_base ) :
         '''@
         [+] callable
         @'''
-        import datetime , time , os
+        import datetime , time , subprocess , shlex
         from sys import platform as _platform
         if not _platform == "win32" :
             print '[-] not windows ><'
@@ -1077,16 +1077,18 @@ class qyh_svr( qyh_base ) :
         loosen = [
             '0740' , '0830' , '0920' , '1015' , '1105' , '1155' ,
             '1520' , '1615' , '1705' ,
-            '1950' , '2045' , '2140' , '2230' ,
+            '1950' , '2045' , '2140' , '2230' 
         ]
         print "checking..."
         now = ''.join( str( datetime.datetime.now( )).split( )[1].split( '.' )[0].split( ':' ) )[0:4]
         if now in hold : 
-            os.popen( 'msg %username% "hold"' )
+            # os.popen( 'msg %username% "hold"' )
             self.log_rejection( 'a' , 'hold' , str( datetime.datetime.now( ) ) )
+            subprocess.Popen( shlex.split( 'msg Administrator "hold"' ) )
         if now in loosen :
-            os.popen( 'msg %username% "loosen"' )
+            # os.popen( 'msg %username% "loosen"' )
             self.log_rejection( 'b' , 'loosen' , str( datetime.datetime.now( ) ) )
+            subprocess.Popen( shlex.split( 'msg Administrator "loosen"' ) )
         self.log_rejection( 'c' , 'check' , str( datetime.datetime.now( ) ) )
         time.sleep( 44 )
         self.svr_check_time( )
