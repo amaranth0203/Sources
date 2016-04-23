@@ -109,6 +109,22 @@ class qyh_base( object ) :
             self.print_red( "[-]unknow os\n" ) ;
         return True
 
+    def lexec_hard( self , cmd ) :
+        from sys import platform as _platform
+        if _platform == "win32" :
+            import win32com.client
+            shell = win32com.client.Dispatch("WScript.Shell")
+            shell.SendKeys( cmd )
+        elif _platform == "cygwin" :
+            self.print_green( "[+] Wow, this is cygwin\n" ) ;
+        elif _platform == "linux" or _platform == "linux2" :
+            self.print_green( "[+] Wow, this is Linux\n" ) ;
+        elif _platform == "darwin" :
+            self.print_green( "[+] Wow, this is Mac OS\n" ) ;
+        else :
+            self.print_red( "[-]unknow os\n" ) ;
+        return True
+
     def git_routine_entity( self , flag , identity ) :
         pass
         infos = {
@@ -152,9 +168,10 @@ class qyh_base( object ) :
                 cmd += info["passphrase"]
                 cmd += '{ENTER}'
             cmd += 'cd /d ' + pwd + '{ENTER}'
-        import win32com.client
-        shell = win32com.client.Dispatch("WScript.Shell")
-        shell.SendKeys( cmd )
+        self.lexec_hard( cmd )
+        # import win32com.client
+        # shell = win32com.client.Dispatch("WScript.Shell")
+        # shell.SendKeys( cmd )
         return True
 
     def git_routine( self , *args ) :
@@ -402,6 +419,41 @@ class qyh_base( object ) :
         return rc
 
 class qyh_adb( qyh_base ) :
+
+    def select_device_serial( self , *args ) :
+        '''@
+        [+] callable
+        [+] visible
+        @short : sds
+        @'''
+        import os
+        indexes = []
+        current_file = os.getenv( 'ANDROID_SERIAL' )
+        current_index = -1
+        # files = self.read_config( "push_lib" , "log_files" ).split("|")
+        devices = self.lexec( 'adb devices' ).strip( ).split( '\n' )[1:]
+        self.print_green_light( '\ncurrent -> {}\n\n'.format( current_file ) )
+        for index,file in enumerate( devices ) :
+            print "[+] {} ---> {}".format( index + 1 , file.split( )[0] )
+            indexes.append( index )
+            if file == current_file :
+                current_index = index
+        selected = -1
+        selected_raw = raw_input( "[+] which one ?\n")
+        if selected_raw == "" :
+            selected = current_index
+        else :
+            try :
+                selected = int( selected_raw ) - 1
+            except :
+                self.error_exit( '[-] bad option {}'.format( selected_raw ) )
+        if selected not in indexes :
+            self.error_exit( '[-] bad option {}'.format( selected + 1 ) )
+        # print devices[ selected ].split( )[0]
+        cmd = 'set ANDROID_SERIAL={}{ENTER}'.format( devices[ selected ].split( )[0] )
+        # print cmd
+        self.lexec( cmd )
+        
 
     def select_log_file( self , *args ) :
         '''@
