@@ -428,15 +428,16 @@ class qyh_adb( qyh_base ) :
         @'''
         import os
         indexes = []
-        current_file = os.getenv( 'ANDROID_SERIAL' )
+        current_serial = os.getenv( 'ANDROID_SERIAL' )
         current_index = -1
-        # files = self.read_config( "push_lib" , "log_files" ).split("|")
         devices = self.lexec( 'adb devices' ).strip( ).split( '\n' )[1:]
-        self.print_green_light( '\ncurrent -> {}\n\n'.format( current_file ) )
+        self.print_green_light( '\ncurrent -> {}\n\n'.format( current_serial ) )
+        print "[+] {} ---> {}".format( 0 , 'None' )
+        indexes.append( -1 )
         for index,file in enumerate( devices ) :
             print "[+] {} ---> {}".format( index + 1 , file.split( )[0] )
             indexes.append( index )
-            if file == current_file :
+            if file == current_serial :
                 current_index = index
         selected = -1
         selected_raw = raw_input( "[+] which one ?\n")
@@ -449,10 +450,11 @@ class qyh_adb( qyh_base ) :
                 self.error_exit( '[-] bad option {}'.format( selected_raw ) )
         if selected not in indexes :
             self.error_exit( '[-] bad option {}'.format( selected + 1 ) )
-        # print devices[ selected ].split( )[0]
-        cmd = 'set ANDROID_SERIAL={}{ENTER}'.format( devices[ selected ].split( )[0] )
-        # print cmd
-        self.lexec( cmd )
+        if selected == -1 :
+            cmd = 'set ANDROID_SERIAL={ENTER}'
+        else :
+            cmd = 'set ANDROID_SERIAL={}'.format( devices[ selected ].split( )[0] ) + '{ENTER}'
+        self.lexec_hard( cmd )
         
 
     def select_log_file( self , *args ) :
@@ -461,9 +463,11 @@ class qyh_adb( qyh_base ) :
         [+] visible
         @short : slf
         @'''
+        import os
         # select lib log file starts
         indexes = []
-        current_file = self.read_config( "push_lib" , "log_file" )
+        # current_file = self.read_config( "push_lib" , "log_file" )
+        current_file = os.getenv( 'qyh_llf' )
         current_index = -1
         files = self.read_config( "push_lib" , "log_files" ).split("|")
         self.print_green_light( '\ncurrent -> {}\n\n'.format( current_file ) )
@@ -483,13 +487,14 @@ class qyh_adb( qyh_base ) :
                 self.error_exit( '[-] bad option {}'.format( selected_raw ) )
         if selected not in indexes :
             self.error_exit( '[-] bad option {}'.format( selected + 1 ) )
-        self.write_config( "push_lib" , "log_file" , files[selected] )
+        cmd = 'set qyh_llf={}'.format( files[selected] ) + '{ENTER}'
         # select lib log file ends
 
         # select bootimg log file starts
         print( '' )
         indexes = []
-        current_file = self.read_config( "flash_boot" , "log_file" )
+        # current_file = self.read_config( "flash_boot" , "log_file" )
+        current_file = os.getenv( 'qyh_flf' )
         current_index = -1
         files = self.read_config( "flash_boot" , "log_files" ).split("|")
         self.print_green_light( '\ncurrent -> {}\n\n'.format( current_file ) )
@@ -509,10 +514,10 @@ class qyh_adb( qyh_base ) :
                 self.error_exit( '[-] bad option {}'.format( selected_raw ) )
         if selected not in indexes :
             self.error_exit( '[-] bad option {}'.format( selected + 1 ) )
-        self.write_config( "flash_boot" , "log_file" , files[selected] )
         # select bootimg log file ends
 
-        self.log_file( )
+        cmd += 'set qyh_flf={}'.format( files[selected] ) + '{ENTER}'
+        self.lexec_hard( cmd )
         pass
 
     def check_device( self , ) :
@@ -635,7 +640,9 @@ class qyh_adb( qyh_base ) :
         flag_backup , flag_fake , flag_dump_first =\
             tuple( self.trans_args( args , ( 'backup' , 'fake' , 'dump_first' ) ) )
 
-        log_filename = self.read_config( 'push_lib' , 'log_file' )
+        log_filename = os.getenv( 'qyh_llf' )
+        if log_filename == None :
+            self.error_exit( 'qyh slf first' )
 
         self.check_log( log_filename , "Install:" , 0 , 8 ) 
         if not flag_fake : 
@@ -699,7 +706,9 @@ class qyh_adb( qyh_base ) :
         [+] visible
         @short : fb
         @'''
-        log_filename = self.read_config( 'flash_boot' , 'log_file' )
+        log_filename = os.getenv( 'qyh_flf' )
+        if log_filename == None :
+            self.error_exit( 'qyh slf first' )
 
         self.check_log( log_filename , "Target boot image:" , 0 , 18 )
         if not self.check_fastboot_mode( ) :
@@ -886,9 +895,9 @@ class qyh_adb( qyh_base ) :
         [+] visible
         @short : lf
         @'''
-        self.print_green( "[+] push_lib   : " + self.read_config( "push_lib" , "log_file" ) + "\n" )
-        # self.print_green( "[+] check_lib  : " + self.read_config( "check_log" , "log_file" ) + "\n" )
-        self.print_green( "[+] flash_boot : " + self.read_config( "flash_boot" , "log_file" ) + "\n" )
+        import os
+        self.print_green( "[+] push_lib   : " + os.getenv( 'qyh_llf' ) + "\n" )
+        self.print_green( "[+] flash_boot : " + os.getenv( 'qyh_flf' ) + "\n" )
         return True
 
     def check_lib_log( self , *args ) :
@@ -899,7 +908,10 @@ class qyh_adb( qyh_base ) :
         @args : count - print amount of lib files to be installed
         @args : list - list all lib files to be installed
         @'''
-        log_filename = self.read_config( 'push_lib' , 'log_file' )
+        import os
+        log_filename = os.getenv( 'qyh_llf' )
+        if log_filename == None :
+            self.error_exit( 'qyh slf first' )
 
         self.check_args( args , ( 'count' , 'list' ) )
         self.check_log( log_filename , "Install:" , 0 , 8 )
@@ -1031,7 +1043,9 @@ class qyh_adb( qyh_base ) :
                 os.makedirs( args[0] )
             spe_dir = True
 
-        log_filename = self.read_config( 'push_lib' , 'log_file' )
+        log_filename = os.getenv( 'qyh_llf' )
+        if log_filename == None :
+            self.error_exit( 'qyh slf first' )
         self.check_log( log_filename , "Install:" , 0 , 8 )
         logs = self.read_log( log_filename , "Install:" , 0 , 8 )
         for index , log in enumerate( logs ) :
