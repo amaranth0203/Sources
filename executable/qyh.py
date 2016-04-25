@@ -434,10 +434,10 @@ class qyh_adb( qyh_base ) :
         self.print_green_light( '\ncurrent -> {}\n\n'.format( current_serial ) )
         print "[+] {} ---> {}".format( 0 , 'None' )
         indexes.append( -1 )
-        for index,file in enumerate( devices ) :
-            print "[+] {} ---> {}".format( index + 1 , file.split( )[0] )
+        for index,serial in enumerate( devices ) :
+            print "[+] {} ---> {}".format( index + 1 , serial.split( )[0] )
             indexes.append( index )
-            if file == current_serial :
+            if serial.split( )[0] == current_serial :
                 current_index = index
         selected = -1
         selected_raw = raw_input( "[+] which one ?\n")
@@ -521,10 +521,34 @@ class qyh_adb( qyh_base ) :
         pass
 
     def check_device( self , ) :
+        import os
         rc = self.lexec( "adb devices" )
-        if rc.strip().replace( "devices" , "" ).find( "device" ) > 0 :
-            self.print_green_light( "[+] device found\n" ) ;
-            return True
+        # print '------------'
+        # print len( rc.strip().replace( "devices" , "" ).split( '\n' ) )
+        # print '------------'
+        # exit( )
+        if len( rc.strip().replace( "devices" , "" ).split( '\n' ) ) == 2 :
+            current_serial = os.getenv( 'ANDROID_SERIAL' )
+            if current_serial == None :
+                self.print_green_light( "[+] device found\n" ) ;
+                return True
+            else :
+                devices = rc.strip( ).split( '\n' )[1]
+                if current_serial == devices.split( )[0] :
+                    self.print_green_light( "[+] device {} found \n".format( current_serial ) ) ;
+                    return True
+                self.error_exit( "device {} not found".format( current_serial ) ) ;
+        elif len( rc.strip().replace( "devices" , "" ).split( '\n' ) ) > 2 :
+            current_serial = os.getenv( 'ANDROID_SERIAL' )
+            if current_serial == None :
+                self.error_exit( "multiple devices , qyh sds first" ) ;
+            else :
+                devices = rc.strip( ).split( '\n' )[1:]
+                for device in devices :
+                    if current_serial == device.split( )[0] :
+                        self.print_green_light( "[+] device {} found\n".format( current_serial ) ) ;
+                        return True
+                self.error_exit( "device {} not found".format( current_serial ) ) ;
         else :
             self.error_exit( "device not attached ><" )
 
