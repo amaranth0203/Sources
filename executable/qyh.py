@@ -1173,11 +1173,11 @@ class qyh_svr( qyh_base ) :
         now = ''.join( str( datetime.datetime.now( )).split( )[1].split( '.' )[0].split( ':' ) )[0:4]
         if now in hold : 
             # os.popen( 'msg %username% "hold"' )
-            self.log_rejection( 'a' , 'hold' , str( datetime.datetime.now( ) ) )
+            # self.log_rejection( 'a' , 'hold' , str( datetime.datetime.now( ) ) )
             subprocess.Popen( shlex.split( 'msg Administrator "hold"' ) )
         if now in loosen :
             # os.popen( 'msg %username% "loosen"' )
-            self.log_rejection( 'b' , 'loosen' , str( datetime.datetime.now( ) ) )
+            # self.log_rejection( 'b' , 'loosen' , str( datetime.datetime.now( ) ) )
             subprocess.Popen( shlex.split( 'msg Administrator "loosen"' ) )
         self.log_rejection( 'c' , 'check' , str( datetime.datetime.now( ) ) )
         time.sleep( 44 )
