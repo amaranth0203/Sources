@@ -420,6 +420,26 @@ class qyh_base( object ) :
 
 class qyh_adb( qyh_base ) :
 
+    def set_adb_no_check( self , *args ) :
+        '''@
+        [+] callable
+        [+] visible
+        @short : snc
+        @args : true - true
+        @args : false - false
+        @'''
+        self.check_args( args , ( 'true' , 'false' ) )
+        flag_true , flag_false =\
+            tuple( self.trans_args( args , ( 'true' , 'false' ) ) )
+        import os
+        print '[+] no check flag : {}'.format( os.getenv( 'qyh_adb_no_check' ) )
+        if flag_true :
+            cmd = "set qyh_adb_no_check=true{ENTER}"
+            self.lexec_hard( cmd )
+        if flag_false :
+            cmd = "set qyh_adb_no_check={ENTER}"
+            self.lexec_hard( cmd )
+
     def select_device_serial( self , *args ) :
         '''@
         [+] callable
@@ -522,6 +542,9 @@ class qyh_adb( qyh_base ) :
 
     def check_device( self , ) :
         import os
+        check_flag = os.getenv( 'qyh_adb_no_check' )
+        if check_flag == 'true' :
+            return True
         rc = self.lexec( "adb devices" )
         # print '------------'
         # print len( rc.strip().replace( "devices" , "" ).split( '\n' ) )
@@ -553,6 +576,10 @@ class qyh_adb( qyh_base ) :
             self.error_exit( "device not attached ><" )
 
     def check_root( self , ) :
+        import os
+        check_flag = os.getenv( 'qyh_adb_no_check' )
+        if check_flag == 'true' :
+            return True
         rc = self.lexec( "adb remount" ) 
         if rc.find( "succeeded" ) > 0 :
             self.print_green_light( "[+] already root\n" )
@@ -638,16 +665,23 @@ class qyh_adb( qyh_base ) :
     #   前提：安卓设备（单一）已经打开debug模式并且root
     #   ps之后查找进程名并结束
     #
-        process_name = args[0]
-        self.print_green_light( "\n[+] kill process : " + process_name + "\n" )
-        cmd_kill = 'adb shell "ps | grep ' + process_name + '"'
-        rc = self.lexec( cmd_kill )
-        if rc.strip() == "" :
-            self.print_red( "[-] process " + process_name + " not exist ><" + "\n" )
-            return
-        kill_cmd = ""
-        kill_cmd += "adb shell kill -9" + " " + rc.strip().split()[1]
-        self.lexec( kill_cmd )
+        processes = args[0]
+        self.print_green_light( "\n[+] kill process : " + ' '.join( processes ) + "\n" )
+        rc = self.lexec( 'adb shell ps' , False ).strip( ).split( '\n' )[1:]
+        targets = []
+        for line in rc :
+            if line.split( )[8].split( '/' )[-1] in processes :
+                targets.append( line )
+        ordered_target = []
+        for process in processes :
+            for line in targets :
+                if process in line :
+                    ordered_target.append( line )
+        print '\n'.join( ordered_target ) 
+        for target in ordered_target : 
+            kill_cmd = ""
+            kill_cmd += "adb shell kill -9" + " " + target.split( )[1]
+            self.lexec( kill_cmd )
         return
 
     def push_lib( self , *args ) :
@@ -749,17 +783,20 @@ class qyh_adb( qyh_base ) :
 
         return True
 
-    def kill_camera_svr_and_clt( self , ) :
+    def kill_camera_svr_and_clt( self , *args ) :
         '''@
         [+] callable
         [+] visible
         @short : kc
         @'''
+
         self.check_device( )
         self.check_root( )
 
+        processes = []
         for process_name in self.read_config( 'kill_camera_svr_and_clt' , 'camera_process_name' ).split( ' ' ) :
-            self.kill_process( process_name )
+            processes.append( process_name )
+        self.kill_process( processes )
         return True
 
     def kill_camera_service( self , ) :
@@ -771,8 +808,10 @@ class qyh_adb( qyh_base ) :
         self.check_device( )
         self.check_root( )
 
+        processes = []
         for process_name in self.read_config( 'kill_camera_service' , 'camera_process_name' ).split( ' ' ) :
-            self.kill_process( process_name )
+            processes.append( process_name )
+        self.kill_process( processes )
         return True
 
     def kill_camera_client( self , ) :
@@ -784,8 +823,11 @@ class qyh_adb( qyh_base ) :
         self.check_device( )
         self.check_root( )
 
+        processes = []
         for process_name in self.read_config( 'kill_camera_client' , 'camera_process_name' ).split( ' ' ) :
-            self.kill_process( process_name )
+            processes.append( process_name )
+        self.kill_process( processes )
+            
         return True
 
     def start_camera( self , ) :
