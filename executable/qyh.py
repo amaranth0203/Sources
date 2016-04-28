@@ -1221,7 +1221,7 @@ class qyh_svr( qyh_base ) :
             # os.popen( 'msg %username% "loosen"' )
             # self.log_rejection( 'b' , 'loosen' , str( datetime.datetime.now( ) ) )
             subprocess.Popen( shlex.split( 'msg Administrator "loosen"' ) )
-        self.log_rejection( 'c' , 'check' , str( datetime.datetime.now( ) ) )
+        # self.log_rejection( 'c' , 'check' , str( datetime.datetime.now( ) ) )
         time.sleep( 44 )
         self.svr_check_time( )
 
