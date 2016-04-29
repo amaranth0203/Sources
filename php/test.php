@@ -1,5 +1,82 @@
 <?php
 
+    
+
+exit( ) ;
+
+    trait Counter {
+        public function inc() {
+            static $c = 0;
+            $c = $c + 1;
+            echo "$c\n";
+        }
+    }
+    
+    class C1 {
+        use Counter;
+    }
+    
+    class C2 {
+        use Counter;
+    }
+    
+    $o = new C1(); $o->inc(); // echo 1
+    $o = new C1(); $o->inc(); // echo 2
+    $p = new C2(); $p->inc(); // echo 1
+
+    class Foo {
+        public static $my_static = 'foo' ;
+        public function staticValue( ) {
+            return self::$my_static ;
+        }
+    }
+    class Bar extends Foo {
+        public function fooStatic( ) {
+            return parent::$my_static ;
+        }
+    }
+
+    print Foo::$my_static . "\n" ;
+
+    $foo = new Foo ;
+    print $foo->staticValue( )."\n" ;
+    print $foo->my_static."\n" ;
+
+    print $foo::my_static."\n" ;
+    $classname = "Foo" ;
+    print $classname::$my_static."\n" ;
+    
+
+    $message = "hello" ;
+
+    $example = function( ) {
+        var_dump( $message ) ;
+    } ;
+
+    $example( ) ;
+
+    $example = function( ) use ( $message ) {
+        var_dump( $message ) ;
+    } ; 
+
+    $example( ) ;
+
+    $message = "world" ;
+
+    $example( ) ;
+
+    $message = "hello" ;
+
+    $example = function( ) use ( &$message ) {
+        var_dump( $message ) ; 
+    } ;
+
+    $example( ) ;
+
+    $message = "world" ;
+
+    $example( ) ;
+
     class C { } ;
 
     function getC( ) {
@@ -7,8 +84,6 @@
     }
 
     var_dump( getC( ) ) ;
-
-exit( ) ;
 
     list( $b , $a ) = [ 1 , 2 , 3 ] ;
 
