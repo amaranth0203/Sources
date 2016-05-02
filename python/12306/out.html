@@ -1,48 +1,9 @@
-HTTP/1.1 302 Moved Temporarily
-Date: Mon, 02 May 2016 10:36:38 GMT
-Server: Microsoft-IIS/6.0
-X-Powered-By: ASP.NET
-X-Powered-By: PHP/5.3.16
-Set-Cookie: fd160_lastpos=other; expires=Tue, 02-May-2017 10:36:38 GMT; path=/; httponly
-Set-Cookie: fd160_lastvisit=2%091462185398%09%2Flogin.php%3F; expires=Tue, 02-May-2017 10:36:38 GMT; path=/; httponly
-Set-Cookie: fd160_ck_info=%2F%09; expires=Tue, 02-May-2017 10:36:38 GMT; path=/; httponly
-Set-Cookie: fd160_winduser=AQQFVgRVOQEFBVxVVQdQCwdSAAUBBwFUAARUBVMEWAUHUFVXBFECb1cHVlZTVAdWV1U%3D; expires=Tue, 02-May-2017 10:36:38 GMT; path=/; httponly
-Set-Cookie: fd160_lastvisit=deleted; expires=Thu, 01-Jan-1970 00:00:01 GMT; path=/; httponly
-Location: http://yydzh.com/
-Content-type: text/html
-Content-Length: 0
-
-
-HTTP/1.1 302 Moved Temporarily
-Date: Mon, 02 May 2016 10:36:38 GMT
-Server: Microsoft-IIS/6.0
-X-Powered-By: ASP.NET
-X-Powered-By: PHP/5.3.16
-Set-Cookie: fd160_lastpos=other; expires=Tue, 02-May-2017 10:36:38 GMT; path=/; httponly
-Set-Cookie: fd160_lastvisit=2%091462185398%09%2Flogin.php%3F; expires=Tue, 02-May-2017 10:36:38 GMT; path=/; httponly
-Set-Cookie: fd160_ck_info=%2F%09; expires=Tue, 02-May-2017 10:36:38 GMT; path=/; httponly
-Set-Cookie: fd160_winduser=AQQFVgRVOQEFBVxVVQdQCwdSAAUBBwFUAARUBVMEWAUHUFVXBFECb1cHVlZTVAdWV1U%3D; expires=Tue, 02-May-2017 10:36:38 GMT; path=/; httponly
-Set-Cookie: fd160_lastvisit=deleted; expires=Thu, 01-Jan-1970 00:00:01 GMT; path=/; httponly
-Location: http://yydzh.com/
-Content-type: text/html
-Content-Length: 0
-
-HTTP/1.1 200 OK
-Content-Length: 6981
-Content-Type: text/html
-Content-Encoding: gzip
-Server: Microsoft-IIS/6.0
-X-Powered-By: ASP.NET
-X-Powered-By: PHP/5.3.16
-Set-Cookie: fd160_lastpos=index; expires=Tue, 02-May-2017 10:36:38 GMT; path=/; httponly
-Set-Cookie: fd160_lastvisit=2%091462185398%09%2Findex.php%3F; expires=Tue, 02-May-2017 10:36:38 GMT; path=/; httponly
-Set-Cookie: fd160_ol_offset=1358; expires=Tue, 02-May-2017 10:36:38 GMT; path=/; httponly
-Set-Cookie: fd160_online=deleted; expires=Thu, 01-Jan-1970 00:00:01 GMT; path=/; httponly
-Date: Mon, 02 May 2016 10:36:37 GMT
-
-
-6981
-6981
+--------------[step1] to get cookie
+[ 0 ] <Cookie fd160_lastpos=other for yydzh.com/>
+[ 1 ] <Cookie fd160_lastvisit=0%091462197171%09%2Flogin.php%3F for yydzh.com/>
+[ 2 ] <Cookie fd160_ol_offset=14647 for yydzh.com/>
+--------------[step2] to get code
+--------------[step4] to login
 
 <!doctype html>
 <html>
@@ -51,11 +12,11 @@ Date: Mon, 02 May 2016 10:36:37 GMT
 <title>YY大杂烩 吃饭喝水上YY</title>
 <meta name="keywords" content="avatar,yyshow,形象,设计,造型,虚拟形象,像素,素材" />
 <meta name="description" content="含音乐，游戏，动漫等论坛。" />
-<link rel='archives' title='YY大杂烩' href='http://www.yydzh.com/simple' />
-<link rel="alternate" type="application/rss+xml" title="RSS" href="http://www.yydzh.com/rss.php?fid=0" />
+<link rel='archives' title='YY大杂烩' href='http://yydzh.com/simple' />
+<link rel="alternate" type="application/rss+xml" title="RSS" href="http://yydzh.com/rss.php?fid=0" />
 <link rel="shortcut icon" href="favicon.ico" />
 <link rel="stylesheet" href="data/style/wind_css.css" />
-<base id="headbase" href="http://www.yydzh.com/" />
+<base id="headbase" href="http://yydzh.com/" />
 
 
 <script language="JavaScript">
@@ -147,7 +108,7 @@ function IsElement(id){
 <img src="images/yy/logo.gif" style="float:left;"></a>
 <span><a href="index.php">首页</a> | <a href="http://www.yydzh.com/simple">手机版</a> | <a href="wap">WAP</a> |  <a href="login.php?action=clearcookie">清除缓存</a> | 
 
-<a href="http://yydzh.com">切换到网通线路</a>
+<a href="http://www.yydzh.com">切换到电信线路</a>
 
 </span>
 </div>
@@ -159,11 +120,37 @@ function IsElement(id){
 </style>
 <div class="yyhead" id="yyhead">
 &nbsp;
-	
+&raquo; <a href="profile.php?action=show&uid=465056" title="今晚吃牛肉亲，您的UID是：465056">今晚吃牛肉</a> | 
+<a href="login.php?action=quit&verify=1d25436d">退出</a> | 
+<a href="userpay.php">充值</a> | 
+<a href="hack.php?H_name=coupon">兑换</a> | 
+<a href="profile.php?action=buy&job=buy&gid=18">VIP</a> | 
+<a href="profile.php">设置</a> | 
+<a href="hack.php?H_name=avatar&index=myshow#s">换形象</a> | 
+<a href="hack.php?H_name=avatar&index=myequip#s">换装备</a> | 
+<a href="hack.php?H_name=avatar&index=rpg_userinfo">冒险</a> | 
+<a href="search.php">搜索</a> | 
+<a id="td_msg" href="message.php?#s">
+<font color="#ff0000">消息</font></a>
+  | 
+<a style="cursor:pointer;" id="td_hack" >设施</a> | 
 
-<a href="login.php">登录</a> | 
-<a href="register.php">注册</a> | 
-<a href="sendpwd.php">忘记密码</a> 
+
+	<a href="hack.php?H_name=medal">胸章</a> | 
+
+	<a href="hack.php?H_name=toolcenter">道具</a> | 
+
+	<a href="hack.php?H_name=avatar">YY秀</a> | 
+
+	<a href="hack.php?H_name=uid">靓号</a> | 
+
+	<a href="hack.php?H_name=usercard">装扮</a> | 
+
+	<a href="hack.php?H_name=soccer">博彩</a> | 
+
+	<a href="hack.php?H_name=vip">礼物</a> | 
+
+	<a href="faq.php">帮助</a>
 
 
 
@@ -172,7 +159,7 @@ function IsElement(id){
 
 <div style="width:960px;margin: auto;left:0px;"><img src="yy/yymap.gif" usemap="#yyhead"></div>
 
-<script language="JavaScript" src="hack/announce/announce.js?12110"></script>
+<script language="JavaScript" src="hack/announce/announce.js?4831"></script>
 
 <map name="yyhead"><area shape="poly" coords="353, 4, 353, 96, 279, 96, 279, 4" href="./" title="返回首页">
 <area shape="poly" coords="63, 1, 29, 77, 0, 86, 1, 1" href="thread.php?fid=20#s" title="前往YY事务所">
@@ -243,13 +230,30 @@ function IsElement(id){
 
 
 
+					<a href="profile.php?action=modify#face"><img src="attachment/avatar/icon/465056.gif" onmouseout="read.close();" style="cursor:pointer;padding:2px;border:#ccc 1px solid;width:40px;height:40px;background:#fff" onmouseover="read.open('showface','sf','4');" class="fl"/></a>
+					<div style="padding:0 0 0 1em;margin:.6em 0 0 45px"> <span id="sf"></span> <span class="user-info" id="showface" style="display:none"> <span class="user-infoWrap"> <span class="co"></span> <a href="personal.php" class="s5">我的主题</a> <a href="personal.php?action=post" class="s5">我的回复</a><br />
+						
+						
+<a href="profile.php?action=favor" class="s5">收藏帖子</a>
+<a href="hack.php?H_name=avatar&index=myshow" class="s5">更换形象</a><br />	
+						Ｙ币: <span class="s3 f9">1154 个</span><br />
+						贡献: <span class="s3 f9">0 点</span><br />
+						<span class="gray f9"> 最后登录: 2016-05-02<br />
+						登录IP: 121.35.71.153<br />
+						</span> </span> </span> UID：465056 | 等级：Lv2 | 帖子：278
+
+
+					</div>
+
+
+
 				</div></td>
 			<td><div style=" padding:5px;" class="fr tar">
 
-					今日发帖:6939 | 昨日发帖:10532 |
+					今日发帖:9123 | 昨日发帖:10532 |
 
-					在线人数:362 <a href="rss.php" target="_blank" title="RSS订阅本版面最新帖子"><img align="absmiddle" src="images/wind/rss.png" /></a>
-					<div style="">主题:1066637 | 帖子:34090144 | 会员:31963 | 欢迎新会员 <a href="profile.php?action=show&username=822102416g" target="_blank">822102416g</a></div>
+					在线人数:366 <a href="rss.php" target="_blank" title="RSS订阅本版面最新帖子"><img align="absmiddle" src="images/wind/rss.png" /></a>
+					<div style="">主题:1066678 | 帖子:34092327 | 会员:31969 | 欢迎新会员 <a href="profile.php?action=show&username=%C3%D8%B1%A6" target="_blank">秘宝</a></div>
 				</div></td>
 		</tr>
 		
@@ -338,7 +342,7 @@ function IsElement(id){
 
 
 
-<h7><a href="thread.php?fid=34#s"><span style="color:#777777"><b><font color=#009999>YY秀创作交流版</font></b></span></a></h7><span class="s3">(21)</span></td>
+<h7><a href="thread.php?fid=34#s"><span style="color:#777777"><b><font color=#009999>YY秀创作交流版</font></b></span></a></h7><span class="s3">(32)</span></td>
 							</tr>
 							<tr valign="middle" height="15">
 								<td class="tinytxt f10"><span class="smalltxt gray">讨论YY秀设计制作的地方</span></td>
@@ -374,7 +378,7 @@ function IsElement(id){
 
 
 
-<h7><a href="thread.php?fid=38#s"><span style="color:#777777"><b><font color=#ff7095>YY秀舞台</font></b></span></a></h7><span class="s3">(6)</span></td>
+<h7><a href="thread.php?fid=38#s"><span style="color:#777777"><b><font color=#ff7095>YY秀舞台</font></b></span></a></h7><span class="s3">(7)</span></td>
 							</tr>
 							<tr valign="middle" height="15">
 								<td class="tinytxt f10"><span class="smalltxt gray">展示你搭配的YY秀</span></td>
@@ -410,7 +414,7 @@ function IsElement(id){
 
 
 
-<h7><a href="thread.php?fid=20#s"><span style="color:#777777"><b><font color=#2F7FD4>事务所</font></b></span></a></h7><span class="s3">(1111)</span></td>
+<h7><a href="thread.php?fid=20#s"><span style="color:#777777"><b><font color=#2F7FD4>事务所</font></b></span></a></h7><span class="s3">(1245)</span></td>
 							</tr>
 							<tr valign="middle" height="15">
 								<td class="tinytxt f10"><span class="smalltxt gray">处理论坛事务的地方</span></td>
@@ -468,7 +472,7 @@ function IsElement(id){
 
 
 
-<h7><a href="thread.php?fid=2#s"><span style="color:#777777"><b><font color=#5176FF>大杂烩</font></b></span></a></h7><span class="s3">(79)</span></td>
+<h7><a href="thread.php?fid=2#s"><span style="color:#777777"><b><font color=#5176FF>大杂烩</font></b></span></a></h7><span class="s3">(103)</span></td>
 							</tr>
 							<tr valign="middle" height="15">
 								<td class="tinytxt f10"><span class="smalltxt gray">八卦一下</span></td>
@@ -504,7 +508,7 @@ function IsElement(id){
 
 
 
-<h7><a href="thread.php?fid=197#s"><span style="color:#777777"><b><font color=#0096FF>映の物语</font></b></span></a></h7><span class="s3">(1)</span></td>
+<h7><a href="thread.php?fid=197#s"><span style="color:#777777"><b><font color=#0096FF>映の物语</font></b></span></a></h7><span class="s3">(3)</span></td>
 							</tr>
 							<tr valign="middle" height="15">
 								<td class="tinytxt f10"><span class="smalltxt gray">这是相机和你带来的故事</span></td>
@@ -573,7 +577,7 @@ function IsElement(id){
 
 
 
-<h7><a href="thread.php?fid=22#s"><span style="color:#777777"><b><font color=#E9B13A>YY大冒险</font></b></span></a></h7><span class="s3">(2125)</span></td>
+<h7><a href="thread.php?fid=22#s"><span style="color:#777777"><b><font color=#E9B13A>YY大冒险</font></b></span></a></h7><span class="s3">(3103)</span></td>
 							</tr>
 							<tr valign="middle" height="15">
 								<td class="tinytxt f10"><span class="smalltxt gray">论坛冒险游戏</span></td>
@@ -611,7 +615,7 @@ function IsElement(id){
 
 
 
-<h7><a href="thread.php?fid=4#s"><span style="color:#777777"><b><font color=#ED53FF>日记屋</font></b></span></a></h7><span class="s3">(0)</span></td>
+<h7><a href="thread.php?fid=4#s"><span style="color:#777777"><b><font color=#ED53FF>日记屋</font></b></span></a></h7><span class="s3">(2)</span></td>
 							</tr>
 							<tr valign="middle" height="15">
 								<td class="tinytxt f10"><span class="smalltxt gray">记录你生活的点点滴滴</span></td>
@@ -647,7 +651,7 @@ function IsElement(id){
 
 
 
-<h7><a href="thread.php?fid=77#s"><span style="color:#777777"><b><font color=#1b66f5>水星球</font></b></span></a></h7><span class="s3">(1645)</span></td>
+<h7><a href="thread.php?fid=77#s"><span style="color:#777777"><b><font color=#1b66f5>水星球</font></b></span></a></h7><span class="s3">(2181)</span></td>
 							</tr>
 							<tr valign="middle" height="15">
 								<td class="tinytxt f10"><span class="smalltxt gray">聊天交友认亲，禁止纯水
@@ -720,7 +724,7 @@ function IsElement(id){
 
 
 
-<h7><a href="thread.php?fid=66#s"><span style="color:#777777"><b><font color=#ff9907>跳蚤市场</font></b></span></a></h7><span class="s3">(32)</span></td>
+<h7><a href="thread.php?fid=66#s"><span style="color:#777777"><b><font color=#ff9907>跳蚤市场</font></b></span></a></h7><span class="s3">(41)</span></td>
 							</tr>
 							<tr valign="middle" height="15">
 								<td class="tinytxt f10"><span class="smalltxt gray">二手交易市场</span></td>
@@ -850,7 +854,7 @@ function IsElement(id){
 
 
 
-<h7><a href="thread.php?fid=32#s"><span style="color:#777777"><b><font color=#B34E8C>&#9756;_人形公馆_&#9758;</font></b></span></a></h7><span class="s3">(0)</span></td>
+<h7><a href="thread.php?fid=32#s"><span style="color:#777777"><b><font color=#B34E8C>&#9756;_人形公馆_&#9758;</font></b></span></a></h7><span class="s3">(6)</span></td>
 							</tr>
 							<tr valign="middle" height="15">
 								<td class="tinytxt f10"><span class="smalltxt gray">让我们一同走进BJD的国度</span></td>
@@ -944,7 +948,7 @@ function IsElement(id){
 
 
 
-<h7><a href="thread.php?fid=26#s"><span style="color:#777777"><b><font color=#E7164A>洛奇讨论版</font></b></span></a></h7><span class="s3">(389)</span></td>
+<h7><a href="thread.php?fid=26#s"><span style="color:#777777"><b><font color=#E7164A>洛奇讨论版</font></b></span></a></h7><span class="s3">(519)</span></td>
 							</tr>
 							<tr valign="middle" height="15">
 								<td class="tinytxt f10"><span class="smalltxt gray"><a href="thread.php?fid=10"><font color=green>【乐谱屋】</font></a> <a href="thread.php?fid=72"><font color=green>【补丁区】</font></a></span></td>
@@ -1112,7 +1116,7 @@ function IsElement(id){
 
 
 
-<h7><a href="thread.php?fid=37#s"><span style="color:red"><b>玛丽</b></span></a></h7><span class="s3">(565)</span></td>
+<h7><a href="thread.php?fid=37#s"><span style="color:red"><b>玛丽</b></span></a></h7><span class="s3">(694)</span></td>
 							</tr>
 							<tr valign="middle" height="15">
 								<td class="tinytxt f10"><span class="smalltxt gray"><a href="thread.php?fid=198"><font color=green>[交易区]</font></a>  <a href="hack.php?H_name=pz&server=1"><font color=green>[查骗子]</font></a></span></td>
@@ -1150,7 +1154,7 @@ function IsElement(id){
 
 
 
-<h7><a href="thread.php?fid=33#s"><span style="color:#00d714"><b>伊文</b></span></a></h7><span class="s3">(492)</span></td>
+<h7><a href="thread.php?fid=33#s"><span style="color:#00d714"><b>伊文</b></span></a></h7><span class="s3">(603)</span></td>
 							</tr>
 							<tr valign="middle" height="15">
 								<td class="tinytxt f10"><span class="smalltxt gray"><a href="thread.php?fid=200"><font color=green>[交易区]</font></a> <a href="hack.php?H_name=pz&server=3"><font color=green>[查骗子]</font></a></span></td>
@@ -1188,7 +1192,7 @@ function IsElement(id){
 
 
 
-<h7><a href="thread.php?fid=78#s"><span style="color:#ff8a00"><b>蕾拉</b></span></a></h7><span class="s3">(329)</span></td>
+<h7><a href="thread.php?fid=78#s"><span style="color:#ff8a00"><b>蕾拉</b></span></a></h7><span class="s3">(411)</span></td>
 							</tr>
 							<tr valign="middle" height="15">
 								<td class="tinytxt f10"><span class="smalltxt gray"><a href="thread.php?fid=52"><font color=green>[交易区]</font></a>  <a href="hack.php?H_name=pz&server=2"><font color=green>[查骗子]</font></a></span></td>
@@ -1226,7 +1230,7 @@ function IsElement(id){
 
 
 
-<h7><a href="thread.php?fid=42#s"><span style="color:#777777"><b>鲁拉里</b></span></a></h7><span class="s3">(74)</span></td>
+<h7><a href="thread.php?fid=42#s"><span style="color:#777777"><b>鲁拉里</b></span></a></h7><span class="s3">(92)</span></td>
 							</tr>
 							<tr valign="middle" height="15">
 								<td class="tinytxt f10"><span class="smalltxt gray"><a href="thread.php?fid=199"><font color=green>[交易区]</font></a>  <a href="hack.php?H_name=pz&server=4"><font color=green>[查骗子]</font></a></span></td>
@@ -1264,7 +1268,7 @@ function IsElement(id){
 
 
 
-<h7><a href="thread.php?fid=51#s"><span style="color:#777777"><b>露娜</b></span></a></h7><span class="s3">(58)</span></td>
+<h7><a href="thread.php?fid=51#s"><span style="color:#777777"><b>露娜</b></span></a></h7><span class="s3">(69)</span></td>
 							</tr>
 							<tr valign="middle" height="15">
 								<td class="tinytxt f10"><span class="smalltxt gray"><a href="thread.php?fid=102"><font color=green>[交易区]</font></a>  <a href="hack.php?H_name=pz&server=5"><font color=green>[查骗子]</font></a></span></td>
@@ -1324,7 +1328,7 @@ function IsElement(id){
 
 </div>
 <div id="footer">
-<small>Total 0.022550(s) query 2, Powered by PHPWind  <a href="http://www.miibeian.gov.cn" target="_blank"><font color=</a>
+<small>Total 0.021380(s) query 3, Powered by PHPWind  <a href="http://www.miibeian.gov.cn" target="_blank"><font color=</a>
  <br />Copyright &copy; 2004–2016 YYDZH.com All Rights Reserved <br />
 
 <script type="text/javascript">var cnzz_protocol = (("https:" == document.location.protocol) ? " https://" : " http://");document.write(unescape("%3Cspan id='cnzz_stat_icon_175294'%3E%3C/span%3E%3Cscript src='" + cnzz_protocol + "s96.cnzz.com/stat.php%3Fid%3D175294%26show%3Dpic2' type='text/javascript'%3E%3C/script%3E"));</script>
@@ -1340,3 +1344,8 @@ read.InitMenu();
  
 </body></html>
 
+[ 0 ] <Cookie fd160_ck_info=%2F%09 for yydzh.com/>
+[ 1 ] <Cookie fd160_lastpos=index for yydzh.com/>
+[ 2 ] <Cookie fd160_lastvisit=1%091462197172%09%2Findex.php%3F for yydzh.com/>
+[ 3 ] <Cookie fd160_ol_offset=97 for yydzh.com/>
+[ 4 ] <Cookie fd160_winduser=AQQFVgRVOQEFBVxVVQdQCwdSAAUBBwFUAARUBVMEWAUHUFVXBFECb1cHVlZTVAdWV1U%3D for yydzh.com/>
