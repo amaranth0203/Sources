@@ -18,7 +18,6 @@
         echo json_encode($return);
     }
     function leave_message( ) {
-        error_log( '[+] here' ) ;
         $return = $_POST;
         require_once( $_SERVER['DOCUMENT_ROOT'].'/priv_handler/leave_message.php' ) ;
         $return["message"] = $message ;

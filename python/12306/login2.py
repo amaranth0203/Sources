@@ -78,8 +78,6 @@ def Login():
     f = urllib2.urlopen(request) 
     print(f.read())
 
-    for index, cookie in enumerate(cj):
-        print '[',index, ']',cookie;
     exit( )
 
     print "--------------[step4] to login";

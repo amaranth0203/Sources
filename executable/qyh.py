@@ -413,7 +413,7 @@ class qyh_base( object ) :
                 break
             if output:
                 rc += output
-                print( "[+] " + output.strip() )
+                print( output.strip() )
         # rc = process.poll()
         print( ' ' )
         return rc
@@ -1450,59 +1450,21 @@ class qyh_svr( qyh_base ) :
         self.write_config( "svr" , "addr" , ( ip , port ) )
         pass
 
-class qyh( qyh_svr , qyh_adb ) :
+class qyh_php( qyh_base ) :
 
-    def log(text):
-        def decorator(func):
-            def wrapper(*args, **kw):
-                print('%s %s():' % (text, func.__name__))
-                return func(*args, **kw)
-            return wrapper
-        return decorator
-
-    @log('aaa')
-    def testwrapper( ) :
-        print "I'm the real function"
-
-    def test_( self ) :
+    def tail_error_logs( self , ) :
         '''@
         [+] callable
+        [+] visible
+        @short : tel
         @'''
-        import inspect
-        print inspect.getsourcelines( eval( "self.testwrapper" ) )
-        
-        exit( )
-        import socket
-        s = socket.socket( socket.AF_INET , socket.SOCK_STREAM )
-        host = 'www.guokr.com'
-        ip = socket.gethostbyname( host )
-        try :
-            s.settimeout( 3 )
-            s.connect( ( ip , 80 ) )
-        except :
-            self.error_exit( 'connect exception' )
-        s.send( "GET / HTTP/1.0\r\n\r\n" )
-        header = ( s.recv( 1000 ) )
-        print header
-        # header = header.split( "\r\n" )
-        # length , = tuple( h for h in header if "content-length" in h.lower() )
-        # length = int( length.split(":")[1].strip() )
-        # total = 0
-        # buf = ""
-        # import sys
-        # while True :
-            # buf = s.recv( 100 )
-            # total += len( buf )
-            # sys.stdout.write( buf )
-            # if len( buf ) == 0 :
-                # break
-        # print "\n" + str( total )
-        # print length
-        pass
+        import os
+        if os.getenv( 'APACHE_HOME' ) == None :
+            self.error_exit( "cannot detect apache home" ) ;
+        self.lexec_( "tail -f \"{}/logs/error.log\"".format( str( os.getenv( 'APACHE_HOME' ) ).replace( '\\' , '/' ) ) )
+        # self.lexec_( self.read_config( "tail_error_logs" , "command" ) )
 
-    def __init__( self ) :
-        super( qyh_svr , self ).__init__( ) 
-        qyh_svr.__init__( self ) 
+class qyh( qyh_svr , qyh_adb , qyh_php ) :
 
     def extract_comments( self , func_name = "" ) :
         import sys
