@@ -1,0 +1,170 @@
+!_TAG_FILE_FORMAT	2	/extended format; --format=1 will not append ;" to lines/
+!_TAG_FILE_SORTED	1	/0=unsorted, 1=sorted, 2=foldcase/
+!_TAG_PROGRAM_AUTHOR	Darren Hiebert	/dhiebert@users.sourceforge.net/
+!_TAG_PROGRAM_NAME	Exuberant Ctags	//
+!_TAG_PROGRAM_URL	http://ctags.sourceforge.net	/official site/
+!_TAG_PROGRAM_VERSION	5.8	//
+ArrayList	.\priv_dao\class\core\ArrayList.class.php	/^	public function ArrayList(){$/;"	f
+ArrayList	.\priv_dao\class\core\ArrayList.class.php	/^class ArrayList{$/;"	c
+Connection	.\priv_dao\class\sql\Connection.class.php	/^	public function Connection(){$/;"	f
+Connection	.\priv_dao\class\sql\Connection.class.php	/^class Connection{$/;"	c
+ConnectionFactory	.\priv_dao\class\sql\ConnectionFactory.class.php	/^class ConnectionFactory{$/;"	c
+ConnectionProperty	.\priv_dao\class\sql\ConnectionProperty.class.php	/^class ConnectionProperty{$/;"	c
+DAOFactory	.\priv_dao\class\dao\DAOFactory.class.php	/^class DAOFactory{$/;"	c
+Message	.\priv_dao\class\dto\Message.class.php	/^	class Message{$/;"	c
+MessagesDAO	.\priv_dao\class\dao\MessagesDAO.class.php	/^interface MessagesDAO{$/;"	i
+MessagesMySqlDAO	.\priv_dao\class\mysql\MessagesMySqlDAO.class.php	/^class MessagesMySqlDAO implements MessagesDAO{$/;"	c
+MessagesMySqlExtDAO	.\priv_dao\class\mysql\ext\MessagesMySqlExtDAO.class.php	/^class MessagesMySqlExtDAO extends MessagesMySqlDAO{$/;"	c
+QueryExecutor	.\priv_dao\class\sql\QueryExecutor.class.php	/^class QueryExecutor{$/;"	c
+SqlQuery	.\priv_dao\class\sql\SqlQuery.class.php	/^	function SqlQuery($txt){$/;"	f
+SqlQuery	.\priv_dao\class\sql\SqlQuery.class.php	/^class SqlQuery{$/;"	c
+Transaction	.\priv_dao\class\sql\Transaction.class.php	/^	public function Transaction(){$/;"	f
+Transaction	.\priv_dao\class\sql\Transaction.class.php	/^class Transaction{$/;"	c
+action	.\handle_request.php	/^            $action = $_POST["action"];$/;"	v
+add	.\priv_dao\class\core\ArrayList.class.php	/^	public function add($value){$/;"	f
+clean	.\priv_dao\class\dao\MessagesDAO.class.php	/^	public function clean();$/;"	f
+clean	.\priv_dao\class\mysql\MessagesMySqlDAO.class.php	/^	public function clean(){$/;"	f
+close	.\priv_dao\class\sql\Connection.class.php	/^	public function close(){$/;"	f
+close	.\priv_dao\class\sql\ConnectionFactory.class.php	/^	static public function close($connection){$/;"	f
+columnName	.\priv_dao\class\sql\SqlQuery.class.php	/^                                $columnName = $this->getColumnName($p[$i]);$/;"	v
+columnName	.\priv_dao\class\sql\SqlQuery.class.php	/^                    $columnName = rtrim($rightTrimmedTextCopy, "=");$/;"	v
+commit	.\priv_dao\class\sql\Transaction.class.php	/^	public function commit(){$/;"	f
+conn	.\priv_dao\class\sql\ConnectionFactory.class.php	/^		$conn = mysql_connect(ConnectionProperty::getHost(), ConnectionProperty::getUser(), ConnectionProperty::getPassword());$/;"	v
+connection	.\priv_dao\class\sql\Connection.class.php	/^		$this->connection = ConnectionFactory::getConnection();$/;"	v
+connection	.\priv_dao\class\sql\Connection.class.php	/^	private $connection;$/;"	v
+connection	.\priv_dao\class\sql\QueryExecutor.class.php	/^			$connection = $transaction->getConnection();$/;"	v
+connection	.\priv_dao\class\sql\QueryExecutor.class.php	/^			$connection = new Connection();$/;"	v
+connection	.\priv_dao\class\sql\Transaction.class.php	/^		$this->connection = new Connection();$/;"	v
+connection	.\priv_dao\class\sql\Transaction.class.php	/^	private $connection;$/;"	v
+content	.\priv_dao\class\dto\Message.class.php	/^$/;"	v
+database	.\priv_dao\class\sql\ConnectionProperty.class.php	/^	private static $database = 'message_board';$/;"	v
+delete	.\priv_dao\class\dao\MessagesDAO.class.php	/^	public function delete($id);$/;"	f
+delete	.\priv_dao\class\mysql\MessagesMySqlDAO.class.php	/^	public function delete($id){$/;"	f
+deleteByContent	.\priv_dao\class\dao\MessagesDAO.class.php	/^	public function deleteByContent($value);$/;"	f
+deleteByContent	.\priv_dao\class\mysql\MessagesMySqlDAO.class.php	/^	public function deleteByContent($value){$/;"	f
+deleteByIp	.\priv_dao\class\dao\MessagesDAO.class.php	/^	public function deleteByIp($value);$/;"	f
+deleteByIp	.\priv_dao\class\mysql\MessagesMySqlDAO.class.php	/^	public function deleteByIp($value){$/;"	f
+deleteByTime	.\priv_dao\class\dao\MessagesDAO.class.php	/^	public function deleteByTime($value);$/;"	f
+deleteByTime	.\priv_dao\class\mysql\MessagesMySqlDAO.class.php	/^	public function deleteByTime($value){$/;"	f
+endsWith	.\priv_dao\class\sql\SqlQuery.class.php	/^        private function endsWith($haystack, $needle)$/;"	f
+execute	.\priv_dao\class\mysql\MessagesMySqlDAO.class.php	/^	protected function execute($sqlQuery){$/;"	f
+execute	.\priv_dao\class\sql\QueryExecutor.class.php	/^	public static function execute($sqlQuery){$/;"	f
+executeInsert	.\priv_dao\class\mysql\MessagesMySqlDAO.class.php	/^	protected function executeInsert($sqlQuery){$/;"	f
+executeInsert	.\priv_dao\class\sql\QueryExecutor.class.php	/^	public static function executeInsert($sqlQuery){$/;"	f
+executeQuery	.\priv_dao\class\sql\Connection.class.php	/^	public function executeQuery($sql){$/;"	f
+executeUpdate	.\priv_dao\class\mysql\MessagesMySqlDAO.class.php	/^	protected function executeUpdate($sqlQuery){$/;"	f
+executeUpdate	.\priv_dao\class\sql\QueryExecutor.class.php	/^	public static function executeUpdate($sqlQuery){$/;"	f
+get	.\priv_dao\class\core\ArrayList.class.php	/^	public function get($idx){$/;"	f
+getColumnName	.\priv_dao\class\sql\SqlQuery.class.php	/^        private function getColumnName($textCopy){$/;"	f
+getConnection	.\priv_dao\class\sql\ConnectionFactory.class.php	/^	static public function getConnection(){$/;"	f
+getConnection	.\priv_dao\class\sql\Transaction.class.php	/^	public function getConnection(){$/;"	f
+getCurrentTransaction	.\priv_dao\class\sql\Transaction.class.php	/^	public static function getCurrentTransaction(){$/;"	f
+getDatabase	.\priv_dao\class\sql\ConnectionProperty.class.php	/^	public static function getDatabase(){$/;"	f
+getHost	.\priv_dao\class\sql\ConnectionProperty.class.php	/^	public static function getHost(){$/;"	f
+getLast	.\priv_dao\class\core\ArrayList.class.php	/^	public function getLast(){$/;"	f
+getList	.\priv_dao\class\mysql\MessagesMySqlDAO.class.php	/^	protected function getList($sqlQuery){$/;"	f
+getMessagesDAO	.\priv_dao\class\dao\DAOFactory.class.php	/^	public static function getMessagesDAO(){$/;"	f
+getPassword	.\priv_dao\class\sql\ConnectionProperty.class.php	/^	public static function getPassword(){$/;"	f
+getQuery	.\priv_dao\class\sql\SqlQuery.class.php	/^	public function getQuery(){$/;"	f
+getRow	.\priv_dao\class\mysql\MessagesMySqlDAO.class.php	/^	protected function getRow($sqlQuery){$/;"	f
+getUser	.\priv_dao\class\sql\ConnectionProperty.class.php	/^	public static function getUser(){$/;"	f
+get_messages	.\handle_request.php	/^    function get_messages( ) {$/;"	f
+host	.\priv_dao\class\sql\ConnectionProperty.class.php	/^	private static $host = 'localhost';$/;"	v
+i	.\priv_dao\class\sql\QueryExecutor.class.php	/^		$i=0;$/;"	v
+id	.\priv_dao\class\dto\Message.class.php	/^		var $id;$/;"	v
+id	.\priv_dao\class\mysql\MessagesMySqlDAO.class.php	/^		$id = $this->executeInsert($sqlQuery);	$/;"	v
+idx	.\priv_dao\class\sql\SqlQuery.class.php	/^	var $idx = 0;$/;"	v
+insert	.\priv_dao\class\dao\MessagesDAO.class.php	/^	public function insert($message);$/;"	f
+insert	.\priv_dao\class\mysql\MessagesMySqlDAO.class.php	/^	public function insert($message){$/;"	f
+ip	.\priv_dao\class\dto\Message.class.php	/^$/;"	v
+ip	.\priv_handler\handler.php	/^        \/\/ $ip = $_SERVER['HTTP_CLIENT_IP'] ;$/;"	v
+ip	.\priv_handler\handler.php	/^        \/\/ $ip = $_SERVER['HTTP_X_FORWARDED_FOR'] ;$/;"	v
+ip	.\priv_handler\handler.php	/^        \/\/ $ip = $_SERVER['REMOTE_ADDR'] ;$/;"	v
+ip	.\priv_handler\handler.php	/^    \/\/ $ip = '' ;$/;"	v
+ip	.\priv_handler\leave_message.php	/^        $ip = $_SERVER['HTTP_CLIENT_IP'] ;$/;"	v
+ip	.\priv_handler\leave_message.php	/^        $ip = $_SERVER['HTTP_X_FORWARDED_FOR'] ;$/;"	v
+ip	.\priv_handler\leave_message.php	/^        $ip = $_SERVER['REMOTE_ADDR'] ;$/;"	v
+ip	.\priv_handler\leave_message.php	/^    $ip = '' ;$/;"	v
+isEmpty	.\priv_dao\class\core\ArrayList.class.php	/^	public function isEmpty(){$/;"	f
+is_ajax	.\handle_request.php	/^    function is_ajax() {$/;"	f
+leave_message	.\handle_request.php	/^    function leave_message( ) {$/;"	f
+len	.\priv_dao\class\sql\SqlQuery.class.php	/^		$len = strlen($str);$/;"	v
+length	.\priv_dao\class\sql\SqlQuery.class.php	/^            $length = strlen($needle);$/;"	v
+load	.\priv_dao\class\dao\MessagesDAO.class.php	/^	public function load($id);$/;"	f
+load	.\priv_dao\class\mysql\MessagesMySqlDAO.class.php	/^	public function load($id){$/;"	f
+message	.\priv_dao\class\mysql\MessagesMySqlDAO.class.php	/^		$message = new Message();$/;"	v
+message	.\priv_handler\handler.php	/^    \/\/ $message = new Message( ) ;$/;"	v
+message	.\priv_handler\leave_message.php	/^    $message = new Message( ) ;$/;"	v
+messages	.\priv_handler\get_messages.php	/^    $messages = array_reverse( DAOFactory::getMessagesDAO()->queryAllOrderBy('time') ) ;$/;"	v
+messages	.\priv_handler\handler.php	/^    $messages = DAOFactory::getMessagesDAO()->queryAllOrderBy('time');$/;"	v
+p	.\priv_dao\class\sql\SqlQuery.class.php	/^		$p = explode("?", $this->txt);$/;"	v
+params	.\priv_dao\class\sql\SqlQuery.class.php	/^	var $params = array();$/;"	v
+password	.\priv_dao\class\sql\ConnectionProperty.class.php	/^	private static $password = 'echo';$/;"	v
+pos	.\priv_dao\class\sql\QueryExecutor.class.php	/^\/\/                $pos = strpos($query, "null");$/;"	v
+query	.\priv_dao\class\sql\QueryExecutor.class.php	/^		$query = $sqlQuery->getQuery();$/;"	v
+queryAll	.\priv_dao\class\dao\MessagesDAO.class.php	/^	public function queryAll();$/;"	f
+queryAll	.\priv_dao\class\mysql\MessagesMySqlDAO.class.php	/^	public function queryAll(){$/;"	f
+queryAllOrderBy	.\priv_dao\class\dao\MessagesDAO.class.php	/^	public function queryAllOrderBy($orderColumn);$/;"	f
+queryAllOrderBy	.\priv_dao\class\mysql\MessagesMySqlDAO.class.php	/^	public function queryAllOrderBy($orderColumn){$/;"	f
+queryByContent	.\priv_dao\class\dao\MessagesDAO.class.php	/^	public function queryByContent($value);$/;"	f
+queryByContent	.\priv_dao\class\mysql\MessagesMySqlDAO.class.php	/^	public function queryByContent($value){$/;"	f
+queryByIp	.\priv_dao\class\dao\MessagesDAO.class.php	/^	public function queryByIp($value);$/;"	f
+queryByIp	.\priv_dao\class\mysql\MessagesMySqlDAO.class.php	/^	public function queryByIp($value){$/;"	f
+queryByTime	.\priv_dao\class\dao\MessagesDAO.class.php	/^	public function queryByTime($value);$/;"	f
+queryByTime	.\priv_dao\class\mysql\MessagesMySqlDAO.class.php	/^	public function queryByTime($value){$/;"	f
+queryForString	.\priv_dao\class\sql\QueryExecutor.class.php	/^	public static function queryForString($sqlQuery){$/;"	f
+querySingleResult	.\priv_dao\class\mysql\MessagesMySqlDAO.class.php	/^	protected function querySingleResult($sqlQuery){$/;"	f
+readRow	.\priv_dao\class\mysql\MessagesMySqlDAO.class.php	/^	protected function readRow($row){$/;"	f
+removeLast	.\priv_dao\class\core\ArrayList.class.php	/^	public function removeLast(){$/;"	f
+replaceFirst	.\priv_dao\class\sql\SqlQuery.class.php	/^	private function replaceFirst($str, $old, $new){$/;"	f
+result	.\priv_dao\class\sql\QueryExecutor.class.php	/^		$result = $connection->executeQuery($query);$/;"	v
+result	.\priv_dao\class\sql\QueryExecutor.class.php	/^		$result = $connection->executeQuery($sqlQuery->getQuery());$/;"	v
+ret	.\priv_dao\class\mysql\MessagesMySqlDAO.class.php	/^		$ret = array();$/;"	v
+return	.\handle_request.php	/^        $return = $_POST;$/;"	v
+rightTrimmedTextCopy	.\priv_dao\class\sql\SqlQuery.class.php	/^                    $rightTrimmedTextCopy = rtrim($textCopy, " ");$/;"	v
+rollback	.\priv_dao\class\sql\Transaction.class.php	/^	public function rollback(){$/;"	f
+row	.\priv_dao\class\sql\QueryExecutor.class.php	/^		$row = mysql_fetch_array($result);		$/;"	v
+set	.\priv_dao\class\sql\SqlQuery.class.php	/^	public function set($value){$/;"	f
+setNumber	.\priv_dao\class\sql\SqlQuery.class.php	/^	public function setNumber($value){$/;"	f
+setString	.\priv_dao\class\sql\SqlQuery.class.php	/^	public function setString($value){$/;"	f
+size	.\priv_dao\class\core\ArrayList.class.php	/^		$this->size = ($this->size) +1;$/;"	v
+size	.\priv_dao\class\core\ArrayList.class.php	/^		$this->size=0;$/;"	v
+size	.\priv_dao\class\core\ArrayList.class.php	/^		return $this->size = ($this->size) -1;$/;"	v
+size	.\priv_dao\class\core\ArrayList.class.php	/^	private $size;$/;"	v
+size	.\priv_dao\class\core\ArrayList.class.php	/^	public function size(){$/;"	f
+sql	.\priv_dao\class\mysql\MessagesMySqlDAO.class.php	/^		$sql = 'DELETE FROM messages WHERE content = ?';$/;"	v
+sql	.\priv_dao\class\mysql\MessagesMySqlDAO.class.php	/^		$sql = 'DELETE FROM messages WHERE id = ?';$/;"	v
+sql	.\priv_dao\class\mysql\MessagesMySqlDAO.class.php	/^		$sql = 'DELETE FROM messages WHERE ip = ?';$/;"	v
+sql	.\priv_dao\class\mysql\MessagesMySqlDAO.class.php	/^		$sql = 'DELETE FROM messages WHERE time = ?';$/;"	v
+sql	.\priv_dao\class\mysql\MessagesMySqlDAO.class.php	/^		$sql = 'DELETE FROM messages';$/;"	v
+sql	.\priv_dao\class\mysql\MessagesMySqlDAO.class.php	/^		$sql = 'INSERT INTO messages (time, content, ip) VALUES (?, ?, ?)';$/;"	v
+sql	.\priv_dao\class\mysql\MessagesMySqlDAO.class.php	/^		$sql = 'SELECT * FROM messages ORDER BY '.$orderColumn;$/;"	v
+sql	.\priv_dao\class\mysql\MessagesMySqlDAO.class.php	/^		$sql = 'SELECT * FROM messages WHERE content = ?';$/;"	v
+sql	.\priv_dao\class\mysql\MessagesMySqlDAO.class.php	/^		$sql = 'SELECT * FROM messages WHERE id = ?';$/;"	v
+sql	.\priv_dao\class\mysql\MessagesMySqlDAO.class.php	/^		$sql = 'SELECT * FROM messages WHERE ip = ?';$/;"	v
+sql	.\priv_dao\class\mysql\MessagesMySqlDAO.class.php	/^		$sql = 'SELECT * FROM messages WHERE time = ?';$/;"	v
+sql	.\priv_dao\class\mysql\MessagesMySqlDAO.class.php	/^		$sql = 'SELECT * FROM messages';$/;"	v
+sql	.\priv_dao\class\mysql\MessagesMySqlDAO.class.php	/^		$sql = 'UPDATE messages SET time = ?, content = ?, ip = ? WHERE id = ?';$/;"	v
+sql	.\priv_dao\class\sql\SqlQuery.class.php	/^		$sql = '';$/;"	v
+sqlQuery	.\priv_dao\class\mysql\MessagesMySqlDAO.class.php	/^		$sqlQuery = new SqlQuery($sql);$/;"	v
+startsWith	.\priv_dao\class\sql\SqlQuery.class.php	/^        private function startsWith($haystack, $needle)$/;"	f
+str	.\priv_dao\class\sql\SqlQuery.class.php	/^				$str = substr($str,0,$i).$new.substr($str,$i+1);$/;"	v
+tab	.\priv_dao\class\core\ArrayList.class.php	/^		$this->tab = array();$/;"	v
+tab	.\priv_dao\class\core\ArrayList.class.php	/^	private $tab;$/;"	v
+tab	.\priv_dao\class\mysql\MessagesMySqlDAO.class.php	/^		$tab = QueryExecutor::execute($sqlQuery);$/;"	v
+tab	.\priv_dao\class\sql\QueryExecutor.class.php	/^		$tab = array();$/;"	v
+time	.\priv_dao\class\dto\Message.class.php	/^$/;"	v
+time	.\priv_handler\handler.php	/^    \/\/ $time = date( 'Y-m-d H:i:s ' , time( ) ) ;$/;"	v
+time	.\priv_handler\leave_message.php	/^    $time = date( 'Y-m-d H:i:s ' , time( ) ) ;$/;"	v
+tran	.\priv_dao\class\sql\Transaction.class.php	/^			$tran = Transaction::$transactions->getLast();$/;"	v
+transaction	.\priv_dao\class\sql\QueryExecutor.class.php	/^		$transaction = Transaction::getCurrentTransaction();$/;"	v
+transaction	.\priv_handler\handler.php	/^    \/\/ $transaction = new Transaction();$/;"	v
+transaction	.\priv_handler\leave_message.php	/^    $transaction = new Transaction();$/;"	v
+transactions	.\priv_dao\class\sql\Transaction.class.php	/^	private static $transactions;$/;"	v
+trimmedUppercaseSql	.\priv_dao\class\sql\SqlQuery.class.php	/^                $trimmedUppercaseSql = trim(strtoupper($this->txt));$/;"	v
+txt	.\priv_dao\class\sql\SqlQuery.class.php	/^		$this->txt = $txt;$/;"	v
+txt	.\priv_dao\class\sql\SqlQuery.class.php	/^	var $txt;$/;"	v
+update	.\priv_dao\class\dao\MessagesDAO.class.php	/^	public function update($message);	$/;"	f
+update	.\priv_dao\class\mysql\MessagesMySqlDAO.class.php	/^	public function update($message){$/;"	f
+user	.\priv_dao\class\sql\ConnectionProperty.class.php	/^	private static $user = 'root';$/;"	v
+value	.\priv_dao\class\sql\SqlQuery.class.php	/^		$value = mysql_real_escape_string($value);$/;"	v
