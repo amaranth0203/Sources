@@ -1,0 +1,4 @@
+mysql 配置在文件 priv_dao\class\sql\ConnectionProperty.class.php 中进行
+创建一个叫 message_board 的数据库之后，使用
+mysql -u root -p message_board < priv_data\message_board_initial.sql
+初始化数据库
