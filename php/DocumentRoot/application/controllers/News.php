@@ -11,7 +11,6 @@
         public function index( ) {
             $data[ 'news' ] = $this->news_model->get_news( ) ;
             $data[ 'title' ] = 'News archive' ;
-            error_log( '[+] wassup in method index inside class News 2' ) ;
 
             $this->load->view( 'templates/header' , $data ) ;
             $this->load->view( 'news/index' , $data ) ;
@@ -20,7 +19,14 @@
 
         public function view( $slug = NULL ) {
             $data[ 'news_item' ] = $this->news_model->get_news( $slug ) ;
-            error_log( print_r( $data[ 'news_item' ] ) ) ;
+            if( empty( $data[ 'news_item' ] ) ) {
+                show_404( ) ;
+            }
+            $data[ 'title' ] = $data[ 'news_item' ][ 'title' ] ;
+
+            $this->load->view( 'templates/header' , $data ) ;
+            $this->load->view( 'news/view' , $data ) ;
+            $this->load->view( 'templates/footer' ) ;
         }
 
     }
