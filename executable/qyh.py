@@ -3,6 +3,20 @@
 
 class qyh_base( object ) :
 
+    def delete_vim_session( self , ) :
+        '''@
+        [+] visible
+        [+] callable
+        @short : dvs
+        @'''
+        from sys import platform as _platform
+        if not _platform == "win32" :
+            print '[-] not windows ><'
+            exit( )
+        import os
+        self.lexec( 'del {}\qyh_session_gvim.vim'.format( os.getenv( 'UserProfile' ) ) )
+        self.lexec( 'del {}\qyh_session_vim.vim'.format( os.getenv( 'UserProfile' ) ) )
+
     def dictionary_youdao( self , *args ) :
         '''@
         [+] visible
