@@ -17,7 +17,8 @@
             $this->load->view( 'templates/footer' ) ;
         }
 
-        public function view( $slug = NULL ) {
+        public function view( $slug = 'wassup' ) {
+            $slug = urldecode( $slug ) ;
             $data[ 'news_item' ] = $this->news_model->get_news( $slug ) ;
             if( empty( $data[ 'news_item' ] ) ) {
                 show_404( ) ;
