@@ -13,9 +13,4 @@ if "%VIM_EXE_DIR%"=="" (
     goto :eof
 )
 
-if exist "%UserProfile%/qyh_session_gvim.vim" (
-    start "dummy" /b "%VIM_EXE_DIR%/gvim.exe" -u %UserProfile%/.qyh_vim/vimrc -S "%UserProfile%/qyh_session_gvim.vim"  %*
-) else (
-    echo. 2> %UserProfile%/qyh_session_gvim.vim
-    start "dummy" /b "%VIM_EXE_DIR%/gvim.exe" -u %UserProfile%/.qyh_vim/vimrc -S "%UserProfile%/qyh_session_gvim.vim"  %*
-)
+start "dummy" /b "%VIM_EXE_DIR%/gvim.exe" -u %UserProfile%/.qyh_vim/vimrc %*

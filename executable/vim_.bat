@@ -13,9 +13,4 @@ if "%VIM_EXE_DIR%"=="" (
     goto :eof
 )
 
-if exist "%UserProfile%/qyh_session_vim.vim" (
-    "%VIM_EXE_DIR%/vim.exe" -u %UserProfile%/.qyh_vim/vimrc -S "%UserProfile%/qyh_session_vim.vim"  %*
-) else (
-    echo. 2> %UserProfile%/qyh_session_vim.vim
-    "%VIM_EXE_DIR%/vim.exe" -u %UserProfile%/.qyh_vim/vimrc -S "%UserProfile%/qyh_session_vim.vim"  %*
-)
+"%VIM_EXE_DIR%/vim.exe" -u %UserProfile%/.qyh_vim/vimrc %*
