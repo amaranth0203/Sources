@@ -1552,7 +1552,6 @@ class qyh( qyh_svr , qyh_adb , qyh_php ) :
             #  if "git_routine" not in func_name[5:] :
                 #  self.call_log( func_name[5:] )
             self.call_log( func_name[5:] )
-            # raw_input( 'pause' )
             if len( args ) > 2 :
                 f = eval( func_name )
                 f( *args[2:] )
