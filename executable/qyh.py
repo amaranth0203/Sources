@@ -696,6 +696,8 @@ class qyh_adb( qyh_base ) :
             kill_cmd = ""
             kill_cmd += "adb shell kill -9" + " " + target.split( )[1]
             self.lexec( kill_cmd )
+            import time
+            time.sleep( 0.3 )
         return
 
     def push_lib( self , *args ) :
