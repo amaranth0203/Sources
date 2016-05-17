@@ -178,6 +178,9 @@ class qyh_base( object ) :
                 cmd += 'cd /d '
                 cmd += path
                 cmd += '{ENTER}'
+                cmd += 'git status{ENTER}'
+                cmd += 'git add .{ENTER}'
+                cmd += 'git commit -m "routine push"{ENTER}'
                 cmd += 'git pull origin master{ENTER}'
                 cmd += info["passphrase"]
                 cmd += '{ENTER}'
