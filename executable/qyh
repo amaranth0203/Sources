@@ -1,2 +1,3 @@
 #!/usr/bin/env bash
-python -B $(dirname $0)"/qyh.py" $*
+#python -B $(dirname $0)"/qyh.py" $*
+python_ E:/Sources/executable/qyh.py $*

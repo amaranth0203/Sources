@@ -3,6 +3,50 @@
 
 class qyh_base( object ) :
 
+    def caller( self ) :
+        '''@
+        [+] visible
+        [+] callable
+        @short : test
+        @'''
+        pass
+
+    def generate_env_script( self , *args ) :
+        '''@
+        [+] callable
+        @short : ges
+        @'''
+        env_d = args[0]
+        from sys import platform as _platform
+        import os , datetime
+        if _platform == "win32" :
+            cmd = ""
+            for k in env_d : 
+                cmd += "set "
+                cmd += k + "=" + env_d[k]
+                cmd += "\n"
+            filename = os.getcwd( ) + '/set_env_' + str( datetime.datetime.now() ).split('.')[0].replace( '-' , '' ).replace( ':' , '' ).replace( ' ' , '_' ) + '.bat'
+            with open( filename , 'a+' ) as f :
+                f.write( cmd )
+            print '\n\nrun [ ' + os.path.basename( filename ) + ' ] yourself'
+        elif _platform == "cygwin" :
+            cmd = ""
+            for k in env_d : 
+                cmd += "export "
+                cmd += k + "=" + env_d[k]
+                cmd += "\n"
+            filename = os.getcwd( ) + '/set_env_' + str( datetime.datetime.now() ).split('.')[0].replace( '-' , '' ).replace( ':' , '' ).replace( ' ' , '_' ) + '.sh'
+            with open( filename , 'a+' ) as f :
+                f.write( cmd )
+            print '\n\nrun [ source ' + os.path.basename( filename ) + ' ] yourself'
+        elif _platform == "linux" or _platform == "linux2" :
+            self.print_green( "[+] Wow, this is Linux\n" ) ;
+        elif _platform == "darwin" :
+            self.print_green( "[+] Wow, this is Mac OS\n" ) ;
+        else :
+            self.print_red( "[-]unknow os\n" ) ;
+        return True
+
     def delete_vim_session( self , ) :
         '''@
         [+] visible
@@ -74,8 +118,10 @@ class qyh_base( object ) :
         @'''
         import os , subprocess
         from sys import platform as _platform
-        if _platform == "win32" or _platform == "cygwin" :
+        if _platform == "win32" :
             subprocess.Popen( self.read_config( "putty_pub" , "command" ) )
+        elif _platform == "cygwin" :
+            os.popen( 'cmd /c ' + self.read_config( "putty_pub" , "command" ) + " &" )
         else :
             self.print_red( "[-] only run in windows\n" ) ;
         return True
@@ -87,8 +133,10 @@ class qyh_base( object ) :
         @'''
         import os , subprocess
         from sys import platform as _platform
-        if _platform == "win32" or _platform == "cygwin" :
+        if _platform == "win32" :
             subprocess.Popen( self.read_config( "putty_priv" , "command" ) )
+        elif _platform == "cygwin" :
+            os.popen( 'cmd /c ' + self.read_config( "putty_priv" , "command" ) + " &" )
         else :
             self.print_red( "[-] only run in windows\n" ) ;
         return True
@@ -178,6 +226,9 @@ class qyh_base( object ) :
                 cmd += 'cd /d '
                 cmd += path
                 cmd += '{ENTER}'
+                cmd += 'git status{ENTER}'
+                cmd += 'git add .{ENTER}'
+                cmd += 'git commit -m "routine push"{ENTER}'
                 cmd += 'git pull origin master{ENTER}'
                 cmd += info["passphrase"]
                 cmd += '{ENTER}'
@@ -265,14 +316,16 @@ class qyh_base( object ) :
         @'''
         import os
         from sys import platform as _platform
-        if _platform == "win32" or _platform == "cygwin" :
+        if _platform == "win32" :
             cmd_open = "explorer "
             cmd_open += os.path.dirname( os.path.realpath( __file__ ) )
             self.lexec( cmd_open )
-        elif _platform == "linux" or _platform == "linux2" :
-            cmd_open = "nautilus "
-            cmd_open += os.path.dirname( os.path.realpath( __file__ ) )
+        elif _platform == "cygwin" :
+            cmd_open = "explorer "
+            cmd_open += os.path.dirname( __file__ ).replace( '/' , '\\\\' ) 
             self.lexec( cmd_open )
+        elif _platform == "linux" or _platform == "linux2" :
+            self.print_green( "[+] Wow, this is Linux\n" ) ;
         elif _platform == "darwin" :
             self.print_green( "[+] Wow, this is Mac OS\n" ) ;
         else :
@@ -285,7 +338,7 @@ class qyh_base( object ) :
     def write_config( self , section , keyword , value ) :
         import os
         self.config.set( section , keyword , value )
-        with open( os.path.dirname( os.path.realpath( __file__ ) ) + '/qyh.ini' , 'wb' ) as ini_file :
+        with open( os.path.dirname( __file__ ) + '/qyh.ini' , 'wb' ) as ini_file :
             self.config.write( ini_file )
 
     def __init__( self , ) :
@@ -295,7 +348,7 @@ class qyh_base( object ) :
             from ConfigParser import ConfigParser  # ver. < 3.0
         import os
         self.config = ConfigParser( ) 
-        self.config.read( os.path.dirname( os.path.realpath( __file__ ) ) + '/qyh.ini' )
+        self.config.read( os.path.dirname( __file__ ) + '/qyh.ini' )
         flag_color = self.read_config( 'colorful' , 'flag' )
         self.print_color = self.print_colorful if flag_color == 'true' else self.print_none_color
 
@@ -448,11 +501,13 @@ class qyh_adb( qyh_base ) :
         import os
         print '[+] no check flag : {}'.format( os.getenv( 'qyh_adb_no_check' ) )
         if flag_true :
-            cmd = "set qyh_adb_no_check=true{ENTER}"
-            self.lexec_hard( cmd )
+            #  cmd = "set qyh_adb_no_check=true{ENTER}"
+            #  self.lexec_hard( cmd )
+            self.generate_env_script( { "qyh_adb_no_check" : "true" } )
         if flag_false :
-            cmd = "set qyh_adb_no_check={ENTER}"
-            self.lexec_hard( cmd )
+            #  cmd = "set qyh_adb_no_check={ENTER}"
+            #  self.lexec_hard( cmd )
+            self.generate_env_script( { "qyh_adb_no_check" : "" } )
 
     def select_device_serial( self , *args ) :
         '''@
@@ -474,6 +529,8 @@ class qyh_adb( qyh_base ) :
             if serial.split( )[0] == current_serial :
                 current_index = index
         selected = -1
+        import sys
+        sys.stdout.flush( )
         selected_raw = raw_input( "[+] which one ?\n")
         if selected_raw == "" :
             selected = current_index
@@ -485,10 +542,12 @@ class qyh_adb( qyh_base ) :
         if selected not in indexes :
             self.error_exit( '[-] bad option {}'.format( selected + 1 ) )
         if selected == -1 :
-            cmd = 'set ANDROID_SERIAL={ENTER}'
+            #  cmd = 'set ANDROID_SERIAL={ENTER}'
+            self.generate_env_script( { "ANDROID_SERIAL" : "" } )
         else :
-            cmd = 'set ANDROID_SERIAL={}'.format( devices[ selected ].split( )[0] ) + '{ENTER}'
-        self.lexec_hard( cmd )
+            #  cmd = 'set ANDROID_SERIAL={}'.format( devices[ selected ].split( )[0] ) + '{ENTER}'
+            self.generate_env_script( { "ANDROID_SERIAL" : devices[ selected ].split( )[0] } )
+        #  self.lexec_hard( cmd )
         
 
     def select_log_file( self , *args ) :
@@ -511,6 +570,8 @@ class qyh_adb( qyh_base ) :
             if file == current_file :
                 current_index = index
         selected = -1
+        import sys
+        sys.stdout.flush( )
         selected_raw = raw_input( "[+] which one ?\n")
         if selected_raw == "" :
             selected = current_index
@@ -521,7 +582,9 @@ class qyh_adb( qyh_base ) :
                 self.error_exit( '[-] bad option {}'.format( selected_raw ) )
         if selected not in indexes :
             self.error_exit( '[-] bad option {}'.format( selected + 1 ) )
-        cmd = 'set qyh_llf={}'.format( files[selected] ) + '{ENTER}'
+        #  cmd = 'set qyh_llf={}'.format( files[selected] ) + '{ENTER}'
+        env_d = {}
+        env_d[ 'qyh_llf' ] = files[selected]
         # select lib log file ends
 
         # select bootimg log file starts
@@ -538,6 +601,8 @@ class qyh_adb( qyh_base ) :
             if file == current_file :
                 current_index = index
         selected = -1
+        import sys
+        sys.stdout.flush( )
         selected_raw = raw_input( "[+] which one ?\n")
         if selected_raw == "" :
             selected = current_index
@@ -550,8 +615,10 @@ class qyh_adb( qyh_base ) :
             self.error_exit( '[-] bad option {}'.format( selected + 1 ) )
         # select bootimg log file ends
 
-        cmd += 'set qyh_flf={}'.format( files[selected] ) + '{ENTER}'
-        self.lexec_hard( cmd )
+        #  cmd += 'set qyh_flf={}'.format( files[selected] ) + '{ENTER}'
+        #  self.lexec_hard( cmd )
+        env_d[ 'qyh_flf' ] = files[selected]
+        self.generate_env_script( env_d )
         pass
 
     def check_device( self , ) :
@@ -1134,7 +1201,10 @@ class qyh_adb( qyh_base ) :
             fsrc = log_filename[:log_filename.rfind('/')] + '/'
             fsrc += log[log.find("out"):].strip()
             if not spe_dir :
+                import datetime
                 fdst = os.getcwd( ).replace( '\\' , '/' ) + '/'
+                fdst += str( datetime.datetime.now() ).split('.')[0].replace( '-' , '' ).replace( ':' , '' ).replace( ' ' , '_' )
+                fdst += '/'
             else :
                 fdst = args[0] + '/'
             fdst += log[log.find("/system")+1:log.rfind("/")].strip() + "/"
@@ -1176,7 +1246,7 @@ class qyh_svr( qyh_base ) :
         log = str( datetime.datetime.now() ).split( '.' )[0] + ' '
         log += 'from {} : {}\n'.format( host , port )
         log += 'data : '
-        with open( os.path.dirname( os.path.realpath( __file__ ) ) + '\qyh_svr_rejection.log' , 'a+' ) as f :
+        with open( os.path.dirname( __file__ ) + '\qyh_svr_rejection.log' , 'a+' ) as f :
             f.write( log )
             f.write( data )
             f.write( '\n' + '\n' )
@@ -1202,6 +1272,7 @@ class qyh_svr( qyh_base ) :
                         # sys.stdout.flush()
                         # self.request.sendall( output )
 
+                svr.log_rejection( self.client_address[0] , self.client_address[1] , data )
                 self.request.sendall( '[!] ' + data + '\r\n' + os.popen( data ).read( ) )
             else :
                 svr.log_rejection( self.client_address[0] , self.client_address[1] , data )
@@ -1318,10 +1389,14 @@ class qyh_svr( qyh_base ) :
         import socket
         hostname = socket.gethostname( )
         ip = socket.gethostbyname( hostname )
+        import sys
+        sys.stdout.flush( )
         ip_ = raw_input( "[+] ip : " + ip + " ?\n" )
         if len( ip_ ) > 0 :
             ip = ip_
         port = 2334
+        import sys
+        sys.stdout.flush( )
         port_ = raw_input( "[+] port : 2334 ?\n" )
         if len( port_ ) > 0 :
             port = int( port_ )
@@ -1351,13 +1426,6 @@ class qyh_svr( qyh_base ) :
             self.print_green_light( '[+] remote server alive\n' )
         return True
 
-    def caller( self ) :
-        '''@
-        [+] callable
-        @short : test
-        @'''
-        self.log_rejection( 'host' , 'port' , 'data' )
-
     def depress_surveillance( self ) :
         '''@
         [+] callable
@@ -1380,7 +1448,7 @@ class qyh_svr( qyh_base ) :
         @short : svs
         @'''
         import subprocess , os , sys
-        cmd = 'pythonw ' + os.path.dirname( os.path.realpath( __file__ ) ).replace( '\\' , '/' ) + '/qyh.py depress_surveillance'
+        cmd = 'pythonw ' + os.path.dirname( __file__ ).replace( '\\' , '/' ) + '/qyh.py depress_surveillance'
         # process = subprocess.Popen( cmd )
         if not self.svr_check( False ) :
             self.svr_reset( False , flag_kill = False)
@@ -1389,10 +1457,19 @@ class qyh_svr( qyh_base ) :
             self.lexec( cmd_fwall_pass , False , False )
             cmd_fwall_pass = 'netsh advfirewall firewall add rule name="qyh_svr" protocol=TCP dir=in localport={} action=allow'.format( port )
             self.lexec( cmd_fwall_pass , False , False )
-            cmd = 'pythonw ' + os.path.dirname( os.path.realpath( __file__ ) ).replace( '\\' , '/' ) + '/qyh.py svr_check_time'
-            process = subprocess.Popen( cmd )
-            cmd = 'pythonw ' + os.path.dirname( os.path.realpath( __file__ ) ).replace( '\\' , '/' ) + '/qyh.py svd'
-            process = subprocess.Popen( cmd )
+            from sys import platform as _platform
+            if _platform == "win32" :
+                cmd = 'pythonw ' + os.path.dirname( __file__ ).replace( '\\' , '/' ) + '/qyh.py svr_check_time'
+                process = subprocess.Popen( cmd )
+                cmd = 'pythonw ' + os.path.dirname( __file__ ).replace( '\\' , '/' ) + '/qyh.py svd'
+                process = subprocess.Popen( cmd )
+            elif _platform == "cygwin" :
+                cmd = "{} {}".format( sys.executable , os.path.dirname( __file__ ) + '/qyh.py svr_check_time &' )
+                os.popen( cmd )
+                cmd = "{} {}".format( sys.executable , os.path.dirname( __file__ ) + '/qyh.py svd &' )
+                os.popen( cmd )
+            else :
+                print "didn't implement yet"
         else :
             self.error_exit( 'daemon is already running...' )
 
@@ -1415,7 +1492,7 @@ class qyh_svr( qyh_base ) :
         [+] visible
         @short : svk
         @'''
-        import signal , os , psutil
+        import signal , os 
         # pid = self.svr_getpid( )
         # if pid > 0 :
         try :
@@ -1425,9 +1502,13 @@ class qyh_svr( qyh_base ) :
             self.write_config( "svr" , "pid" , -1 )
         except :
             pass
-                # self.error_exit( '!!!!!!!!!!!! os.kill exception' )
-        # else :
-            # self.error_exit( 'daemon down' )import psutil
+        try :
+            process_name = "python_.exe"
+            print os.popen( 'taskkill /F /IM ' + process_name + ' /T' ).read( )
+            os.kill( pid , signal.SIGTERM )
+            self.write_config( "svr" , "pid" , -1 )
+        except :
+            pass
 
     def svr_exec( self , *cmd ) :
         '''@
