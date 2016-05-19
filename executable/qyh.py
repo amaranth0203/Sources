@@ -15,7 +15,7 @@ class qyh_base( object ) :
         print repo.git.status( )
         print repo.git.add( '.' )
         print repo.git.commit( m = "routine push" )
-        origin = repo.remotes
+        origin = repo.remotes.origin
         ssh_executable = os.path.join( "" , 'my_ssh_executable.sh' )
         repo.git.update_environment( GIT_SSH_COMMAND = ssh_executable )
         origin.push( repo.active_branch.name )
