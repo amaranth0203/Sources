@@ -14,7 +14,7 @@ class qyh_base( object ) :
         repo = git.Repo( "/cygdrive/e/Sources" )
         print repo.git.status( )
         print repo.git.add( '.' )
-        print repo.git.commit( m = "routine push" )
+        print repo.git.commit( m = "routine push" ) 
 
     def generate_env_script( self , *args ) :
         '''@
