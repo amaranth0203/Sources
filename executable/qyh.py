@@ -12,13 +12,14 @@ class qyh_base( object ) :
         pass
         import git , os 
         repo = git.Repo( "/cygdrive/e/Sources" )
-        print repo.git.status( )
-        print repo.git.add( '.' )
-        print repo.git.commit( m = "routine push" )
-        origin = repo.remote.origin
-        ssh_executable = os.path.join( "" , 'my_ssh_executable.sh' )
+        #  print repo.git.status( )
+        #  print repo.git.add( '.' )
+        #  print repo.git.commit( m = "routine push" )
+        o = repo.remotes.origin
+        ssh_executable = os.path.join( "/home/Administrator" , 'ssh_executable.sh' )
         repo.git.update_environment( GIT_SSH_COMMAND = ssh_executable )
-        origin.push( repo.active_branch.name )
+        o.fetch( )
+        #  o.push( repo.active_branch.name )
 
     def generate_env_script( self , *args ) :
         '''@
@@ -1597,7 +1598,17 @@ class qyh_php( qyh_base ) :
         if os.getenv( 'APACHE_HOME' ) == None :
             self.error_exit( "cannot detect apache home" ) ;
         self.lexec_( "tail -f \"{}/logs/error.log\"".format( str( os.getenv( 'APACHE_HOME' ) ).replace( '\\' , '/' ) ) )
-        # self.lexec_( self.read_config( "tail_error_logs" , "command" ) )
+
+    def tail_access_logs( self , ) :
+        '''@
+        [+] callable
+        [+] visible
+        @short : tal
+        @'''
+        import os
+        if os.getenv( 'APACHE_HOME' ) == None :
+            self.error_exit( "cannot detect apache home" ) ;
+        self.lexec_( "tail -f \"{}/logs/access.log\"".format( str( os.getenv( 'APACHE_HOME' ) ).replace( '\\' , '/' ) ) )
 
 class qyh( qyh_svr , qyh_adb , qyh_php ) :
 
