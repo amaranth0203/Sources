@@ -10,6 +10,16 @@ class qyh_base( object ) :
         @short : test
         @'''
         pass
+        import git , os 
+        repo = git.Repo( "/cygdrive/e/Sources" )
+        #  print repo.git.status( )
+        #  print repo.git.add( '.' )
+        #  print repo.git.commit( m = "routine push" )
+        o = repo.remotes.origin
+        ssh_executable = os.path.join( "/home/Administrator" , 'ssh_executable.sh' )
+        repo.git.update_environment( GIT_SSH_COMMAND = ssh_executable )
+        o.fetch( )
+        #  o.push( repo.active_branch.name )
 
     def generate_env_script( self , *args ) :
         '''@
@@ -69,7 +79,9 @@ class qyh_base( object ) :
         @args : keyword - keyword to translate
         @'''
         from sys import platform as _platform
-        if not _platform == "win32" :
+        if _platform == "win32" or _platform == "cygwin" :
+            pass
+        else :
             print '[-] not windows ><'
             exit( )
         if len( args ) < 1 :
@@ -77,10 +89,21 @@ class qyh_base( object ) :
         import urllib  
         import urllib2  
         import cookielib  
-        import lxml.html
-        url = "http://dict.youdao.com/w/" + urllib.quote( ' '.join( args ).decode( 'gbk' ).encode( 'utf-8' ) )
+        if _platform == "win32" :
+            url = "http://dict.youdao.com/w/" + urllib.quote( ' '.join( args ).decode( 'gbk' ).encode( 'utf-8' ) )
+        elif _platform == "cygwin" :
+            url = "http://dict.youdao.com/w/" + urllib.quote( ' '.join( args ) )
         opener = urllib2.build_opener()
         resp = opener.open(url)
+        #  self.log_rejection( "a" , "a" , "".join( resp.read().strip().split() ) )
+        raw = "".join( resp.read().strip().split() ) 
+        idx = raw.find( 'trans-container' )
+        raw = raw[ idx : ]
+        idx = raw.find( '<li>' ) + 4
+        length = raw.find( '</li>' )
+        print raw[ idx : length ].decode( 'utf-8' )
+        exit( )
+        import lxml.html
         html = lxml.html.fromstring( resp.read().strip() )
         results = html.xpath( "//div[@class='trans-container']" )
         try :
@@ -107,9 +130,18 @@ class qyh_base( object ) :
         @short : t
         @args : msg - message to show
         @'''
-        cmd_tick = 'msg "%username%" '
-        cmd_tick += msg
-        self.lexec( cmd_tick , False , False )
+        import os 
+        from sys import platform as _platform
+        if _platform == "win32" :
+            cmd_tick = 'msg "%username%" '
+            cmd_tick += msg
+            self.lexec( cmd_tick , False , False )
+        elif _platform == "cygwin" :
+            cmd_tick = 'msg "$USER" '
+            cmd_tick += msg
+            self.lexec( cmd_tick , False , False )
+        else :
+            self.print_red( "[-] only run in windows\n" ) ;
 
     def run_putty_pub( self ) :
         '''@
@@ -148,8 +180,10 @@ class qyh_base( object ) :
         @'''
         import os
         from sys import platform as _platform
-        if _platform == "win32" or _platform == "cygwin" :
+        if _platform == "win32" :
             self.lexec_( self.read_config( "run_vmware_background" , "command" ) )
+        elif _platform == "cygwin" :
+            os.popen( 'cmd /c ' + self.read_config( "run_vmware_background" , "command" ) + " &" )
         else :
             self.print_red( "[-] only run in windows\n" ) ;
         return True
@@ -161,8 +195,10 @@ class qyh_base( object ) :
         @'''
         import os
         from sys import platform as _platform
-        if _platform == "win32" or _platform == "cygwin" :
+        if _platform == "win32" :
             self.lexec( self.read_config( "mount_vmware_drive" , "command" ) )
+        elif _platform == "cygwin" :
+            self.lexec( self.read_config( "mount_vmware_drive" , "command" ).replace( '\\' , '\\\\' ) )
         elif _platform == "linux" or _platform == "linux2" :
             self.print_green( "[+] Wow, this is Linux, this function is under construction\n" ) ;
         elif _platform == "darwin" :
@@ -1153,7 +1189,7 @@ class qyh_adb( qyh_base ) :
                 file += [ '/sdcard/DCIM/camera/raw/' + f for f in rc.split( ) if '.raw' in f ]
 
         ### dump photo from VivoCamera
-        rc = self.lexec( 'adb shell ls /sdcard/' + u'\u76f8\u673a'.encode('utf-8') , False )
+        rc = self.lexec( 'adb shell ls /sdcard//' + u'\u76f8\u673a'.encode('utf-8') , False )
         if '.jpg' in rc : ### grep condition "no such file or directory" out
             file += [ '/sdcard/' + u'\u76f8\u673a'.encode('utf-8') + '/' + f for f in rc.split( ) if '.jpg' in f ]
 
@@ -1203,9 +1239,11 @@ class qyh_adb( qyh_base ) :
             if not spe_dir :
                 import datetime
                 fdst = os.getcwd( ).replace( '\\' , '/' ) + '/'
-                fdst += str( datetime.datetime.now() ).split('.')[0].replace( '-' , '' ).replace( ':' , '' ).replace( ' ' , '_' )
+                folder_name = str( datetime.datetime.now() ).split('.')[0].replace( '-' , '' ).replace( ':' , '' ).replace( ' ' , '_' )
+                fdst += folder_name
                 fdst += '/'
             else :
+                folder_name = args[0]
                 fdst = args[0] + '/'
             fdst += log[log.find("/system")+1:log.rfind("/")].strip() + "/"
             try :
@@ -1216,6 +1254,7 @@ class qyh_adb( qyh_base ) :
             self.print_white( str( index + 1 ) + "/" + str( len( logs ) ) )
             self.print_none_color( " file(s) : " + fsrc[fsrc.find('/system'):] + '\n' ) ;
             shutil.copy( fsrc , fdst )
+        print "\n[+] dump to {}/".format( folder_name )
 
         return True
 
@@ -1559,7 +1598,17 @@ class qyh_php( qyh_base ) :
         if os.getenv( 'APACHE_HOME' ) == None :
             self.error_exit( "cannot detect apache home" ) ;
         self.lexec_( "tail -f \"{}/logs/error.log\"".format( str( os.getenv( 'APACHE_HOME' ) ).replace( '\\' , '/' ) ) )
-        # self.lexec_( self.read_config( "tail_error_logs" , "command" ) )
+
+    def tail_access_logs( self , ) :
+        '''@
+        [+] callable
+        [+] visible
+        @short : tal
+        @'''
+        import os
+        if os.getenv( 'APACHE_HOME' ) == None :
+            self.error_exit( "cannot detect apache home" ) ;
+        self.lexec_( "tail -f \"{}/logs/access.log\"".format( str( os.getenv( 'APACHE_HOME' ) ).replace( '\\' , '/' ) ) )
 
 class qyh( qyh_svr , qyh_adb , qyh_php ) :
 
