@@ -1,4 +1,4 @@
-#!/usr/bin/env python_
+#!/usr/bin/env python 
 #-*- coding=utf-8 -*-
 
 class qyh_base( object ) :
@@ -71,6 +71,38 @@ class qyh_base( object ) :
         self.lexec( 'del {}\qyh_session_gvim.vim'.format( os.getenv( 'UserProfile' ) ) )
         self.lexec( 'del {}\qyh_session_vim.vim'.format( os.getenv( 'UserProfile' ) ) )
 
+    def get_news( self , *args ) :
+        '''@
+        [+] visible
+        [+] callable
+        @short : news
+        @'''
+        from sys import platform as _platform
+        if _platform == "win32" or _platform == "cygwin" :
+            pass
+        else :
+            print '[-] not windows ><'
+            exit( )
+        import urllib  
+        import urllib2  
+        import cookielib  
+        opener = urllib2.build_opener()
+        url = 'http://news.baidu.com'
+        resp = opener.open(url)
+        from lxml import etree
+        tree = etree.HTML( resp.read() )
+        for elem in tree.xpath( "//div[@class='imgtit']" ) :
+            print etree.tostring( elem , pretty_print=True )
+        #  import lxml.html
+        #  html = lxml.html.fromstring( resp.read().strip() )
+        #  results = html.xpath( "//div[@class='imgtit']" )
+        #  try :
+            #  #  print dir( results[0].getchildren()[0] )
+            #  #  print results[0].xpath( )
+            #  #  print " ".join( results[0].getchildren()[0].getchildren()[0].text_content().split( ) )
+        #  except :
+            #  print "-"
+
     def dictionary_youdao( self , *args ) :
         '''@
         [+] visible
@@ -96,13 +128,13 @@ class qyh_base( object ) :
         opener = urllib2.build_opener()
         resp = opener.open(url)
         #  self.log_rejection( "a" , "a" , "".join( resp.read().strip().split() ) )
-        raw = "".join( resp.read().strip().split() ) 
-        idx = raw.find( 'trans-container' )
-        raw = raw[ idx : ]
-        idx = raw.find( '<li>' ) + 4
-        length = raw.find( '</li>' )
-        print raw[ idx : length ].decode( 'utf-8' )
-        exit( )
+        #  raw = "".join( resp.read().strip().split() ) 
+        #  idx = raw.find( 'trans-container' )
+        #  raw = raw[ idx : ]
+        #  idx = raw.find( '<li>' ) + 4
+        #  length = raw.find( '</li>' )
+        #  print raw[ idx : length ].decode( 'utf-8' )
+        #  exit( )
         import lxml.html
         html = lxml.html.fromstring( resp.read().strip() )
         results = html.xpath( "//div[@class='trans-container']" )
@@ -110,6 +142,7 @@ class qyh_base( object ) :
             print " ".join( results[0].getchildren()[0].getchildren()[0].text_content().split( ) )
         except :
             print "-"
+
     def change_background_color( self , *args ) :
         '''@
         [+] callable
