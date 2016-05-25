@@ -702,7 +702,7 @@ class qyh_adb( qyh_base ) :
         # exit( )
         if len( rc.strip().replace( "devices" , "" ).split( '\n' ) ) == 2 :
             current_serial = os.getenv( 'ANDROID_SERIAL' )
-            if current_serial == None :
+            if current_serial == None or current_serial == "" : 
                 self.print_green_light( "[+] device found\n" ) ;
                 return True
             else :
