@@ -1,19 +1,19 @@
 #!/usr/bin/env pythoy
-# -*- coding: gbk -*-
+# -*- coding: utf-8 -*-
 __author__ = 'QiYunhu-13111020'
 '''
-    Ö÷ÌåÊÇ×îºóÄÇÀïµÄÒ»¸öWhileÑ­»·
+    ä¸»ä½“æ˜¯æœ€åé‚£é‡Œçš„ä¸€ä¸ªWhileå¾ªç¯
 '''
 from classes import * ;
 
-#ÓÃÓÚÅĞ¶Ï×Ö·û´®Àï±ßµÄ¹¹³ÉÊÇ²»ÊÇ¶¼ÊÇÊı×Ö
+#ç”¨äºåˆ¤æ–­å­—ç¬¦ä¸²é‡Œè¾¹çš„æ„æˆæ˜¯ä¸æ˜¯éƒ½æ˜¯æ•°å­—
 def isNumeric( str ) :
     for i in str :
         if i not in [ '0' , '1' , '2' , '3' , '4' , '5' , '6' , '7' , '8' , '9' ] :
             return False
     return True
 
-#ÓÃÓÚ»ñÈ¡Ä¿µÄµØ
+#ç”¨äºè·å–ç›®çš„åœ°
 def destination( ) :
     metro.tips( )
     while True :
@@ -22,7 +22,7 @@ def destination( ) :
         _input = raw_input( )
         if( _input == '#' ) : 
             return 1
-#ÊäÈëµÄ²»ÊÇÊı×Ö
+#è¾“å…¥çš„ä¸æ˜¯æ•°å­—
         while( not isNumeric( _input ) ) :
             metro.tips( )
             slowPrint( '  OOPS! you have to input a number...\n' )
@@ -30,7 +30,7 @@ def destination( ) :
             metro.PrintStationNameList( )
             _input = raw_input( )
             if( _input == '#' ) : return 1
-#ÊäÈëµÄÊı×Ö²»ÔÚ¿ÉÑ¡·¶Î§
+#è¾“å…¥çš„æ•°å­—ä¸åœ¨å¯é€‰èŒƒå›´
         while( int(_input)<1 or int(_input) >35 ) :
             metro.tips( )
             slowPrint( '  OOPS! out of range...\n' )
@@ -38,7 +38,7 @@ def destination( ) :
             metro.PrintStationNameList( )
             _input = raw_input( )
             if( _input == '#' ) : return 1
-#ÊäÈëµÄÊı×Ö´ú±í±¾Õ¾
+#è¾“å…¥çš„æ•°å­—ä»£è¡¨æœ¬ç«™
         while( metro.db.GetStationNameList( )[int(_input)-1] \
             == metro.db.GetThisStationName( ) ) :
             metro.tips( )
@@ -48,7 +48,7 @@ def destination( ) :
             _input = raw_input( )
             if( _input == '#' ) : return 1
         else :
-#°ÑÆğµãÕ¾£¨±¾Õ¾£©¡¢ÖÕµãÕ¾ºÍ¼Û¸ñ±£´æµ½recordÖĞ
+#æŠŠèµ·ç‚¹ç«™ï¼ˆæœ¬ç«™ï¼‰ã€ç»ˆç‚¹ç«™å’Œä»·æ ¼ä¿å­˜åˆ°recordä¸­
             metro.record.SetBeginStation( metro.db.GetThisStationName( ) )
             metro.record.SetEndStation( \
                 metro.db.GetStationNameList( )[int(_input)-1] )
@@ -58,14 +58,14 @@ def destination( ) :
                     metro.db.GetStationNameList( )[int(_input)-1]))
             return 0
 
-#ÓÃÓÚ»ñµÃÍ¶ÈëµÄÇ®±ÒÊı
+#ç”¨äºè·å¾—æŠ•å…¥çš„é’±å¸æ•°
 def money( ) :
     metro.tips( )
     while( True ) :
         slowPrint( '  Insert money : \n' )
         _input = raw_input( )
         if( _input == '#' ) : return 1
-#ÊäÈëµÄ²»ÊÇÊı×Ö
+#è¾“å…¥çš„ä¸æ˜¯æ•°å­—
         while( not isNumeric( _input ) ) :
             metro.tips( )
             slowPrint( '  OOPS! you have to input a number...\n' )
@@ -79,25 +79,25 @@ def money( ) :
                 metro.record.GetMoneyGained( ) - metro.record.GetPrice( ) )
             return 0
 
-#ÅĞ¶ÏÊÇ²»ÊÇÒª³öÆ±
+#åˆ¤æ–­æ˜¯ä¸æ˜¯è¦å‡ºç¥¨
 def trans( ) :
-#Í¶ÈëµÄÇ®±Ò²»×ãÒÔÖ§¸¶Æ±¼Û£¬ÍË»ØÒÑ¾­Í¶ÈëµÄÇ®±Ò
+#æŠ•å…¥çš„é’±å¸ä¸è¶³ä»¥æ”¯ä»˜ç¥¨ä»·ï¼Œé€€å›å·²ç»æŠ•å…¥çš„é’±å¸
     if( metro.record.GetMoneyForChange( ) < 0 ) :
         metro.tips( )
         slowPrint( '  You money is not enough for this time...' )
         metro.change( metro.record.GetMoneyGained( ) )
         slowPrint( '  Press any key to go back to main menu\n' )
         raw_input( )
-#ÓàÆ±²»×ã£¬ÍË»ØÒÑ¾­Í¶ÈëµÄÇ®±Ò
+#ä½™ç¥¨ä¸è¶³ï¼Œé€€å›å·²ç»æŠ•å…¥çš„é’±å¸
     elif( metro.db.GetTicketLeft( ) <= 0 ) :
         metro.tips( )
         slowPrint( '  No tickets left .... ' )
         metro.change( metro.record.GetMoneyGained( ) )
         slowPrint( '  Press any key to go back to main menu\n' )
         raw_input( )
-#×¼±¸³öÆ±
-#ÈôÈ·¶¨£¬¾Í³öÆ±£¬²¢ÇÒ±£´æ½»Ò×¼ÇÂ¼
-#ÈôÊäÈë'#'£¬ÔòÈ¡Ïû³öÆ±£¬²¢ÇÒÍË»ØÒÑ¾­Í¶ÈëµÄÇ®±Ò
+#å‡†å¤‡å‡ºç¥¨
+#è‹¥ç¡®å®šï¼Œå°±å‡ºç¥¨ï¼Œå¹¶ä¸”ä¿å­˜äº¤æ˜“è®°å½•
+#è‹¥è¾“å…¥'#'ï¼Œåˆ™å–æ¶ˆå‡ºç¥¨ï¼Œå¹¶ä¸”é€€å›å·²ç»æŠ•å…¥çš„é’±å¸
     else :
         metro.tips( )
         slowPrint( '\n' )
@@ -105,7 +105,7 @@ def trans( ) :
         slowPrint( '  for ticket from [ %s ] to [ %s ] \n' % 
                    ( metro.record.GetBeginStation() ,
                      metro.record.GetEndStation() ) )
-        check = raw_input( '  Press Enter to continue or \'#\' to go back\n' )
+        check = raw_input( '  Press Enter to continue or \'#\' to go back' )
         if( check != '#' ) :
             metro.db.SetTicketLeft( metro.db.GetTicketLeft( ) - 1 )
             metro.tips( )
@@ -125,11 +125,11 @@ def trans( ) :
             slowPrint( '  Press any key to go back to main menu\n' )
             raw_input( )
 
-#¹ÜÀíÔ±Ä£Ê½
+#ç®¡ç†å‘˜æ¨¡å¼
 def admin( ) :
     metro.tips( )
     slowPrint( '  Input password : \n  ' )
-#ÑéÖ¤³É¹¦
+#éªŒè¯æˆåŠŸ
     if( metro.OpenAdminMode( ) ) :
         slowPrint( '  [+] Open success\n' ) 
         slowPrint( '  [+] ' )
@@ -139,16 +139,16 @@ def admin( ) :
             metro.adminServices( )
             _input = raw_input( )
             if( _input == '#' ) : break 
-#²éÑ¯½»Ò×¼ÇÂ¼
+#æŸ¥è¯¢äº¤æ˜“è®°å½•
             elif( _input == '1' ) :
                 metro.adminTips( )
                 metro.PrintRecord( )
-#Ìí¼ÓÓàÆ±
+#æ·»åŠ ä½™ç¥¨
             elif( _input == '2' ) :
                 metro.adminTips( )
                 slowPrint( '\n [+] how many ? ' )
                 amount = raw_input( )
-#ÊäÈëµÄÓûÌí¼ÓµÄÆ±Êı²»ÊÇÊı×Ö
+#è¾“å…¥çš„æ¬²æ·»åŠ çš„ç¥¨æ•°ä¸æ˜¯æ•°å­—
                 while( not isNumeric( amount ) ) :
                     metro.adminTips( )
                     slowPrint( '  OOPS! you have to input a number...\n' )
@@ -159,13 +159,13 @@ def admin( ) :
                 else :
                     metro.db.SetTicketLeft( 
                         metro.db.GetTicketLeft( ) + int(amount) )
-#¸ü¸Ä±¾Õ¾Ãû³Æ
+#æ›´æ”¹æœ¬ç«™åç§°
             elif( _input == '3' ) :
                 metro.adminTips( )
                 metro.PrintStationNameList( )
                 slowPrint( '\n [+] select a station as start station :\n' )
                 station = raw_input( )
-#ÊäÈëµÄ´úºÅ²»ÊÇÊı×Ö
+#è¾“å…¥çš„ä»£å·ä¸æ˜¯æ•°å­—
                 while( not isNumeric( station ) ) :
                     metro.adminTips( )
                     metro.PrintStationNameList( )
@@ -177,11 +177,11 @@ def admin( ) :
                 else :
                     metro.db.SetThisStationName(
                         metro.db.GetStationNameList( )[int(station)-1] )
-#ÑéÖ¤Ê§°Ü
+#éªŒè¯å¤±è´¥
     else :
         slowPrint( '  [-] Open fail\n  Press any key to go back' )
         raw_input( )
-#Ö÷º¯Êı£¬ÀàËÆÏûÏ¢Ñ­»·
+#ä¸»å‡½æ•°ï¼Œç±»ä¼¼æ¶ˆæ¯å¾ªç¯
 if __name__ == '__main__' :
     metro = Metro( )
     while True :

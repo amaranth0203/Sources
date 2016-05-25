@@ -1,0 +1,8 @@
+Fri Jul 18 20:16:34 CST 2014 : Partition 1
+brw-rw---T 1 root disk 8, 1 Jul 18 18:26 /dev/sda1
+Fri Jul 18 20:16:37 CST 2014 : Partition 2
+brw-rw---T 1 root disk 8, 2 Jul 18 18:25 /dev/sda2
+Fri Jul 18 20:16:39 CST 2014 : Partition 3
+brw-rw---T 1 root disk 8, 3 Jul 18 18:25 /dev/sda3
+Fri Jul 18 20:16:40 CST 2014 : Partition 4
+brw-rw---T 1 root disk 8, 4 Jul 18 18:25 /dev/sda4

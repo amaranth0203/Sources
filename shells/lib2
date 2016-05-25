@@ -1,0 +1,8 @@
+_lib2=1
+[ -z "$_lib1" ] && . ./lib1
+
+func2()
+{
+    echo func2
+    anotherfunc
+}

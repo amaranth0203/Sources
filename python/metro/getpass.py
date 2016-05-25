@@ -1,19 +1,19 @@
 #!/usr/bin/env pythoy
-# -*- coding: gbk -*-
+# -*- coding: utf-8 -*-
 __author__ = 'QiYunhu-13111020'
 '''
-    ÓÃÓÚwindowsºÍlinuxÏÂ±ßÃÜÂëÊäÈë¹¦ÄÜ
+    ç”¨äºwindowså’Œlinuxä¸‹è¾¹å¯†ç è¾“å…¥åŠŸèƒ½
                          2014-12-14
 '''
 import platform , getpass
-#ÏÈÅĞ¶Ï²Ù×÷ÏµÍ³£¬È»ºó·µ»Ø¸÷¸ö²Ù×÷ÏµÍ³ÊÊÓÃµÄgetpass·½·¨
+#å…ˆåˆ¤æ–­æ“ä½œç³»ç»Ÿï¼Œç„¶åè¿”å›å„ä¸ªæ“ä½œç³»ç»Ÿé€‚ç”¨çš„getpassæ–¹æ³•
 def getpass( ) :
     Os = platform.system( )
     if( Os == 'Linux' ) :
         import sys , tty , termios
 
-#linuxÏÂ±ßÒª×Ô¼ºÊµÏÖgetch()
-#ÓÃÓÚ»ñµÃ¼üÅÌÊäÈëµÄ×Ö·ûÂë£¨Ìø¹ı»º³åÇø£©
+#linuxä¸‹è¾¹è¦è‡ªå·±å®ç°getch()
+#ç”¨äºè·å¾—é”®ç›˜è¾“å…¥çš„å­—ç¬¦ç ï¼ˆè·³è¿‡ç¼“å†²åŒºï¼‰
         def getch( ) :
             fd = sys.stdin.fileno( )
             old_settings = termios.tcgetattr(fd)
@@ -23,21 +23,21 @@ def getpass( ) :
             finally :
                 termios.tcsetattr( fd, termios.TCSADRAIN , old_settings )
             return ch
-#²ÎÊıÊÇÊäÈëÃÜÂëµÄÊ±ºòÏÔÊ¾µÄ×Ö·û
+#å‚æ•°æ˜¯è¾“å…¥å¯†ç çš„æ—¶å€™æ˜¾ç¤ºçš„å­—ç¬¦
         def getpass( maskchar = "*" ) :
             password = ""
             while True :
                 ch = getch( )
-#ÊäÈë»Ø³µµÄÊ±ºò±íÊ¾ÊäÈë½áÊø
+#è¾“å…¥å›è½¦çš„æ—¶å€™è¡¨ç¤ºè¾“å…¥ç»“æŸ
                 if ch == '\r' or ch == '\n' :
                     print ""
                     return password
-#ÊäÈëÁËÍË¸ñ¼ü
+#è¾“å…¥äº†é€€æ ¼é”®
                 elif ch == '\b' or ord(ch) == 127 :
                     if len(password) > 0 :
                         sys.stdout.write( "\b \b" )
                         password = password[:-1]
-#Õı³£×Ö·û
+#æ­£å¸¸å­—ç¬¦
                 else :
                     if maskchar != None :
                         sys.stdout.write( maskchar )
@@ -63,7 +63,7 @@ def getpass( ) :
     else :
         return getpass.getpass
 
-#²âÊÔÓÃ
+#æµ‹è¯•ç”¨
 if __name__ == '__main__' :
     print "Enter password : "
     testGetPass = getpass( )

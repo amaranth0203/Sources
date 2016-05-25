@@ -1,19 +1,19 @@
 #!/usr/bin/env python
-#-*- coding: gbk -*-
+#-*- coding: utf-8 -*-
 __author__ = 'QiYunhu-13111020'
 '''
-    ÓÃÓÚ³õÊ¼»¯Êý¾Ý¿â
-    price.xlsÊÇ´Ó°Ù¶ÈÕÒµ½µÄÎ÷°²µØÌú¼Û¸ñ±í
-    ¼òµ¥µØ´ÓÀï±ß¶Á³öÊý¾ÝÓÃsqlite3´æ´¢µ½metro.dbµÄMETROPRICE±íÖÐ
-    CONTEXT±íÓÃÓÚ±£´æÓàÆ±ÊýÁ¿ºÍ±¾Õ¾Ãû³Æ
-        Ä¬ÈÏ±¾Õ¾Îª'Ð¡Õ¯'£¬ÓàÆ±2ÕÅ
-    SELLINGRECORD±íÓÃÓÚ±£´æ½»Ò×¼ÇÂ¼
+    ç”¨äºŽåˆå§‹åŒ–æ•°æ®åº“
+    price.xlsæ˜¯ä»Žç™¾åº¦æ‰¾åˆ°çš„è¥¿å®‰åœ°é“ä»·æ ¼è¡¨
+    ç®€å•åœ°ä»Žé‡Œè¾¹è¯»å‡ºæ•°æ®ç”¨sqlite3å­˜å‚¨åˆ°metro.dbçš„METROPRICEè¡¨ä¸­
+    CONTEXTè¡¨ç”¨äºŽä¿å­˜ä½™ç¥¨æ•°é‡å’Œæœ¬ç«™åç§°
+        é»˜è®¤æœ¬ç«™ä¸º'å°å¯¨'ï¼Œä½™ç¥¨2å¼ 
+    SELLINGRECORDè¡¨ç”¨äºŽä¿å­˜äº¤æ˜“è®°å½•
                             2014-11-25
 '''
 import xlrd , sqlite3, platform
 
-#linuxÏÂÖÐÎÄÊ¹ÓÃutf-8±àÂëÊä³öµ½ÃüÁîÐÐ
-#windowsÏÂÖÐÎÄÊ¹ÓÃgbk±àÂë
+#linuxä¸‹ä¸­æ–‡ä½¿ç”¨utf-8ç¼–ç è¾“å‡ºåˆ°å‘½ä»¤è¡Œ
+#windowsä¸‹ä¸­æ–‡ä½¿ç”¨gbkç¼–ç 
 Os = platform.system( )
 if( Os == 'Linux' ) :
     CODING = 'utf-8'
@@ -22,20 +22,20 @@ elif( Os == 'Windows' ) :
 
 
 fname = "price.xls"
-#»ñÈ¡excelÖ¸Õë
+#èŽ·å–excelæŒ‡é’ˆ
 bk = xlrd.open_workbook( fname )
 shxrange = range( bk.nsheets )
-#´ò¿ª¹¤×÷±¡
+#æ‰“å¼€å·¥ä½œè–„
 try :
     sh = bk.sheet_by_name( "Sheet1" )
 except :
     print "No sheet in %s named Sheet1" % fname
-#»ñÈ¡ÐÐÊýºÍÁÐÊý
+#èŽ·å–è¡Œæ•°å’Œåˆ—æ•°
 nrows = sh.nrows
 ncols = sh.ncols
-#¹¹ÔìvalÓÃÓÚ´´½¨METROPRICE±í
+#æž„é€ valç”¨äºŽåˆ›å»ºMETROPRICEè¡¨
 val = []
-#¸÷¸öµØÌúÕ¾Ãû×Ö
+#å„ä¸ªåœ°é“ç«™åå­—
 names = sh.row_values( 1 )
 for i in range( 2 , nrows - 1 ) :
     for j in range( 3 , ncols ) :
@@ -44,33 +44,33 @@ for i in range( 2 , nrows - 1 ) :
         price = sh.row_values( i )[ j ] 
         val.append( [ start.encode( CODING ) , end.encode( CODING ) , price if price != '-' else 0 ] )
 
-#´ò¿ªÊý¾Ý¿â
+#æ‰“å¼€æ•°æ®åº“
 conn = sqlite3.connect( 'metro.db' )
-#windowsÏÂÊ¹ÓÃgbk±àÂë
+#windowsä¸‹ä½¿ç”¨gbkç¼–ç 
 conn.text_factory = lambda x: unicode( x , CODING , "ignore" ) 
-#»ñÈ¡ÓÎ±ê
+#èŽ·å–æ¸¸æ ‡
 cursor = conn.cursor( )
-#½¨METROPRICE±í
+#å»ºMETROPRICEè¡¨
 cursor.execute( "DROP TABLE IF EXISTS METROPRICE" )
 cursor.execute( "CREATE TABLE METROPRICE (\
                     START VARCHAR( 30 ) ,\
                     END VARCHAR( 30 ) ,\
                     PRICE INT )" )
 sql = '''INSERT INTO METROPRICE VALUES( ? , ? , ? )'''
-#²åÈëÊý¾Ý
+#æ’å…¥æ•°æ®
 cursor.executemany( sql , tuple( val ) )
 
-#½¨CONTEXT±í
-#Ä¬ÈÏÆðµãÕ¾£¨±¾Õ¾£©ÎªÐ¡Õ¯
-#Ä¬ÈÏÓàÆ±ÓÐÁ½ÕÅ
+#å»ºCONTEXTè¡¨
+#é»˜è®¤èµ·ç‚¹ç«™ï¼ˆæœ¬ç«™ï¼‰ä¸ºå°å¯¨
+#é»˜è®¤ä½™ç¥¨æœ‰ä¸¤å¼ 
 cursor.execute( "DROP TABLE IF EXISTS CONTEXT" )
-cursor.execute( "CREATE TABLE CONTEXT( NAME VARCHAR(30), NUM_VALUE INT , STR_VALUE VARCHAR  )" )
+cursor.execute( "CREATE TABLE CONTEXT( NAME VARCHAR(30), NUM_VALUE INT , STR_VALUE VARCHAR )" )
 cursor.execute( "INSERT INTO CONTEXT( NAME , NUM_VALUE ) \
                  VALUES ( 'TICKETS' , 2 )" )
 cursor.execute( "INSERT INTO CONTEXT( NAME , STR_VALUE ) \
-                 VALUES ( 'THIS_STATION' , 'Ð¡Õ¯' )" )
+                 VALUES ( 'THIS_STATION' , 'å°å¯¨' )" )
 
-#½¨SELLINGRECORD±í
+#å»ºSELLINGRECORDè¡¨
 cursor.execute( "DROP TABLE IF EXISTS SELLINGRECORD" )
 cursor.execute( "CREATE TABLE SELLINGRECORD(\
                     ID INTEGER PRIMARY KEY,\
