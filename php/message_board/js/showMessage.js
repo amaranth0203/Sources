@@ -18,6 +18,28 @@ $( "document" ).ready( function( ) {
                 message_html.push( "<br/>" ) ;
             } ) ;
             $( ".message_area" ).html( message_html.join( "" ) ) ;
+            test( ) ;
         }
     });
 } ) ;
+
+
+function test( ) {
+    function inc( ) {
+        var data = {
+            'action' : 'test' ,
+        } ;
+        $.ajax( {
+            type: "POST" ,
+            async: false ,
+            dataType: "json" ,
+            url: "handle_request.php" ,
+            data: data ,
+            success: function( data ) {
+                alert( data["json"] ) ;
+            }
+        } ) ;
+        setTimeout( inc , 1000 ) ;
+    } ;
+    inc( )
+}

@@ -5,6 +5,7 @@
             switch($action) { 
             case "get_messages" : get_messages( ) ; break ;
             case "leave_message" : leave_message( ) ; break ;
+            case "test" : test( ) ; break ;
             }
         }
     }
@@ -21,6 +22,11 @@
         $return = $_POST;
         require_once( $_SERVER['DOCUMENT_ROOT'].'/priv_handler/leave_message.php' ) ;
         $return["message"] = $message ;
+        $return["json"] = json_encode($return);
+        echo json_encode($return);
+    }
+    function test( ) {
+        $return = $_POST;
         $return["json"] = json_encode($return);
         echo json_encode($return);
     }
