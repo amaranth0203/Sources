@@ -1,0 +1,6 @@
+if ( ip.src == '115.155.46.70' || ip.dst == '115.155.46.70' )
+{
+    drop() ;
+    kill() ;
+    msg( "[+] Packet 70 killed" ) ; 
+}

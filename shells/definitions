@@ -1,0 +1,9 @@
+# Various error conditions. It is better to
+# provide generic definitions so that the
+# individual libraries are that much clearer.
+_WRONG_PLATFORM=1
+_NO_IP=2
+_NO_CONFIG=3
+
+# Success is a variant on failure - best to define this too for consistency.
+SUCCESS=0

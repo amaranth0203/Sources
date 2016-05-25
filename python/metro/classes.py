@@ -1,11 +1,11 @@
 #!/usr/bin/env pythoy
-# -*- coding: gbk -*-
+# -*- coding: utf-8 -*-
 __author__ = 'QiYunhu-13111020'
 '''
-    Èı¸öÀà Metro SellingRecord dbOperator
-        MetroÀï±ßÊÇÊÛÆ±»úÖ÷ÒªÄÜÊµÏÖµÄ¹¦ÄÜ
-        SellingRecordÀàÓÃÀ´·â×°Ã¿´Î³É¹¦½»Ò×Ö®ºóµÄ½»Ò×ÏêÇé
-        dbOperatorÓÃÀ´ÊµÏÖºÍÊı¾İ¿âÓĞ¹ØµÄ²Ù×÷
+    ä¸‰ä¸ªç±» Metro SellingRecord dbOperator
+        Metroé‡Œè¾¹æ˜¯å”®ç¥¨æœºä¸»è¦èƒ½å®ç°çš„åŠŸèƒ½
+        SellingRecordç±»ç”¨æ¥å°è£…æ¯æ¬¡æˆåŠŸäº¤æ˜“ä¹‹åçš„äº¤æ˜“è¯¦æƒ…
+        dbOperatorç”¨æ¥å®ç°å’Œæ•°æ®åº“æœ‰å…³çš„æ“ä½œ
 
                             2014-12-14
 '''
@@ -13,8 +13,8 @@ __author__ = 'QiYunhu-13111020'
 import sqlite3 , time , platform , os , getpass
 from slowPrint import slowPrint
 
-#linuxÏÂÖĞÎÄÊ¹ÓÃutf-8±àÂëÊä³öµ½ÃüÁîĞĞ
-#windowsÏÂÖĞÎÄÊ¹ÓÃgbk±àÂë
+#linuxä¸‹ä¸­æ–‡ä½¿ç”¨utf-8ç¼–ç è¾“å‡ºåˆ°å‘½ä»¤è¡Œ
+#windowsä¸‹ä¸­æ–‡ä½¿ç”¨gbkç¼–ç 
 Os = platform.system( )
 if( Os == 'Linux' ) :
     CODING = 'utf-8'
@@ -26,12 +26,12 @@ else :
 
 class Metro :
 
-#³õÊ¼»¯º¯Êı
+#åˆå§‹åŒ–å‡½æ•°
     def __init__( self ) :
         self.db = dbOperator( )
         self.record = SellingRecord( )
 
-#ÊµÏÖÇåÆÁ¹¦ÄÜ
+#å®ç°æ¸…å±åŠŸèƒ½
     def cls( self ) :
         Os = platform.system( )
         if( Os == 'Linux' ) :
@@ -39,7 +39,7 @@ class Metro :
         if( Os == 'Windows' ) :
             os.system( 'cls' )
 
-#Êä³ö»¶Ó­ĞÅÏ¢
+#è¾“å‡ºæ¬¢è¿ä¿¡æ¯
     def tips( self ) :
         self.cls( )
         slowPrint( '\n' ) 
@@ -47,10 +47,9 @@ class Metro :
         slowPrint( ' This station is [ %s ] \n' % self.db.GetThisStationName( )  )
         slowPrint( ' This machine has [ %d ] tickets now\n' % self.db.GetTicketLeft( ) )
         slowPrint( ' Today is %s \n' % ( time.strftime( "%Y-%m-%d" , time.localtime( time.time() ) ) ) )
-        slowPrint( ' You can go back by inputing \'#\' at any time\n' )
         slowPrint( '\n' )
 
-#¹ÜÀíÔ±Ä£Ê½µÄ»¶Ó­ĞÅÏ¢
+#ç®¡ç†å‘˜æ¨¡å¼çš„æ¬¢è¿ä¿¡æ¯
     def adminTips( self ) :
         self.cls( )
         slowPrint( '\n' ) 
@@ -58,11 +57,10 @@ class Metro :
         slowPrint( ' [+] This station is [ %s ] \n' % self.db.GetThisStationName( )  )
         slowPrint( ' [+] This machine has [ %d ] tickets now\n' % self.db.GetTicketLeft( ) )
         slowPrint( ' [+] Today is %s \n' % ( time.strftime( "%Y-%m-%d" , time.localtime( time.time() ) ) ) )
-        slowPrint( ' [+] You can go back by inputing \'#\' at any time\n' )
         slowPrint( ' [+]  Careful! This is administrate mode\n' )
         slowPrint( '\n' )
 
-#¿ÉÑ¡µÄ²Ù×÷
+#å¯é€‰çš„æ“ä½œ
     def services( self ) :
         slowPrint( '\n' ) 
         slowPrint( '   Services : \n' )
@@ -70,7 +68,7 @@ class Metro :
         slowPrint( '    1. Buy metro ticket\n' )
         slowPrint( '    2. Manager this mechine\n' )    
 
-#¹ÜÀíÔ±¿ÉÑ¡µÄ²Ù×÷
+#ç®¡ç†å‘˜å¯é€‰çš„æ“ä½œ
     def adminServices( self ) :
         slowPrint( '\n' )
         slowPrint( ' [+]  Services : \n' )
@@ -79,7 +77,7 @@ class Metro :
         slowPrint( ' [+]   2. Add tickets to this machine\n' )    
         slowPrint( ' [+]   3. Change this station name\n' )
 
-#ÕÒÇ®»òÕßÍËÇ®
+#æ‰¾é’±æˆ–è€…é€€é’±
     def change( self , money ) :
         slowPrint( '\n' )
         slowPrint( '----------------------------------------------------\n' )
@@ -87,7 +85,7 @@ class Metro :
         slowPrint( '----------------------------------------------------\n' )
         slowPrint( '\n' )
 
-#³öÆ±
+#å‡ºç¥¨
     def printTicket( self , begin , end , price ) :
         slowPrint( '\n' )
         slowPrint( '  This is your ticket , have a nice trip \n' )
@@ -99,7 +97,7 @@ class Metro :
         slowPrint( '  |  price : %d                           |\n' % price )
         slowPrint( '  +--------------------------------------+ \n' )
 
-#´òÓ¡¿ÉÑ¡ÔñµÄÕ¾µã
+#æ‰“å°å¯é€‰æ‹©çš„ç«™ç‚¹
     def PrintStationNameList( self ) :
         nameList = self.db.GetStationNameList( )
         index = 0 ;
@@ -113,8 +111,8 @@ class Metro :
             index = index + 1 
         slowPrint( '\n' )
 
-#´òÓ¡ÀúÊ·½»Ò×¼ÇÂ¼
-#Ã¿´òÓ¡ÆßÌõÔİÍ£Ò»ÏÂ·ÀÖ¹Êı¾İÌ«¶à¿´²»µ½ÉÏ±ßµÄĞÅÏ¢
+#æ‰“å°å†å²äº¤æ˜“è®°å½•
+#æ¯æ‰“å°ä¸ƒæ¡æš‚åœä¸€ä¸‹é˜²æ­¢æ•°æ®å¤ªå¤šçœ‹ä¸åˆ°ä¸Šè¾¹çš„ä¿¡æ¯
     def PrintRecord( self ) :
         recordList = self.db.GetRecord( )
         index = 0 
@@ -127,8 +125,8 @@ class Metro :
             index = index + 1 
         input_ = raw_input( '\n...END Press any key to go back' )
 
-#½øÈë¹ÜÀíÔ±Ä£Ê½µÄÊ±ºò½øĞĞÉí·İÑéÖ¤
-#Ä¬ÈÏÃÜÂëadmin
+#è¿›å…¥ç®¡ç†å‘˜æ¨¡å¼çš„æ—¶å€™è¿›è¡Œèº«ä»½éªŒè¯
+#é»˜è®¤å¯†ç admin
     def OpenAdminMode( self ) :
         getPass = getpass.getpass( )
         password = getPass( "#" )
@@ -136,37 +134,37 @@ class Metro :
             return True
         return False
         
-#ÓÃÓÚ´æ´¢³É¹¦µÄ½»Ò×¼ÇÂ¼
+#ç”¨äºå­˜å‚¨æˆåŠŸçš„äº¤æ˜“è®°å½•
 class SellingRecord :
-#ÆğµãÕ¾£¨±¾Õ¾£©µÄ·ÃÎÊÆ÷ºÍÉèÖÃÆ÷
+#èµ·ç‚¹ç«™ï¼ˆæœ¬ç«™ï¼‰çš„è®¿é—®å™¨å’Œè®¾ç½®å™¨
     def SetBeginStation( self , begin ) :
         self.__beginStation = begin
     def GetBeginStation( self ) :
         return self.__beginStation
-#ÖÕµãÕ¾µÄ·ÃÎÊÆ÷ºÍÉèÖÃÆ÷
+#ç»ˆç‚¹ç«™çš„è®¿é—®å™¨å’Œè®¾ç½®å™¨
     def SetEndStation( self , end ) :
         self.__endStation = end
     def GetEndStation( self ) :
         return self.__endStation
-#Í¶ÈëÇ®±ÒµÄ·ÃÎÊÆ÷ºÍÉèÖÃÆ÷
+#æŠ•å…¥é’±å¸çš„è®¿é—®å™¨å’Œè®¾ç½®å™¨
     def SetMoneyGained( self , money ) :
         self.__moneyGained = money
     def GetMoneyGained( self ) :
         return self.__moneyGained
-#Æ±¼ÛµÄ·ÃÎÊÆ÷ºÍÉèÖÃÆ÷
+#ç¥¨ä»·çš„è®¿é—®å™¨å’Œè®¾ç½®å™¨
     def SetPrice( self , price ) :
         self.__price = price
     def GetPrice( self ) :
         return self.__price
-#Ó¦ÕÒÁãÇ®µÄ·ÃÎÊÆ÷ºÍÉèÖÃÆ÷
+#åº”æ‰¾é›¶é’±çš„è®¿é—®å™¨å’Œè®¾ç½®å™¨
     def SetMoneyForChange( self , money ) :
         self.__moneyForChange = money
     def GetMoneyForChange( self ) :
         return self.__moneyForChange
-#Íê³É½»Ò×µÄÊ±¼äÉèÖÃÆ÷
+#å®Œæˆäº¤æ˜“çš„æ—¶é—´è®¾ç½®å™¨
     def SetCompletedTime( self , time ) :
         self.__completedTime = time 
-#Ïàµ±ÓÚjavaµÄtoString()·½·¨
+#ç›¸å½“äºjavaçš„toString()æ–¹æ³•
     def __str__( self ) :
         return ' %s price:%-3d gain:%-3d change:%-3d %s -> %s' % \
             ( self.__completedTime , self.__price , self.__moneyGained , 
@@ -174,21 +172,21 @@ class SellingRecord :
 
 class dbOperator :
 
-#¹¹Ôìº¯Êı£¬»ñµÃÊı¾İ¿âÁ¬½ÓºÍÓÎ±ê
+#æ„é€ å‡½æ•°ï¼Œè·å¾—æ•°æ®åº“è¿æ¥å’Œæ¸¸æ ‡
     def __init__( self ) :
         self.__conn = sqlite3.connect( 'metro.db' )
         self.__conn.text_factory = lambda x: unicode( x , CODING , "ignore" ) 
         self.__cursor = self.__conn.cursor( )
 
-#Îö¹¹º¯Êı£¬¹Ø±ÕÓÎ±êºÍÊı¾İ¿âÁ¬½Ó
+#ææ„å‡½æ•°ï¼Œå…³é—­æ¸¸æ ‡å’Œæ•°æ®åº“è¿æ¥
     def __del__( self ) :
         self.__cursor.close( )
         self.__conn.close( )
         
-#²âÊÔÓÃº¯Êı
+#æµ‹è¯•ç”¨å‡½æ•°
     def test( self ) :
         self.__cursor.execute( "select * from METROPRICE\
-                                where start = 'Ğ¡Õ¯' \
+                                where start = 'å°å¯¨' \
                                 limit 0 , 5 " )
         str = self.__cursor.fetchall( )
         for i in str :
@@ -196,7 +194,7 @@ class dbOperator :
                 print j 
             print( "----" )
 
-#»ñµÃËùÓĞÕ¾µãµÄÃû×Ö£¬·µ»ØÒ»¸öList
+#è·å¾—æ‰€æœ‰ç«™ç‚¹çš„åå­—ï¼Œè¿”å›ä¸€ä¸ªList
     def GetStationNameList( self ) :
         self.__cursor.execute( "select distinct start \
                                 from METROPRICE" ) 
@@ -206,48 +204,48 @@ class dbOperator :
             r.append( i[0].encode( CODING ) )
         return r
 
-#²ÎÊıÊÇÆğµãÕ¾£¨±¾Õ¾£©ºÍÖÕµãÕ¾µÄÃû×Ö
-#·µ»ØÖµÊÇÆ±¼Û
+#å‚æ•°æ˜¯èµ·ç‚¹ç«™ï¼ˆæœ¬ç«™ï¼‰å’Œç»ˆç‚¹ç«™çš„åå­—
+#è¿”å›å€¼æ˜¯ç¥¨ä»·
     def CalcPrice( self , begin , end ) :
         self.__cursor.execute( "select * from METROPRICE\
                                 where start = ? and end = ?",
                                 ( begin , end ) )
         return self.__cursor.fetchall( )[0][2]
 
-#ÉèÖÃ±¾»úÆ÷Ê£ÓàÆ±ÊıÁ¿
+#è®¾ç½®æœ¬æœºå™¨å‰©ä½™ç¥¨æ•°é‡
     def SetTicketLeft( self , ti ) :
         self.__cursor.execute( "update CONTEXT \
                                 set NUM_VALUE = ?\
                                 where name = 'TICKETS'" , (ti,) )
         self.__conn.commit( )
 
-#»ñµÃ±¾»úÆ÷Ê£ÓàµÄÆ±Êı
+#è·å¾—æœ¬æœºå™¨å‰©ä½™çš„ç¥¨æ•°
     def GetTicketLeft( self ) :
         self.__cursor.execute( "select NUM_VALUE from CONTEXT\
                                 where NAME = 'TICKETS'" )
         return self.__cursor.fetchall( )[0][0]
 
-#ÉèÖÃ±¾Õ¾Ãû³Æ
+#è®¾ç½®æœ¬ç«™åç§°
     def SetThisStationName( self , name ) :
         self.__cursor.execute( "update CONTEXT\
                                 set STR_VALUE = ?\
                                 where name = 'THIS_STATION'" , (name,) )
         self.__conn.commit( )
 
-#»ñµÃ±¾Õ¾Ãû×Ö
+#è·å¾—æœ¬ç«™åå­—
     def GetThisStationName( self ) :
         self.__cursor.execute( "select STR_VALUE from CONTEXT\
                                 where name = 'THIS_STATION'" )
         return self.__cursor.fetchall( )[0][0].encode( CODING )
 
-#±£´æ½»Ò×¼ÇÂ¼
-#£¨¼ò»¯³É±£´æ×Ö·û´®¡£¡££©
+#ä¿å­˜äº¤æ˜“è®°å½•
+#ï¼ˆç®€åŒ–æˆä¿å­˜å­—ç¬¦ä¸²ã€‚ã€‚ï¼‰
     def SaveRecord( self , record ) :
         self.__cursor.execute( "INSERT INTO SELLINGRECORD( RECORD ) VALUES ( ? )" , (record.__str__(),) )
         self.__conn.commit( )
 
-#»ñµÃ½»Ò×¼ÇÂ¼
-#·µ»ØÖµÊÇÒ»¸öList
+#è·å¾—äº¤æ˜“è®°å½•
+#è¿”å›å€¼æ˜¯ä¸€ä¸ªList
     def GetRecord( self ) :
         self.__cursor.execute( "SELECT RECORD FROM SELLINGRECORD" )
         tmp = self.__cursor.fetchall( )
@@ -256,7 +254,7 @@ class dbOperator :
             r.append( i[0] )
         return r
 
-#²âÊÔÓÃ
+#æµ‹è¯•ç”¨
 if __name__ == '__main__' :
     a = dbOperator( )
     # a.test( )
@@ -264,10 +262,10 @@ if __name__ == '__main__' :
     # print a.GetTicketLeft( )
     # a.SetTicketLeft( 4 )
     # print a.GetTicketLeft( )
-    # print a.CalcPrice( 'Ğ¡Õ¯' , 'Ğ¡Õ¯' )
-    # a.SetThisStationName( 'ºº³ÇÂ·' ) 
+    # print a.CalcPrice( 'å°å¯¨' , 'å°å¯¨' )
+    # a.SetThisStationName( 'æ±‰åŸè·¯' ) 
     # print a.GetThisStationName( )
-    # a.SetThisStationName( 'Ğ¡Õ¯' ) 
+    # a.SetThisStationName( 'å°å¯¨' ) 
     # print a.GetThisStationName( )
     # for i in a.GetStationNameList( ) :
         # print i 
