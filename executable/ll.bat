@@ -1,2 +1,2 @@
 @echo off
-ls.exe -lF --color=auto --show-control-chars %*
+ls.exe -lF --color=auto --show-control-chars -N %*
