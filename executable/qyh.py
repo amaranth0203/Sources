@@ -442,14 +442,22 @@ class qyh_base( object ) :
         return True
 
     def print_color_test( self , ) :
-        from ctypes import c_ulong , windll
-        STD_OUTPUT_HANDLE_ID = c_ulong(0xfffffff5)
-        windll.Kernel32.GetStdHandle.restype = c_ulong
-        std_output_hdl = windll.Kernel32.GetStdHandle(STD_OUTPUT_HANDLE_ID)
-        for color in xrange(16):
-            windll.Kernel32.SetConsoleTextAttribute(std_output_hdl, color)
-            print( "hello : " )
-            print( color )
+        '''@
+        [+] callable
+        @'''
+        from sys import platform as _platform
+        if _platform == "win32" :
+            from ctypes import c_ulong , windll
+            STD_OUTPUT_HANDLE_ID = c_ulong(0xfffffff5)
+            windll.Kernel32.GetStdHandle.restype = c_ulong
+            std_output_hdl = windll.Kernel32.GetStdHandle(STD_OUTPUT_HANDLE_ID)
+            for color in xrange(16):
+                windll.Kernel32.SetConsoleTextAttribute(std_output_hdl, color)
+                print( "hello : {}".format( color ) )
+            windll.Kernel32.SetConsoleTextAttribute(std_output_hdl, 7)
+        elif _platform == "linux" or _platform == "linux2" or _platform == "cygwin" :
+            for color in xrange( 16 ) :
+                self.print_colorful( "hello : {}\n".format( color ) , color )
 
     def print_none_color( self , str , *nouse ) :
         import sys
@@ -469,11 +477,20 @@ class qyh_base( object ) :
         elif _platform == "linux" or _platform == "linux2" or _platform == "cygwin" :
             color_code = {
                 "none" : "\033[0m",
+                0  : "\033[0;30m" ,
+                1  : "\033[0;34m" ,
                 2  : "\033[0;32m" ,
+                3  : "\033[0;36m" ,
                 4  : "\033[0;31m" ,
+                5  : "\033[0;35m" ,
                 6  : "\033[0;33m" ,
+                7  : "\033[0;37m" ,
+                8  : "\033[1;30m" ,
+                9  : "\033[1;34m" ,
                 10 : "\033[1;32m" ,
+                11 : "\033[1;36m" ,
                 12 : "\033[1;31m" ,
+                13 : "\033[1;35m" ,
                 14 : "\033[1;33m" ,
                 15 : "\033[1;37m" ,
             }
