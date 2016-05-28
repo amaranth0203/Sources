@@ -28,23 +28,38 @@ class qyh_base( object ) :
         @short : vp
         @'''
         pass
-        from Tkinter import Tk
-        r = Tk()
-        r.withdraw()
-        r.clipboard_clear()
-        r.clipboard_append('"C:\Program Files (x86)\Microsoft Visual Studio 12.0\Common7\Tools\VsDevCmd.bat"\n')
-        r.destroy()
-        print "\n\n[+] execute command in clipboard yourself"
-        # import os
-        # from sys import platform as _platform
-        # if _platform == "win32" :
-            # identity = os.getenv( 'identity' ) 
-            # if identity == 'Shadow' :
-                # print 'building...'
-            # elif identity == 'vivo_work' :
-                # print '"C:\Program Files (x86)\Microsoft Visual Studio 12.0\Common7\Tools\VsDevCmd.bat"'
-            # else :
-                # self.error_exit( 'unknown computer' ) ;
+        import os
+        from sys import platform as _platform
+        if _platform == "win32" :
+            identity = os.getenv( 'identity' ) 
+            if identity == 'Shadow' :
+                print 'building...'
+            elif identity == 'vivo_work' :
+                cmd = ""
+                cmd += '"C:\Program Files (x86)\Microsoft Visual Studio 12.0\Common7\Tools\VsDevCmd.bat"\n'
+                cmd += "set Masm32Dir=C:\Masm32\n"
+                cmd += "set include=%Masm32Dir%\Include;%include%\n"
+                cmd += "set lib=%Masm32Dir%\lib;%lib%\n"
+                cmd += "set path=%Masm32Dir%\Bin;%Masm32Dir%;%PATH%\n"
+                cmd += "set Masm32Dir=\n"
+                from Tkinter import Tk
+                r = Tk()
+                r.withdraw()
+                r.clipboard_clear()
+                r.clipboard_append( cmd )
+                r.destroy()
+                print "\n\n[+] execute command in clipboard yourself"
+                # self.generate_env_script( [ 
+                    # "Masm32Dir=C:\Masm32" ,
+                    # "include=%Masm32Dir%\Include;%include%" ,
+                    # "lib=%Masm32Dir%\lib;%lib%" ,
+                    # "path=%Masm32Dir%\Bin;%Masm32Dir%;%PATH%" ,
+                    # "Masm32Dir=" ,
+                # ] )
+            else :
+                self.error_exit( 'unknown computer' ) ;
+        else :
+            self.error_exit( 'only in cmd' ) ;
 
     def generate_env_script( self , *args ) :
         '''@
@@ -58,24 +73,24 @@ class qyh_base( object ) :
             cmd = ""
             for k in env_d : 
                 cmd += "set "
-                cmd += k + "=" + env_d[k]
+                cmd += k
                 cmd += "\n"
-            from Tkinter import Tk
-            r = Tk()
-            r.withdraw()
-            r.clipboard_clear()
-            r.clipboard_append( cmd )
-            r.destroy()
-            print "\n\n[+] execute command in clipboard yourself"
-            # filename = os.getcwd( ) + '/set_env_' + str( datetime.datetime.now() ).split('.')[0].replace( '-' , '' ).replace( ':' , '' ).replace( ' ' , '_' ) + '.bat'
-            # with open( filename , 'a+' ) as f :
-                # f.write( cmd )
-            # print '\n\nrun [ ' + os.path.basename( filename ) + ' ] yourself'
+            # from Tkinter import Tk
+            # r = Tk()
+            # r.withdraw()
+            # r.clipboard_clear()
+            # r.clipboard_append( cmd )
+            # r.destroy()
+            # print "\n\n[+] execute command in clipboard yourself"
+            filename = os.getcwd( ) + '/set_env_' + str( datetime.datetime.now() ).split('.')[0].replace( '-' , '' ).replace( ':' , '' ).replace( ' ' , '_' ) + '.bat'
+            with open( filename , 'a+' ) as f :
+                f.write( cmd )
+            print '\n\nrun [ ' + os.path.basename( filename ) + ' ] yourself'
         elif _platform == "cygwin" :
             cmd = ""
             for k in env_d : 
                 cmd += "export "
-                cmd += k + "=" + env_d[k]
+                cmd += k
                 cmd += "\n"
             filename = os.getcwd( ) + '/set_env_' + str( datetime.datetime.now() ).split('.')[0].replace( '-' , '' ).replace( ':' , '' ).replace( ' ' , '_' ) + '.sh'
             with open( filename , 'a+' ) as f :
@@ -621,11 +636,11 @@ class qyh_adb( qyh_base ) :
         if flag_true :
             #  cmd = "set qyh_adb_no_check=true{ENTER}"
             #  self.lexec_hard( cmd )
-            self.generate_env_script( { "qyh_adb_no_check" : "true" } )
+            self.generate_env_script( [ "qyh_adb_no_check=true" ] )
         if flag_false :
             #  cmd = "set qyh_adb_no_check={ENTER}"
             #  self.lexec_hard( cmd )
-            self.generate_env_script( { "qyh_adb_no_check" : "" } )
+            self.generate_env_script( [ "qyh_adb_no_check=" ] )
 
     def select_device_serial( self , *args ) :
         '''@
@@ -661,10 +676,10 @@ class qyh_adb( qyh_base ) :
             self.error_exit( '[-] bad option {}'.format( selected + 1 ) )
         if selected == -1 :
             #  cmd = 'set ANDROID_SERIAL={ENTER}'
-            self.generate_env_script( { "ANDROID_SERIAL" : "" } )
+            self.generate_env_script( [ "ANDROID_SERIAL=" ] )
         else :
             #  cmd = 'set ANDROID_SERIAL={}'.format( devices[ selected ].split( )[0] ) + '{ENTER}'
-            self.generate_env_script( { "ANDROID_SERIAL" : devices[ selected ].split( )[0] } )
+            self.generate_env_script( [ "ANDROID_SERIAL=" + devices[ selected ].split( )[0] ] )
         #  self.lexec_hard( cmd )
         
 
@@ -701,8 +716,8 @@ class qyh_adb( qyh_base ) :
         if selected not in indexes :
             self.error_exit( '[-] bad option {}'.format( selected + 1 ) )
         #  cmd = 'set qyh_llf={}'.format( files[selected] ) + '{ENTER}'
-        env_d = {}
-        env_d[ 'qyh_llf' ] = files[selected]
+        env_d = []
+        env_d.append( 'qyh_llf={}'.format( files[selected] ) )
         # select lib log file ends
 
         # select bootimg log file starts
@@ -735,7 +750,7 @@ class qyh_adb( qyh_base ) :
 
         #  cmd += 'set qyh_flf={}'.format( files[selected] ) + '{ENTER}'
         #  self.lexec_hard( cmd )
-        env_d[ 'qyh_flf' ] = files[selected]
+        env_d.append( 'qyh_flf={}'.format( files[selected] ) )
         self.generate_env_script( env_d )
         pass
 
