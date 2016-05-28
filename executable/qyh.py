@@ -28,16 +28,23 @@ class qyh_base( object ) :
         @short : vp
         @'''
         pass
-        import os
-        from sys import platform as _platform
-        if _platform == "win32" :
-            identity = os.getenv( 'identity' ) 
-            if identity == 'Shadow' :
-                print 'building...'
-            elif identity == 'vivo_work' :
-                print '"C:\Program Files (x86)\Microsoft Visual Studio 12.0\Common7\Tools\VsDevCmd.bat"'
-            else :
-                self.error_exit( 'unknown computer' ) ;
+        from Tkinter import Tk
+        r = Tk()
+        r.withdraw()
+        r.clipboard_clear()
+        r.clipboard_append('"C:\Program Files (x86)\Microsoft Visual Studio 12.0\Common7\Tools\VsDevCmd.bat"\n')
+        r.destroy()
+        print "\n\n[+] execute command in clipboard yourself"
+        # import os
+        # from sys import platform as _platform
+        # if _platform == "win32" :
+            # identity = os.getenv( 'identity' ) 
+            # if identity == 'Shadow' :
+                # print 'building...'
+            # elif identity == 'vivo_work' :
+                # print '"C:\Program Files (x86)\Microsoft Visual Studio 12.0\Common7\Tools\VsDevCmd.bat"'
+            # else :
+                # self.error_exit( 'unknown computer' ) ;
 
     def generate_env_script( self , *args ) :
         '''@
@@ -53,10 +60,17 @@ class qyh_base( object ) :
                 cmd += "set "
                 cmd += k + "=" + env_d[k]
                 cmd += "\n"
-            filename = os.getcwd( ) + '/set_env_' + str( datetime.datetime.now() ).split('.')[0].replace( '-' , '' ).replace( ':' , '' ).replace( ' ' , '_' ) + '.bat'
-            with open( filename , 'a+' ) as f :
-                f.write( cmd )
-            print '\n\nrun [ ' + os.path.basename( filename ) + ' ] yourself'
+            from Tkinter import Tk
+            r = Tk()
+            r.withdraw()
+            r.clipboard_clear()
+            r.clipboard_append( cmd )
+            r.destroy()
+            print "\n\n[+] execute command in clipboard yourself"
+            # filename = os.getcwd( ) + '/set_env_' + str( datetime.datetime.now() ).split('.')[0].replace( '-' , '' ).replace( ':' , '' ).replace( ' ' , '_' ) + '.bat'
+            # with open( filename , 'a+' ) as f :
+                # f.write( cmd )
+            # print '\n\nrun [ ' + os.path.basename( filename ) + ' ] yourself'
         elif _platform == "cygwin" :
             cmd = ""
             for k in env_d : 
