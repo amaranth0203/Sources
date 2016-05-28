@@ -21,6 +21,24 @@ class qyh_base( object ) :
         o.fetch( )
         #  o.push( repo.active_branch.name )
 
+    def vs_bat( self , ) :
+        '''@
+        [+] visible
+        [+] callable
+        @short : vp
+        @'''
+        pass
+        import os
+        from sys import platform as _platform
+        if _platform == "win32" :
+            identity = os.getenv( 'identity' ) 
+            if identity == 'Shadow' :
+                print 'building...'
+            elif identity == 'vivo_work' :
+                print '"C:\Program Files (x86)\Microsoft Visual Studio 12.0\Common7\Tools\VsDevCmd.bat"'
+            else :
+                self.error_exit( 'unknown computer' ) ;
+
     def generate_env_script( self , *args ) :
         '''@
         [+] callable
@@ -1131,6 +1149,9 @@ class qyh_adb( qyh_base ) :
         @short : lf
         @'''
         import os
+        log_filename = os.getenv( 'qyh_llf' )
+        if log_filename == None :
+            self.error_exit( 'qyh slf first' )
         self.print_green( "[+] push_lib   : " + os.getenv( 'qyh_llf' ) + "\n" )
         self.print_green( "[+] flash_boot : " + os.getenv( 'qyh_flf' ) + "\n" )
         return True
