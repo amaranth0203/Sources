@@ -33,7 +33,20 @@ class qyh_base( object ) :
         if _platform == "win32" :
             identity = os.getenv( 'identity' ) 
             if identity == 'Shadow' :
-                print 'building...'
+                cmd = ""
+                cmd += '"C:\Program Files (x86)\Microsoft Visual Studio 12.0\Common7\Tools\VsDevCmd.bat"\n'
+                cmd += "set Masm32Dir=C:\Masm32\n"
+                cmd += "set include=%Masm32Dir%\Include;%include%\n"
+                cmd += "set lib=%Masm32Dir%\lib;%lib%\n"
+                cmd += "set path=%Masm32Dir%\Bin;%Masm32Dir%;%PATH%\n"
+                cmd += "set Masm32Dir=\n"
+                from Tkinter import Tk
+                r = Tk()
+                r.withdraw()
+                r.clipboard_clear()
+                r.clipboard_append( cmd )
+                r.destroy()
+                print "\n\n[+] execute command in clipboard yourself"
             elif identity == 'vivo_work' :
                 cmd = ""
                 cmd += '"C:\Program Files (x86)\Microsoft Visual Studio 12.0\Common7\Tools\VsDevCmd.bat"\n'
