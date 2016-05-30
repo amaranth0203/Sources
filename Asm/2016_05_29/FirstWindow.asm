@@ -48,4 +48,6 @@ _ProcWinMain    endp
 _WinMain        proc
                 local   @stWndClass:WNDCLASSEX
                 local   @stMsg:MSG
-                invoke  GetModuleHan
+                invoke  GetModuleHandle , NULL
+                mov     RtlZeroMemory , addr @stWndClass , sizeof @stWndClass
+                invoke  LoadCur

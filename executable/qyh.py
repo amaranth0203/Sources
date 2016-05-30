@@ -49,7 +49,7 @@ class qyh_base( object ) :
                 print "\n\n[+] execute command in clipboard yourself"
             elif identity == 'vivo_work' :
                 cmd = ""
-                cmd += '"C:\Program Files (x86)\Microsoft Visual Studio 12.0\Common7\Tools\VsDevCmd.bat"\n'
+                cmd += '"D:\Program Files (x86)\\vs2015\Common7\Tools\VsDevCmd.bat"\n'
                 cmd += "set Masm32Dir=C:\Masm32\n"
                 cmd += "set include=%Masm32Dir%\Include;%include%\n"
                 cmd += "set lib=%Masm32Dir%\lib;%lib%\n"

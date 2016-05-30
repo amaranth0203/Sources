@@ -1,0 +1,71 @@
+!_TAG_FILE_FORMAT	2	/extended format; --format=1 will not append ;" to lines/
+!_TAG_FILE_SORTED	1	/0=unsorted, 1=sorted, 2=foldcase/
+!_TAG_PROGRAM_AUTHOR	Darren Hiebert	/dhiebert@users.sourceforge.net/
+!_TAG_PROGRAM_NAME	Exuberant Ctags	//
+!_TAG_PROGRAM_URL	http://ctags.sourceforge.net	/official site/
+!_TAG_PROGRAM_VERSION	5.8	//
+BeginPaint	.\keywords.c	11;"	d	file:
+CallWindowProcA	.\keywords.c	12;"	d	file:
+ChangeDisplaySettingsA	.\keywords.c	13;"	d	file:
+CloseClipboard	.\keywords.c	14;"	d	file:
+CreateWindowEx	.\keywords.c	2;"	d	file:
+CreateWindowExA	.\keywords.c	15;"	d	file:
+DefWindowProcA	.\keywords.c	16;"	d	file:
+DeleteMenu	.\keywords.c	17;"	d	file:
+DrawText	.\keywords.c	18;"	d	file:
+EmptyClipboard	.\keywords.c	19;"	d	file:
+EnableWindow	.\keywords.c	20;"	d	file:
+EndPaint	.\keywords.c	21;"	d	file:
+EnunDisplaySettingsA	.\keywords.c	22;"	d	file:
+ExitWindowsEx	.\keywords.c	23;"	d	file:
+FillRect	.\keywords.c	24;"	d	file:
+FindWindowA	.\keywords.c	25;"	d	file:
+FindWindowEx	.\keywords.c	3;"	d	file:
+GetAsyncKeyState	.\keywords.c	26;"	d	file:
+GetClassInfoEx	.\keywords.c	4;"	d	file:
+GetClassNameEx	.\keywords.c	5;"	d	file:
+GetClientRect	.\keywords.c	27;"	d	file:
+GetCursorPos	.\keywords.c	28;"	d	file:
+GetDC	.\keywords.c	29;"	d	file:
+GetDesktopWindow	.\keywords.c	30;"	d	file:
+GetSysColor	.\keywords.c	31;"	d	file:
+GetSysColorBrush	.\keywords.c	32;"	d	file:
+GetSystemMenu	.\keywords.c	33;"	d	file:
+GetSystemMetrics	.\keywords.c	34;"	d	file:
+GetWindow	.\keywords.c	35;"	d	file:
+GetWindowLongA	.\keywords.c	36;"	d	file:
+GetWindowRect	.\keywords.c	37;"	d	file:
+GetWindowTextA	.\keywords.c	38;"	d	file:
+GetWindowTextLengthA	.\keywords.c	39;"	d	file:
+GetWindowWord	.\keywords.c	40;"	d	file:
+MoveWindow	.\keywords.c	41;"	d	file:
+OpenClipboard	.\keywords.c	42;"	d	file:
+PostMessageA	.\keywords.c	43;"	d	file:
+RegisterClassEx	.\keywords.c	1;"	d	file:
+ReleaseDC	.\keywords.c	44;"	d	file:
+SendMessageA	.\keywords.c	45;"	d	file:
+SetClipboardData	.\keywords.c	46;"	d	file:
+SetLayeredWindowAttributes	.\keywords.c	47;"	d	file:
+SetParent	.\keywords.c	48;"	d	file:
+SetSysColors	.\keywords.c	49;"	d	file:
+SetWindowLongA	.\keywords.c	50;"	d	file:
+SetWindowPos	.\keywords.c	51;"	d	file:
+ShowWindow	.\keywords.c	52;"	d	file:
+SystemParametersInfoA	.\keywords.c	53;"	d	file:
+UnregisterClassEx	.\keywords.c	6;"	d	file:
+WNDCLASSEX	.\keywords.c	8;"	d	file:
+WindowProcEx	.\keywords.c	7;"	d	file:
+_ProcWinMain	.\FirstWindow.asm	/^_ProcWinMain    proc    use ebx edi esi , hWnd , uMsg , wParam , lParam$/;"	l
+_WinMain	.\FirstWindow.asm	/^_WinMain        proc$/;"	l
+hInstance	.\FirstWindow.asm	/^hInstance   dd  ?$/;"	d
+hWinMain	.\FirstWindow.asm	/^hWinMain    dd  ?$/;"	d
+include	.\FirstWindow.asm	/^include     gdi32.inc$/;"	l
+include	.\FirstWindow.asm	/^include     kernel32.inc$/;"	l
+include	.\FirstWindow.asm	/^include     user32.inc$/;"	l
+include	.\FirstWindow.asm	/^include     windows.inc$/;"	l
+includelib	.\FirstWindow.asm	/^includelib  gdi32.lib$/;"	l
+includelib	.\FirstWindow.asm	/^includelib  kernel32.lib$/;"	l
+includelib	.\FirstWindow.asm	/^includelib  user32.lib$/;"	l
+szCaptionMain	.\FirstWindow.asm	/^szCaptionMain   db      'My First Window !' , 0$/;"	d
+szClassName	.\FirstWindow.asm	/^szClassName     db      'MyClass' , 0$/;"	d
+szText	.\FirstWindow.asm	/^szText          db      'Win32 Assembly, Simple and powerful !' , 0$/;"	d
