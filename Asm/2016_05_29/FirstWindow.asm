@@ -20,7 +20,7 @@ szCaptionMain   db      'My First Window !' , 0
 szText          db      'Win32 Assembly, Simple and powerful !' , 0
 
     .code
-_ProcWinMain    proc    use ebx edi esi , hWnd , uMsg , wParam , lParam
+_ProcWinMain    proc    uses ebx edi esi , hWnd , uMsg , wParam , lParam
                 local   @stPs:PAINTSTRUCT
                 local   @stRect:RECT
                 local   @hDc
@@ -35,7 +35,7 @@ _ProcWinMain    proc    use ebx edi esi , hWnd , uMsg , wParam , lParam
                                 DT_SINGLELINE or DT_CENTER or DT_VCENTER
                         invoke  EndPaint , hWnd , addr @stPs
                 .elseif eax ==  WM_CLOSE
-                        invoke  DestoryWindow , hWinMain
+                        invoke  DestroyWindow , hWinMain
                         invoke  PostQuitMessage , NULL
                 .else
                         invoke  DefWindowProc , hWnd , uMsg , wParam , lParam
@@ -49,5 +49,36 @@ _WinMain        proc
                 local   @stWndClass:WNDCLASSEX
                 local   @stMsg:MSG
                 invoke  GetModuleHandle , NULL
-                mov     RtlZeroMemory , addr @stWndClass , sizeof @stWndClass
-                invoke  LoadCur
+                mov     hInstance , eax
+                invoke  RtlZeroMemory , addr @stWndClass , sizeof @stWndClass
+                invoke  LoadCursor , 0 , IDC_ARROW
+                mov     @stWndClass.hCursor , eax
+                push    hInstance
+                pop     @stWndClass.hInstance
+                mov     @stWndClass.cbSize , sizeof WNDCLASSEX
+                mov     @stWndClass.style , CS_HREDRAW or CS_VREDRAW
+                mov     @stWndClass.lpfnWndProc , offset _ProcWinMain
+                mov     @stWndClass.hbrBackground , COLOR_WINDOW + 1
+                mov     @stWndClass.lpszClassName , offset szClassName
+                invoke  RegisterClassEx , addr @stWndClass
+                invoke  CreateWindowEx , WS_EX_CLIENTEDGE , \
+                        offset szClassName , offset szCaptionMain , \
+                        WS_OVERLAPPEDWINDOW , \
+                        100 , 100 , 600 , 400 , \
+                        NULL , NULL , hInstance , NULL
+                mov     hWinMain , eax
+                invoke  ShowWindow , hWinMain , SW_SHOWNORMAL
+                invoke  UpdateWindow , hWinMain
+                .while  TRUE
+                        invoke  GetMessage , addr @stMsg , NULL , 0 , 0
+                        .break  .if eax == 0
+                        invoke  TranslateMessage , addr @stMsg
+                        invoke  DispatchMessage , addr @stMsg
+                .endw
+                ret
+_WinMain        endp
+
+start:
+                call    _WinMain
+                invoke  ExitProcess , NULL
+                end     start
