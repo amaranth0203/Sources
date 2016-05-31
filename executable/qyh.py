@@ -21,25 +21,35 @@ class qyh_base( object ) :
         o.fetch( )
         #  o.push( repo.active_branch.name )
 
-    def vs_bat( self , ) :
+    def vs_bat( self , *args ) :
         '''@
         [+] visible
         [+] callable
         @short : vp
+        @args : 32 - keyword to translate
+        @args : 64 - keyword to translate
+        @args : masm - keyword to translate
         @'''
         pass
+        self.check_args( args , ( '32' , '64' , 'masm' ) )
+        flag_32 , flag_64 , flag_masm =\
+            tuple( self.trans_args( args , ( '32' , '64' , 'masm' ) ) )
         import os
         from sys import platform as _platform
         if _platform == "win32" :
             identity = os.getenv( 'identity' ) 
             if identity == 'Shadow' :
                 cmd = ""
-                cmd += '"C:\Program Files (x86)\Microsoft Visual Studio 12.0\Common7\Tools\VsDevCmd.bat"\n'
-                cmd += "set Masm32Dir=C:\Masm32\n"
-                cmd += "set include=%Masm32Dir%\Include;%include%\n"
-                cmd += "set lib=%Masm32Dir%\lib;%lib%\n"
-                cmd += "set path=%Masm32Dir%\Bin;%Masm32Dir%;%PATH%\n"
-                cmd += "set Masm32Dir=\n"
+                if flag_32 :
+                    cmd += '"C:\Program Files (x86)\Microsoft Visual Studio 12.0\VC\\vcvarsall.bat"\n'
+                elif flag_64 :
+                    cmd += '"C:\Program Files (x86)\Microsoft Visual Studio 12.0\VC\\vcvarsall.bat" amd64\n'
+                if flag_masm :
+                    cmd += "set Masm32Dir=C:\Masm32\n"
+                    cmd += "set include=%Masm32Dir%\Include;%include%\n"
+                    cmd += "set lib=%Masm32Dir%\lib;%lib%\n"
+                    cmd += "set path=%Masm32Dir%\Bin;%Masm32Dir%;%PATH%\n"
+                    cmd += "set Masm32Dir=\n"
                 from Tkinter import Tk
                 r = Tk()
                 r.withdraw()
@@ -49,12 +59,16 @@ class qyh_base( object ) :
                 print "\n\n[+] execute command in clipboard yourself"
             elif identity == 'vivo_work' :
                 cmd = ""
-                cmd += '"D:\Program Files (x86)\\vs2015\Common7\Tools\VsDevCmd.bat"\n'
-                cmd += "set Masm32Dir=C:\Masm32\n"
-                cmd += "set include=%Masm32Dir%\Include;%include%\n"
-                cmd += "set lib=%Masm32Dir%\lib;%lib%\n"
-                cmd += "set path=%Masm32Dir%\Bin;%Masm32Dir%;%PATH%\n"
-                cmd += "set Masm32Dir=\n"
+                if flag_32 :
+                    cmd += '"D:\Program Files (x86)\\vs2015\VC\\vcvarsall.bat"\n'
+                elif flag_64 :
+                    cmd += '"D:\Program Files (x86)\\vs2015\VC\\vcvarsall.bat" amd64\n'
+                if flag_masm :
+                    cmd += "set Masm32Dir=C:\Masm32\n"
+                    cmd += "set include=%Masm32Dir%\Include;%include%\n"
+                    cmd += "set lib=%Masm32Dir%\lib;%lib%\n"
+                    cmd += "set path=%Masm32Dir%\Bin;%Masm32Dir%;%PATH%\n"
+                    cmd += "set Masm32Dir=\n"
                 from Tkinter import Tk
                 r = Tk()
                 r.withdraw()
