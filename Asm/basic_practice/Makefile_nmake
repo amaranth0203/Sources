@@ -1,6 +1,4 @@
-NAME = test2
-:q
-:q
+NAME = test
 OBJS = $(NAME).obj
 
 LINK_FLAG = /subsystem:console
@@ -8,9 +6,8 @@ ML_FLAG = /c /coff
 
 $(NAME).exe: $(OBJS)
 	Link $(LINK_FLAG) $(OBJS)
-%.obj : %.asm
+.asm.obj:
 	ml $(ML_FLAG) $<
 
 clean:
-	rm *.obj
-	rm *.exe
+	del *.obj

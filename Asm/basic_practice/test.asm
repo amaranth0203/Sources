@@ -43,31 +43,35 @@ _str_strip      proc    lpStr
         mov     eax , lpStr
         mov     ebx , lpStr
         _ww :
-        cmp     byte ptr[eax] , 10
-        jne     _c1_end
-        inc     eax
-        jmp      _ww
-        _c1_end :
-        cmp     byte ptr[eax] , 13
-        jne     _c2_end
-        inc     eax
-        jmp      _ww
-        _c2_end :
-        cmp     byte ptr[eax] , 5
-        jne     _c3_end
-        inc     eax
-        jmp      _ww
-        _c3_end :
-        cmp     byte ptr[eax] , 3
-        jne     _c4_end
-        inc     eax
-        jmp      _ww
-        _c4_end :
-        cmp     byte ptr[eax] , 4
-        jne     _c5_end
-        inc     eax
-        jmp      _ww
-        _c5_end :
+        .if byte ptr[eax] == 10 ||            byte ptr[eax] == 13 ||            byte ptr[eax] == 13 ||            byte ptr[eax] == 1 ||            byte ptr[eax] == 2 ||            byte ptr[eax] == 3 ||            byte ptr[eax] == 4 ||            byte ptr[eax] == 5 ||            byte ptr[eax] == 6 ||            byte ptr[eax] == 7 ||            byte ptr[eax] == 8 ||            byte ptr[eax] == 9 
+            inc     eax
+            jmp     _ww
+        .endif
+        ; cmp     byte ptr[eax] , 10
+        ; jne     _c1_end
+        ; inc     eax
+        ; jmp      _ww
+        ; _c1_end :
+        ; cmp     byte ptr[eax] , 13
+        ; jne     _c2_end
+        ; inc     eax
+        ; jmp      _ww
+        ; _c2_end :
+        ; cmp     byte ptr[eax] , 5
+        ; jne     _c3_end
+        ; inc     eax
+        ; jmp      _ww
+        ; _c3_end :
+        ; cmp     byte ptr[eax] , 3
+        ; jne     _c4_end
+        ; inc     eax
+        ; jmp      _ww
+        ; _c4_end :
+        ; cmp     byte ptr[eax] , 4
+        ; jne     _c5_end
+        ; inc     eax
+        ; jmp      _ww
+        ; _c5_end :
         mov     cl , byte ptr[eax]
         mov     byte ptr[ebx] , cl
         inc     eax
@@ -123,7 +127,7 @@ start :
                         NULL
             .break  .if ! eax
             invoke  SetConsoleTextAttribute , hStdOut , FOREGROUND_BLUE or FOREGROUND_INTENSITY
-            ; invoke  _str_strip , offset szMsgBuffer
+            invoke  _str_strip , offset szMsgBuffer
             invoke  wsprintf , offset szMsgBuffer , offset szMsgFmt , dwBytesRead , offset szBuffer
             invoke  lstrlen , offset szMsgBuffer
             mov     dwMsgSize , eax
