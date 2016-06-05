@@ -13,8 +13,7 @@ hStdOut         dd  ?
 szBuffer        dd  5 dup (0)
 dwBytesRead     dd  ?
 dwBytesWrite    dd  ?
-; dwArray         dd  '4' , '5' , '2' , '7' , '2' , '4' , '1' , '9' , '9' , '2' , '0' , '2' , '0' , '3' , '0' , '5' , '1' , '1' , 0 
-dwArray         dd  1 , 2 , 0
+dwArray         dd  4 , 5 , 2 , 7 , 2 , 4 , 1 , 9 , 9 , 2 , 0 , 2 , 0 , 3 , 0 , 5 , 1 , 1 , 'x'
     .const
 szFmt           db  '%d' , 13 , 10 , 0
 
@@ -54,22 +53,42 @@ _fibnacci       proc    param
 _fibnacci       endp
 
 _max            proc    param
-        local   tmp:dword
-        mov     tmp , 0
+        mov     esi , param
+        mov     eax , 0
         _ss:
-        cmp     param , 0
+        cmp     dword ptr[ esi ] , 'x'
         je      ee
-        cmp     tmp , param
+        cmp     eax , dword ptr[ esi ]
         jng     _lt
-        inc     param
+        add     esi , 4
         jmp     _ss
         _lt:
-        mov     tmp , param
-        inc     param
+        mov     eax , dword ptr[ esi ]
+        add     esi , 4
         jmp     _ss
         ee:
         ret
 _max            endp
+
+; _min            proc    param
+_min :
+        ; mov     esi , param
+        mov     esi , dword ptr[ esp + 4 ]
+        mov     eax , 9
+        _ss:
+        cmp     dword ptr[ esi ] , 'x'
+        je      ee
+        cmp     eax , dword ptr[ esi ]
+        jg      _gt
+        add     esi , 4
+        jmp     _ss
+        _gt:
+        mov     eax , dword ptr[ esi ]
+        add     esi , 4
+        jmp     _ss
+        ee:
+        ret
+; _min            endp
 
         
 start :
@@ -77,8 +96,11 @@ start :
         mov     hStdOut , eax
         invoke  SetConsoleCtrlHandler , offset _CtrlHandler , TRUE
 
-        ; invoke  _fibnacci , 9
-        invoke  _max , dwArray
+        ; invoke  _fibnacci , 40
+        ; invoke  _max , offset dwArray
+        push    offset  dwArray
+        call    _min
+
         invoke  wsprintf , offset szBuffer , offset szFmt , eax
         invoke  lstrlen , offset szBuffer
         mov     dwBytesRead , eax

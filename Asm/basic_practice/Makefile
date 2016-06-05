@@ -1,4 +1,4 @@
-NAME = test2
+NAME = test3
 :q
 :q
 OBJS = $(NAME).obj
