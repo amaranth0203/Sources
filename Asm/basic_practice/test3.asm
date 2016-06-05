@@ -24,17 +24,15 @@ szCharFmt       db  '%c' , 0
 
     .code
 _CtrlHandler    proc    _dwCtrlType
-        pushad
         mov eax , _dwCtrlType
         .if eax ==  CTRL_C_EVENT || eax == CTRL_BREAK_EVENT
             invoke  ExitProcess , NULL
         .endif
-        popad
         mov eax , TRUE
         ret
 _CtrlHandler    endp
 
-_max            proc    param
+_max            proc    uses esi    param
         mov     esi , param
         mov     eax , 0
         _ss:
@@ -52,9 +50,9 @@ _max            proc    param
         ret
 _max            endp
 
-_min            proc    param
+_min            proc    uses esi    param
         mov     esi , param
-        mov     eax , 9
+        mov     eax , 7fffffffh
         _ss:
         cmp     dword ptr[ esi ] , 'x'
         je      ee
@@ -96,7 +94,7 @@ _print_int      proc    param
         ret
 _print_int      endp
 
-_print_char_array    proc    param
+_print_char_array    proc   uses esi    param
         mov     esi , param
         _ss:
         cmp     dword ptr[ esi ] , 'x'
@@ -110,7 +108,7 @@ _print_char_array    proc    param
         ret
 _print_char_array    endp
 
-_print_int_array    proc    param
+_print_int_array    proc    uses esi    param
         mov     esi , param
         _ss:
         cmp     dword ptr[ esi ] , 'x'
@@ -125,7 +123,7 @@ _print_int_array    proc    param
         ret
 _print_int_array    endp
 
-_swap           proc , ptr1 , ptr2
+_swap           proc    uses esi ebx ptr1 , ptr2
         mov     esi , ptr1
         mov     eax , dword ptr[ esi ]
         mov     esi , ptr2
@@ -137,20 +135,18 @@ _swap           proc , ptr1 , ptr2
         ret
 _swap           endp
 
-_bubble_sort    proc    param
+_bubble_sort    proc    uses esi ecx ebx    param
         local   tmp
         mov     esi , param
         _ss:
         cmp     dword ptr[ esi ] , 'x'
         je      _ee
-        push    esi
-        ; sort inc or dec
+        ; ; ; sort inc or dec
         ; invoke  _max , esi
         invoke  _min , esi
-        ; sort inc or dec end
-        pop     esi
+        ; ; ; sort inc or dec end
         mov     tmp , eax
-        ; find max in right area and swap to mid
+        ; ; ; find max in right area and swap to mid
         mov     ecx , 0
         _sss:
         cmp     dword ptr[ esi + ecx*4 ] , 'x'
@@ -159,22 +155,21 @@ _bubble_sort    proc    param
         cmp     eax , tmp
         jne     _ne
         lea     ebx , dword ptr[ esi + ecx*4 ]
-        push    esi
         invoke  _swap , esi , ebx
-        pop     esi
+        inc     ecx
         jmp     _eee
         _ne:
         inc     ecx
         jmp     _sss
         _eee:
-        ; find max in right area and swap to mid end
+        ; ; ; find max in right area and swap to mid end
         add     esi , 4
         jmp     _ss
         _ee:
         ret
 _bubble_sort    endp
 
-_process_input  proc    param
+_process_input  proc    uses esi ebx    param
         mov     esi , param
         mov     edi , offset szTargetBuffer
         xor     eax , eax
@@ -185,10 +180,8 @@ _process_input  proc    param
         jne      _nespace
         mov     dword ptr[ edi ] , eax
         add     edi , 4
-        ; pushad
         ; invoke  _print_int , eax
         ; invoke  _print_char , 10
-        ; popad
         xor     eax , eax
         inc     esi
         jmp     _ss
@@ -209,10 +202,8 @@ _process_input  proc    param
         mov     bl , byte ptr[ esi ]
         sub     bl , 48
         add     eax , ebx
-        ; pushad
         ; invoke  _print_int , eax
         ; invoke  _print_char , 10
-        ; popad
         inc     esi
         jmp     _ss
         _ee:
@@ -241,10 +232,6 @@ start :
                     offset dwBytesRead , 
                     NULL
         invoke  _process_input , offset szRawBuffer
-
-        ; invoke  _print_char_array , offset dwArray
-        ; invoke  _bubble_sort , offset dwArray
-        ; invoke  _print_char_array , offset dwArray
 
         invoke  ExitProcess , NULL
         end start
