@@ -1,4 +1,4 @@
-NAME = test3
+NAME = test14
 OBJS = $(NAME).obj
 
 LINK_FLAG = /subsystem:console

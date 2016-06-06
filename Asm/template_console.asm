@@ -1,15 +1,4 @@
 
-; 冒泡排序
-; 输入数字 以空格为间隔符 以字符 'x' 为结束符
-; 输出排序后的数字
-; 排列方式到标记 wassup 处更改调用 max 或 min
-
-; 输入示例 :
-; 4 13 3 2 x
-; 得到输出
-; 2 3 4 13
-
-
     .386
     .model   flat , c
     option  casemap:none
@@ -28,7 +17,7 @@ szRawBuffer     dd  1024 dup (0)
 szTargetBuffer  dd  1024 dup (0)
 dwBytesRead     dd  ?
 dwBytesWrite    dd  ?
-dwArray         dd  4 , 5 , 2 , 7 , 2 , 4 , 1 , 9 , 9 , 2 , 0 , 2 , 0 , 3 , 0 , 5 , 1 , 1 , 'x'
+dwArray         dd  4 , 5 , 2 , 7 , 2 , 4 , 'x'
 
     .const
 szIntFmt        db  '%d' , 0

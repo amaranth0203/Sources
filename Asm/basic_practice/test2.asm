@@ -2,6 +2,7 @@
 ; fibnacci 数列
 ; 求数列中的最大值/最小值
 ; 数列以字符 'x' 结尾
+;                   2016.06.04
 
     .386
     .model   flat , c
@@ -18,7 +19,7 @@ hStdOut         dd  ?
 szBuffer        dd  5 dup (0)
 dwBytesRead     dd  ?
 dwBytesWrite    dd  ?
-dwArray         dd  4 , 5 , 2 , 7 , 2 , 4 , 1 , 9 , 9 , 2 , 0 , 2 , 0 , 3 , 0 , 5 , 1 , 1 , 'x'
+dwArray         dd  4 , 5 , 2 , 7 , 2 , 4 , 'x'
     .const
 szFmt           db  '%d' , 13 , 10 , 0
 

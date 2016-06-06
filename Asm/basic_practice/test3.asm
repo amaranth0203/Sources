@@ -9,6 +9,8 @@
 ; 得到输出
 ; 2 3 4 13
 
+;           2016.06.05
+
 
     .386
     .model   flat , c
@@ -28,13 +30,14 @@ szRawBuffer     dd  1024 dup (0)
 szTargetBuffer  dd  1024 dup (0)
 dwBytesRead     dd  ?
 dwBytesWrite    dd  ?
-dwArray         dd  4 , 5 , 2 , 7 , 2 , 4 , 1 , 9 , 9 , 2 , 0 , 2 , 0 , 3 , 0 , 5 , 1 , 1 , 'x'
+dwArray         dd  4 , 5 , 2 , 7 , 2 , 4 , 'x'
 
     .const
 szIntFmt        db  '%d' , 0
 szCharFmt       db  '%c' , 0
 
     .code
+
 _CtrlHandler    proc    _dwCtrlType
         mov eax , _dwCtrlType
         .if eax ==  CTRL_C_EVENT || eax == CTRL_BREAK_EVENT
@@ -211,8 +214,9 @@ _process_input  proc    uses esi ebx    param
         _ng:
         mov     bx , 10
         mul     bx
-        xor     ebx , ebx
-        mov     bl , byte ptr[ esi ]
+        ; xor     ebx , ebx
+        ; mov     bl , byte ptr[ esi ]
+        movzx   ebx , byte ptr[ esi ]
         sub     bl , 48
         add     eax , ebx
         ; invoke  _print_int , eax
@@ -245,6 +249,7 @@ start :
                     offset dwBytesRead , 
                     NULL
         invoke  _process_input , offset szRawBuffer
+        invoke  _
 
         invoke  ExitProcess , NULL
         end start
