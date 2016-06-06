@@ -1,3 +1,15 @@
+
+; 冒泡排序
+; 输入数字 以空格为间隔符 以字符 'x' 为结束符
+; 输出排序后的数字
+; 排列方式到标记 wassup 处更改调用 max 或 min
+
+; 输入示例 :
+; 4 13 3 2 x
+; 得到输出
+; 2 3 4 13
+
+
     .386
     .model   flat , c
     option  casemap:none
@@ -141,6 +153,7 @@ _bubble_sort    proc    uses esi ecx ebx    param
         _ss:
         cmp     dword ptr[ esi ] , 'x'
         je      _ee
+;wassup
         ; ; ; sort inc or dec
         ; invoke  _max , esi
         invoke  _min , esi

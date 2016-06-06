@@ -1,3 +1,8 @@
+
+; fibnacci 数列
+; 求数列中的最大值/最小值
+; 数列以字符 'x' 结尾
+
     .386
     .model   flat , c
     option  casemap:none

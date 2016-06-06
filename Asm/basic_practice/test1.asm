@@ -1,3 +1,7 @@
+
+; 以十进制的方式输出从 0 开始到 0ffffffh 的数字
+; 按 ctrl-c 可以终止
+
     .386
     .model   flat , c
     option  casemap:none
