@@ -1,0 +1,55 @@
+#include        <resource.h>
+#define ICO_MAIN        0x1000
+#define IDM_MAIN        0x2000
+#define IDA_MAIN        0x2000
+#define IDM_OPEN        0x4101
+#define IDM_OPTION      0x4102
+#define IDM_EXIT        0x4103
+#define IDM_SETFONT     0x4201
+#define IDM_SETCOLOR    0x4202
+#define IDM_INACT       0x4203
+#define IDM_GRAY        0x4204
+#define IDM_BIG         0x4205
+#define IDM_SMALL       0x4206
+#define IDM_LIST        0x4207
+#define IDM_DETAIL      0x4208
+#define IDM_TOOLBAR     0x4209
+#define IDM_TOOLBARTEXT 0x4210
+#define IDM_INPUTBAR    0x4211
+#define IDM_STATUSBAR   0x4212
+#define IDM_HELP        0x4301
+#define IDM_ABOUT       0x4302
+
+ICO_MAIN    ICON    "Main.ico"
+
+IDM_MAIN    menu    discardable {
+    popup   "文件(&F)" {
+        menuitem    "打开文件(&O)..." , IDM_OPEN
+        menuitem    separator
+        menuitem    "退出(&X)" , IDM_EXIT
+    } 
+    popup   "查看(&V)" {
+        menuitem    "背景色(&B)...\tCtrl+Alt+b" , IDM_SETCOLOR
+        menuitem    separator
+        menuitem    "大图标(&G)" , IDM_BIG
+        menuitem    "小图标(&M)" , IDM_SMALL
+        menuitem    "列表(&L)" , IDM_LIST
+        menuitem    "详细资料(&D)" , IDM_DETAIL
+        menuitem    separator
+        popup "工具栏(&T)" {
+            menuitem    "标准按钮(&S)" , IDM_TOOLBAR
+            menuitem    "文字标签(&C)" , IDM_TOOLBARTEXT
+            menuitem    "命令栏(&I)" , IDM_INPUTBAR
+        }
+    }
+    popup   "帮助(&H)" , HELP {
+        menuitem    "帮助主题(&H)\tF1" , IDM_HELP
+        menuitem    "about" , IDM_ABOUT
+    }
+}
+
+IDM_MAIN    accelerators {
+    VK_F1 , IDM_HELP , VIRTKEY
+    "B" ,   IDM_SETCOLOR , VIRTKEY , CONTROL , ALT
+    "w" ,   IDM_EXIT , VIRTKEY , CONTROL
+}
