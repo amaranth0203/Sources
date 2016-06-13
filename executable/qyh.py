@@ -1,4 +1,4 @@
-#!/usr/bin/env python 
+ooo#!/usr/bin/env python 
 #-*- coding=utf-8 -*-
 
 class qyh_base( object ) :
