@@ -48,7 +48,7 @@ IDM_MAIN    menu    discardable {
     }
 }
 
-IDM_MAIN    accelerators {
+IDA_MAIN    accelerators {
     VK_F1 , IDM_HELP , VIRTKEY
     "B" ,   IDM_SETCOLOR , VIRTKEY , CONTROL , ALT
     "w" ,   IDM_EXIT , VIRTKEY , CONTROL
