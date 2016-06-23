@@ -1,0 +1,73 @@
+#include <resource.h>
+
+#define ICO_MAIN    1000
+#define DLG_MAIN    1000
+#define IDC_INFO    1001
+#define IDM_MAIN    2000
+#define IDM_OPEN    2001
+#define IDM_EXIT    2002
+
+#define IDM_1       4000
+#define IDM_2       4001
+#define IDM_3       4002
+#define IDM_4       4003
+
+#define RESULT_MODULE   5000
+#define ID_TEXT1        5001
+#define ID_TEXT2        5002
+#define IDC_MODULETABLE 5003
+#define IDC_OK          5004
+#define ID_STATIC       5005
+#define ID_STATIC1      5006
+#define IDC_BROWSE1     5007
+#define IDC_BROWSE2     5008
+#define IDC_THESAME     5009
+
+ICO_MAIN    ICON    "main.ico"
+
+DLG_MAIN    DIALOG  50 , 50 , 544 , 399
+STYLE       DS_MODALFRAME | WS_POPUP | WS_VISIBLE | WS_CAPTION | WS_SYSMENU
+CAPTION     "PEComp"
+MENU        IDM_MAIN
+FONT        9 , "宋体"
+BEGIN
+    CONTROL "" , IDC_INFO , "RichEdit20A" , 196 | ES_WANTRETURN | WS_CHILD | WS_VISIBLE | WS_BORDER | WS_VSCROLL | WS_TABSTOP , 0 , 0 , 540 , 396
+END
+
+RESULT_MODULE DIALOG 76 , 10 , 630 , 480
+STYLE DS_MODALFRAME | WS_POPUP | WS_VISIBLE | WS_CAPTION | WS_SYSMENU
+CAPTION "PE文件对比结果"
+FONT 9 , "宋体" {
+    LTEXT       "第一个文件: " , ID_STATIC , 10 , 13 , 200 , 15
+    EDITTEXT    ID_TEXT1 , 130 , 13 , 440 , 15
+    PUSHBUTTON  "浏览..." , IDC_BROWSE1 , 570 , 13 , 50 , 14
+
+    LTEXT       "第二个文件: " , ID_STATIC1 , 10 , 13 , 200 , 15
+    EDITTEXT    ID_TEXT2 , 130 , 13 , 440 , 15
+    PUSHBUTTON  "浏览..." , IDC_BROWSE2 , 570 , 13 , 50 , 14
+
+    CONTROL     "" , IDC_MODULETABLE , "SysListView32" , 13 | WS_CHILD | WS_VISIBLE | WS_BORDER | WS_TABSTOP , 10 , 60 , 610 , 390
+
+    AUTOCHECKBOX    "只显示不同的值" , IDC_THESAME , 10 , 460 , 100 , 14
+    PUSHBUTTON  "执行...(&R)" , IDC_OK , 570 , 460 , 50 , 14
+}
+
+
+IDM_MAIN    menu discardable {
+    POPUP   "文件 (&F)" {
+        menuitem "打开PE对比对话框 (&O)..." , IDM_OPEN
+        menuitem "---" , IDM_1
+        menuitem "---" , IDM_2
+        menuitem "---" , IDM_3 CHECKED
+        menuitem separator
+        menuitem "退出 (&x)" , IDM_EXIT
+    }
+    POPUP   "查看" {
+        menuitem "源文件" , IDM_1
+        menuitem "窗口透明度" , IDM_2
+        menuitem separator
+        menuitem "大小" , IDM_3
+        menuitem "宽度" , IDM_4
+    }
+}
+

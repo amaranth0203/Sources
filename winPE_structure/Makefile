@@ -1,4 +1,4 @@
-NAME = peDump
+NAME = peComp
 OBJS = $(NAME).obj
 RES  = $(NAME).res
 
