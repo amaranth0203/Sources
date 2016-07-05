@@ -1300,39 +1300,72 @@ class qyh_adb( qyh_base ) :
 
         file = []
 
-        ### dump metadata
-        if flag_meta or flag_all :
-            rc = self.lexec( 'adb shell ls /data' , False )
-            if 'snapshot' in rc : ### grep condition "no such file or directory" out
-                file += [ '/data/' + f for f in rc.split( ) if 'snapshot' in f ]
-            rc = self.lexec( 'adb shell ls /data/misc/camera' , False )
-            if '.raw' in rc or '.yuv' in rc or '.bin' in rc : ### grep condition "no such file or directory" out
-                file += [ '/data/misc/camera/' + f for f in rc.split( ) if '.raw' in f or '.yuv' in f or '.bin' in f ]
+        import datetime , os
+        fdst = os.getcwd( ).replace( '\\' , '/' ) + '/'
+        folder_name = "dump_qyh_" + str( datetime.datetime.now() ).split('.')[0].replace( '-' , '' ).replace( ':' , '' ).replace( ' ' , '_' )
+        fdst += folder_name
+        fdst += '/'
+        cmd = ""
+        cmd += 'mkdir /sdcard/' + folder_name + '\n'
 
-        ### dump raw from Snapdragon Camera
-        if flag_snapraw or flag_all :
-            rc = self.lexec( 'adb shell ls /sdcard/DCIM/camera/raw' , False )
-            if '.raw' in rc : ### grep condition "no such file or directory" out
-                file += [ '/sdcard/DCIM/camera/raw/' + f for f in rc.split( ) if '.raw' in f ]
+        if not flag_del_only :
+            ### dump metadata
+            if flag_meta or flag_all :
+                #  rc = self.lexec( 'adb shell ls /data' , False )
+                #  if 'snapshot' in rc : ### grep condition "no such file or directory" out
+                    #  file += [ '/data/' + f for f in rc.split( ) if 'snapshot' in f ]
+                #  rc = self.lexec( 'adb shell ls /data/misc/camera' , False )
+                #  if '.raw' in rc or '.yuv' in rc or '.bin' in rc : ### grep condition "no such file or directory" out
+                    #  file += [ '/data/misc/camera/' + f for f in rc.split( ) if '.raw' in f or '.yuv' in f or '.bin' in f ]
+                cmd += 'cp /data/*snapshot* /sdcard/' + folder_name + '\n'
+                cmd += 'cp /data/misc/camera/*.raw /sdcard/' + folder_name + '\n'
+                cmd += 'cp /data/misc/camera/*.yuv /sdcard/' + folder_name + '\n'
+                cmd += 'cp /data/misc/camera/*.bin /sdcard/' + folder_name + '\n'
 
-        ### dump photo from VivoCamera
-        rc = self.lexec( 'adb shell ls /sdcard//' + u'\u76f8\u673a'.encode('utf-8') , False )
-        if '.jpg' in rc : ### grep condition "no such file or directory" out
-            file += [ '/sdcard/' + u'\u76f8\u673a'.encode('utf-8') + '/' + f for f in rc.split( ) if '.jpg' in f ]
+            ### dump raw from Snapdragon Camera
+            if flag_snapraw or flag_all :
+                #  rc = self.lexec( 'adb shell ls /sdcard/DCIM/camera/raw' , False )
+                #  if '.raw' in rc : ### grep condition "no such file or directory" out
+                    #  file += [ '/sdcard/DCIM/camera/raw/' + f for f in rc.split( ) if '.raw' in f ]
+                cmd += 'cp /sdcard/DCIM/camera/raw/*.raw /sdcard/' + folder_name + '\n'
+
+            ### dump photo from VivoCamera
+            #  rc = self.lexec( 'adb shell ls /sdcard//' + u'\u76f8\u673a'.encode('utf-8') , False )
+            #  if '.jpg' in rc : ### grep condition "no such file or directory" out
+                #  file += [ '/sdcard/' + u'\u76f8\u673a'.encode('utf-8') + '/' + f for f in rc.split( ) if '.jpg' in f ]
+            cmd += 'cp /sdcard/' + u'\u76f8\u673a'.encode( 'utf-8' ) + '/*.jpg /sdcard/' + folder_name + '\n'
 
         ### tips
-        print( "------------------ file(s) to process start ------------------" )
-        print( '\n'.join( str( f ) for f in file ) )
-        print( "------------------ file(s) to process end --------------------" )
+        #  print( "------------------ file(s) to process start ------------------" )
+        #  print( '\n'.join( str( f ) for f in file ) )
+        #  print( "------------------ file(s) to process end --------------------" )
         ### pull command
-        if not flag_del_only :
-            for index , f in enumerate( file ) :
-                print "[+] " + str( index + 1 ) + "/" + str( len( file ) ) + " file(s) :"
-                self.lexec( 'adb pull ' + f + ' .' )
+        #  for index , f in enumerate( file ) :
+            #  print "[+] " + str( index + 1 ) + "/" + str( len( file ) ) + " file(s) :"
+            #  self.lexec( 'adb pull ' + f + ' .' )
         ### rm files dumped
-        for index , f in enumerate( file ) :
-            print "[+] " + str( index + 1 ) + "/" + str( len( file ) ) + " file(s) :"
-            self.lexec( 'adb shell rm ' + f )
+        #  if not flag_del_only :
+        #  for index , f in enumerate( file ) :
+            #  print "[+] " + str( index + 1 ) + "/" + str( len( file ) ) + " file(s) :"
+            #  self.lexec( 'adb shell rm ' + f )
+        if flag_meta or flag_all :
+            cmd += 'rm /data/*snapshot*' + '\n'
+            cmd += 'rm /data/misc/camera/*.raw' + '\n'
+            cmd += 'rm /data/misc/camera/*.yuv' + '\n'
+            cmd += 'rm /data/misc/camera/*.bin' + '\n'
+        if flag_snapraw or flag_all :
+            cmd += 'rm /sdcard/DCIM/camera/raw/*.raw' + '\n'
+        cmd += 'rm /sdcard/' + u'\u76f8\u673a'.encode( 'utf-8' ) + '/*.jpg' + '\n'
+
+        cmd += "exit\n"
+        with open( folder_name , "w" ) as f :
+            f.write( cmd )
+        self.lexec( 'adb shell < ' + folder_name , False , True )
+        print cmd
+        os.remove( folder_name )
+        if not flag_del_only :
+            self.lexec( 'adb pull /sdcard/' + folder_name + ' .' )
+            #self.lexec( 'adb shell rm -rvf /sdcard/' + folder_name )
 
         return True
 
