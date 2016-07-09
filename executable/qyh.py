@@ -1212,6 +1212,28 @@ class qyh_adb( qyh_base ) :
         self.print_green( "[+] flash_boot : " + os.getenv( 'qyh_flf' ) + "\n" )
         return True
 
+    def check_flash_log( self , *args ) :
+        '''@
+        [+] callable
+        [+] visible
+        @short : cfl
+        @'''
+        import os
+        log_filename = os.getenv( 'qyh_flf' )
+        if log_filename == None :
+            self.error_exit( 'qyh slf first' )
+
+        self.check_log( log_filename , "Target boot image:" , 0 , 18 )
+
+        self.print_green_light( "[+] check flash log success" + "\n" ) ;
+        logs = self.read_log( log_filename , "Target boot image:" , 0 , 18 )
+        for index , log in enumerate( logs ) :
+            self.print_none_color( "[+] " )
+            self.print_white( str( index + 1 ) + "/" + str( len( logs ) ) + " : " )
+            self.print_none_color( log[log.find('out'):].strip() + '\n' ) ;
+
+        return True
+
     def check_lib_log( self , *args ) :
         '''@
         [+] callable
