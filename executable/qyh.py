@@ -1007,6 +1007,7 @@ class qyh_adb( qyh_base ) :
         [+] visible
         @short : fb
         @'''
+        import os
         log_filename = os.getenv( 'qyh_flf' )
         if log_filename == None :
             self.error_exit( 'qyh slf first' )
