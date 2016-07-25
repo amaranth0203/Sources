@@ -1388,7 +1388,7 @@ class qyh_adb( qyh_base ) :
         os.remove( folder_name )
         if not flag_del_only :
             self.lexec( 'adb pull /sdcard/' + folder_name + ' .' )
-            #self.lexec( 'adb shell rm -rvf /sdcard/' + folder_name )
+        self.lexec( 'adb shell rm -rf /sdcard/' + folder_name )
 
         return True
 
