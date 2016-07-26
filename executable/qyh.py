@@ -7,7 +7,7 @@ class qyh_base( object ) :
         '''@
         [+] visible
         [+] callable
-        @short : test
+        @short : test_
         @'''
         pass
         import git , os 
@@ -1504,6 +1504,7 @@ class qyh_svr( qyh_base ) :
     def svr_check_time( self ) :
         '''@
         [+] callable
+        @short : test
         @'''
         import datetime , time , subprocess , shlex
         from sys import platform as _platform
@@ -1512,26 +1513,27 @@ class qyh_svr( qyh_base ) :
         hold = [
             '0650' , '0720' , '0750' , '0840' , '0935' , '1025' , '1115' ,
             '1440' , '1535' , '1625' ,
-            '1830' , '1930' , '2000' , '2055' , '2150' ,
+            '1830' , '1930' , '2000' , '2055' , '2150' , 
         ]
         loosen = [
             '0740' , '0830' , '0920' , '1015' , '1105' , '1155' ,
             '1520' , '1615' , '1705' ,
             '1950' , '2045' , '2140' , '2230' 
         ]
-        print "checking..."
-        now = ''.join( str( datetime.datetime.now( )).split( )[1].split( '.' )[0].split( ':' ) )[0:4]
-        if now in hold : 
-            # os.popen( 'msg %username% "hold"' )
-            # self.log_rejection( 'a' , 'hold' , str( datetime.datetime.now( ) ) )
-            subprocess.Popen( shlex.split( 'msg Administrator "hold"' ) )
-        if now in loosen :
-            # os.popen( 'msg %username% "loosen"' )
-            # self.log_rejection( 'b' , 'loosen' , str( datetime.datetime.now( ) ) )
-            subprocess.Popen( shlex.split( 'msg Administrator "loosen"' ) )
-        # self.log_rejection( 'c' , 'check' , str( datetime.datetime.now( ) ) )
-        time.sleep( 44 )
-        self.svr_check_time( )
+        while True :
+            print "checking..."
+            now = ''.join( str( datetime.datetime.now( )).split( )[1].split( '.' )[0].split( ':' ) )[0:4]
+            if now in hold : 
+                # os.popen( 'msg %username% "hold"' )
+                # self.log_rejection( 'a' , 'hold' , str( datetime.datetime.now( ) ) )
+                subprocess.Popen( shlex.split( 'msg Administrator "hold"' ) )
+            if now in loosen :
+                # os.popen( 'msg %username% "loosen"' )
+                # self.log_rejection( 'b' , 'loosen' , str( datetime.datetime.now( ) ) )
+                subprocess.Popen( shlex.split( 'msg Administrator "loosen"' ) )
+            # self.log_rejection( 'c' , 'check' , str( datetime.datetime.now( ) ) )
+            time.sleep( 44 )
+            #  self.svr_check_time( )
 
     def svr_set_timer( self , *args ) :
         '''@
@@ -1724,7 +1726,7 @@ class qyh_svr( qyh_base ) :
         except :
             pass
         try :
-            process_name = "python_.exe"
+            process_name = "python"
             print os.popen( 'taskkill /F /IM ' + process_name + ' /T' ).read( )
             os.kill( pid , signal.SIGTERM )
             self.write_config( "svr" , "pid" , -1 )
