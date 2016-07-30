@@ -3,11 +3,11 @@
 
 class qyh_base( object ) :
 
-    def caller( self ) :
+    def BASE_caller( self ) :
         '''@
         [+] visible
         [+] callable
-        @short : test_
+        @short : test
         @'''
         pass
         import git , os 
@@ -21,7 +21,7 @@ class qyh_base( object ) :
         o.fetch( )
         #  o.push( repo.active_branch.name )
 
-    def vs_bat( self , *args ) :
+    def BASE_win32api( self , *args ) :
         '''@
         [+] visible
         [+] callable
@@ -131,7 +131,7 @@ class qyh_base( object ) :
             self.print_red( "[-]unknow os\n" ) ;
         return True
 
-    def delete_vim_session( self , ) :
+    def BASE_delete_vim_session( self , ) :
         '''@
         [+] visible
         [+] callable
@@ -145,7 +145,7 @@ class qyh_base( object ) :
         self.lexec( 'del {}\qyh_session_gvim.vim'.format( os.getenv( 'UserProfile' ) ) )
         self.lexec( 'del {}\qyh_session_vim.vim'.format( os.getenv( 'UserProfile' ) ) )
 
-    def get_news( self , *args ) :
+    def BASE_get_news( self , *args ) :
         '''@
         [+] visible
         [+] callable
@@ -177,7 +177,7 @@ class qyh_base( object ) :
         #  except :
             #  print "-"
 
-    def dictionary_youdao( self , *args ) :
+    def BASE_dictionary_youdao( self , *args ) :
         '''@
         [+] visible
         [+] callable
@@ -230,7 +230,7 @@ class qyh_base( object ) :
         std_output_hdl = windll.Kernel32.GetStdHandle(STD_OUTPUT_HANDLE_ID)
         windll.Kernel32.SetConsoleTextAttribute(std_output_hdl, int( args[0] ) )
 
-    def tick( self , msg = "[+] ticking..." ) :
+    def BASE_tick( self , msg = "[+] ticking..." ) :
         '''@
         [+] callable
         [+] visible
@@ -382,7 +382,7 @@ class qyh_base( object ) :
         # shell.SendKeys( cmd )
         return True
 
-    def git_routine( self , *args ) :
+    def BASE_git_routine( self , *args ) :
         '''@
         [+] callable
         [+] visible
@@ -422,7 +422,7 @@ class qyh_base( object ) :
             self.print_red( "[-]unknow os\n" ) ;
         return True
 
-    def change_to_source_dir( self ) :
+    def BASE_change_to_source_dir( self ) :
         '''@
         [+] callable
         [+] visible
@@ -451,7 +451,7 @@ class qyh_base( object ) :
             self.print_red( "[-]unknow os\n" ) ;
         return True
 
-    def open_source_dir( self ) :
+    def BASE_open_source_dir( self ) :
         '''@
         [+] callable
         [+] visible
@@ -495,7 +495,7 @@ class qyh_base( object ) :
         flag_color = self.read_config( 'colorful' , 'flag' )
         self.print_color = self.print_colorful if flag_color == 'true' else self.print_none_color
 
-    def set_colorful( self , *args ) :
+    def BASE_set_colorful( self , *args ) :
         '''@
         [+] callable
         [+] visible
@@ -647,7 +647,7 @@ class qyh_base( object ) :
 
 class qyh_adb( qyh_base ) :
 
-    def set_adb_no_check( self , *args ) :
+    def adb_set_adb_no_check( self , *args ) :
         '''@
         [+] callable
         [+] visible
@@ -669,7 +669,7 @@ class qyh_adb( qyh_base ) :
             #  self.lexec_hard( cmd )
             self.generate_env_script( [ "qyh_adb_no_check=" ] )
 
-    def select_device_serial( self , *args ) :
+    def adb_select_device_serial( self , *args ) :
         '''@
         [+] callable
         [+] visible
@@ -710,11 +710,11 @@ class qyh_adb( qyh_base ) :
         #  self.lexec_hard( cmd )
         
 
-    def select_log_file( self , *args ) :
+    def adb_log_file_select( self , *args ) :
         '''@
         [+] callable
         [+] visible
-        @short : slf
+        @short : lf_s
         @'''
         import os
         # select lib log file starts
@@ -781,7 +781,61 @@ class qyh_adb( qyh_base ) :
         self.generate_env_script( env_d )
         pass
 
-    def check_device( self , ) :
+    def adb_log_file_add( self , ) :
+        '''@
+        [+] callable
+        [+] visible
+        @short : lf_a
+        @'''
+        drive = raw_input( "[+] which drive ? ( default Z:/ ) " ) or "Z"
+        proj = raw_input( "[+] project folder name ? " )
+        llf = ""
+        flf = ""
+        if proj == "" :
+            self.error_exit( '[-] project folder name needed....' )
+        llf = drive + ":/proj/" + proj + "/compile_lib.log"
+        flf = drive + ":/proj/" + proj + "/compile_boot.log"
+        files = self.read_config( "push_lib" , "log_files" ).split( '|' )
+        files.append( llf )
+        self.write_config( "push_lib" , "log_files" , '|'.join( files ) )
+        files = self.read_config( "flash_boot" , "log_files" ).split( '|' )
+        files.append( llf )
+        self.write_config( "flash_boot" , "log_files" , '|'.join( files ) )
+        return True
+
+    def adb_log_file_remoev( self , ) :
+        '''@
+        [+] callable
+        [+] visible
+        @short : lf_r
+        @'''
+        indexes = []
+        files = self.read_config( "push_lib" , "log_files" ).split("|")
+        for index,file in enumerate( files ) :
+            print "[+] {} ---> {}".format( index + 1 , file )
+            indexes.append( index )
+        selected = -1
+        import sys
+        sys.stdout.flush( )
+        selected_raw = raw_input( "[+] which one ?\n")
+        if selected_raw == "" :
+            self.print_red( "[-] aborting...\n" )
+            exit( )
+        else :
+            try :
+                selected = int( selected_raw ) - 1
+            except :
+                self.error_exit( '[-] bad option {}'.format( selected_raw ) )
+        if selected not in indexes :
+            self.error_exit( '[-] bad option {}'.format( selected + 1 ) )
+        files_ini = self.read_config( "push_lib" , "log_files" ).split( '|' )
+        del files_ini[selected]
+        self.write_config( "push_lib" , "log_files" , '|'.join( files_ini ) )
+        files_ini = self.read_config( "flash_boot" , "log_files" ).split( '|' )
+        del files_ini[selected]
+        self.write_config( "flash_boot" , "log_files" , '|'.join( files_ini ) )
+
+    def adb_check_device( self , ) :
         import os
         check_flag = os.getenv( 'qyh_adb_no_check' )
         if check_flag == 'true' :
@@ -816,7 +870,7 @@ class qyh_adb( qyh_base ) :
         else :
             self.error_exit( "device not attached ><" )
 
-    def check_root( self , ) :
+    def adb_check_root( self , ) :
         import os
         check_flag = os.getenv( 'qyh_adb_no_check' )
         if check_flag == 'true' :
@@ -828,7 +882,7 @@ class qyh_adb( qyh_base ) :
         else :
             self.error_exit( "not root ><" )
 
-    def check_fastboot_mode( self , ) :
+    def adb_check_fastboot_mode( self , ) :
         rc = self.lexec( "fastboot devices" )
         if rc.strip().find( "fastboot" ) > 0 :
             self.print_green_light( "[+] fastboot mode\n" )
@@ -836,7 +890,7 @@ class qyh_adb( qyh_base ) :
         else :
             return False
 
-    def root_device( self , ) :
+    def adb_root_device( self , ) :
         # rc = self.lexec( "adb root" )
         rc = self.lexec( "adb vivoroot" )
         if rc.strip().find( "as root" ) > 0 :
@@ -848,7 +902,7 @@ class qyh_adb( qyh_base ) :
             else :
                 return False
      
-    def reboot_fastboot( self , ) :    
+    def adb_reboot_fastboot( self , ) :    
         self.lexec( "adb reboot bootloader" )
         try_count = 14
         while( try_count > 0 ) :
@@ -862,7 +916,7 @@ class qyh_adb( qyh_base ) :
         # lexec( "fastboot continue" )
         return False
 
-    def check_log( self , log_filename , keyword , k_index_start , k_index_end ) :
+    def adb_check_log( self , log_filename , keyword , k_index_start , k_index_end ) :
     #
     #   首先确认log文件是否存在
     #   接在log文件中查找是否含有包含keyword的行（log是否有效）
@@ -885,7 +939,7 @@ class qyh_adb( qyh_base ) :
         except IOError :
             self.error_exit( "[-] log file not exist ><\n" )
 
-    def read_log( self , log_filename , keyword , k_index_start , k_index_end ) :
+    def adb_read_log( self , log_filename , keyword , k_index_start , k_index_end ) :
     #
     #   在log文件中查找含有keyword的行
     #   
@@ -901,7 +955,7 @@ class qyh_adb( qyh_base ) :
             log_list = [ line for line in f.readlines( ) if line[k_index_start:k_index_end] == keyword ]
         return log_list
 
-    def kill_process( self , *args ) :
+    def adb_kill_process( self , *args ) :
     #
     #   前提：安卓设备（单一）已经打开debug模式并且root
     #   ps之后查找进程名并结束
@@ -927,7 +981,7 @@ class qyh_adb( qyh_base ) :
             time.sleep( 0.3 )
         return
 
-    def push_lib( self , *args ) :
+    def adb_push_lib( self , *args ) :
         '''@
         [+] callable
         [+] visible
@@ -943,12 +997,12 @@ class qyh_adb( qyh_base ) :
 
         log_filename = os.getenv( 'qyh_llf' )
         if log_filename == None :
-            self.error_exit( 'qyh slf first' )
+            self.error_exit( 'qyh lf_s first' )
 
-        self.check_log( log_filename , "Install:" , 0 , 8 ) 
+        self.adb_check_log( log_filename , "Install:" , 0 , 8 ) 
         if not flag_fake : 
-            self.check_device( ) 
-            self.check_root( )
+            self.adb_check_device( ) 
+            self.adb_check_root( )
 
         if flag_backup :
             folder_name_backup = "backup_lib_" + str( datetime.datetime.now() ).split('.')[0].replace( '-' , '' ).replace( ':' , '' ).replace( ' ' , '_' )
@@ -957,7 +1011,7 @@ class qyh_adb( qyh_base ) :
             except :
                 os.makedirs( folder_name_backup )
 
-        logs = self.read_log( log_filename , "Install:" , 0 , 8 )
+        logs = self.adb_read_log( log_filename , "Install:" , 0 , 8 )
         if flag_backup :
             for index , log in enumerate( logs ) :
                 dir = folder_name_backup + log[log.find("/system"):log.rfind("/")].strip()
@@ -983,7 +1037,7 @@ class qyh_adb( qyh_base ) :
                 except :
                     os.makedirs( folder_name_tmp )
                 import subprocess
-                self.dump_lib( folder_name_tmp ) ;
+                self.adb_dump_lib( folder_name_tmp ) ;
                 self.lexec_( "adb push " + folder_name_tmp + " /" ) ;
                 shutil.rmtree( folder_name_tmp , True )
         else :
@@ -1001,7 +1055,7 @@ class qyh_adb( qyh_base ) :
                     self.lexec_( cmd_push )
         return True
 
-    def flash_boot( self , ) :
+    def adb_flash_boot( self , ) :
         '''@
         [+] callable
         [+] visible
@@ -1010,15 +1064,15 @@ class qyh_adb( qyh_base ) :
         import os
         log_filename = os.getenv( 'qyh_flf' )
         if log_filename == None :
-            self.error_exit( 'qyh slf first' )
+            self.error_exit( 'qyh lf_s first' )
 
-        self.check_log( log_filename , "Target boot image:" , 0 , 18 )
-        if not self.check_fastboot_mode( ) :
-            self.check_device( )
-            self.reboot_fastboot( )
+        self.adb_check_log( log_filename , "Target boot image:" , 0 , 18 )
+        if not self.adb_check_fastboot_mode( ) :
+            self.adb_check_device( )
+            self.adb_reboot_fastboot( )
 
         self.lexec_( "fastboot bbk unlock_vivo" )
-        for log in self.read_log( log_filename , "Target boot image:" , 0 , 18 ) :
+        for log in self.adb_read_log( log_filename , "Target boot image:" , 0 , 18 ) :
             cmd_flash = "fastboot flash boot "
             cmd_flash += log_filename[:log_filename.rfind('/')] + '/'
             cmd_flash += log[log.find("out"):].strip() + " "
@@ -1027,93 +1081,93 @@ class qyh_adb( qyh_base ) :
 
         return True
 
-    def kill_camera_svr_and_clt( self , *args ) :
+    def adb_kill_camera_svr_and_clt( self , *args ) :
         '''@
         [+] callable
         [+] visible
         @short : kc
         @'''
 
-        self.check_device( )
-        self.check_root( )
+        self.adb_check_device( )
+        self.adb_check_root( )
 
         processes = []
         for process_name in self.read_config( 'kill_camera_svr_and_clt' , 'camera_process_name' ).split( ' ' ) :
             processes.append( process_name )
-        self.kill_process( processes )
+        self.adb_kill_process( processes )
         return True
 
-    def kill_camera_service( self , ) :
+    def adb_kill_camera_service( self , ) :
         '''@
         [+] callable
         [+] visible
         @short : kcs
         @'''
-        self.check_device( )
-        self.check_root( )
+        self.adb_check_device( )
+        self.adb_check_root( )
 
         processes = []
         for process_name in self.read_config( 'kill_camera_service' , 'camera_process_name' ).split( ' ' ) :
             processes.append( process_name )
-        self.kill_process( processes )
+        self.adb_kill_process( processes )
         return True
 
-    def kill_camera_client( self , ) :
+    def adb_kill_camera_client( self , ) :
         '''@
         [+] callable
         [+] visible
         @short : kcc
         @'''
-        self.check_device( )
-        self.check_root( )
+        self.adb_check_device( )
+        self.adb_check_root( )
 
         processes = []
         for process_name in self.read_config( 'kill_camera_client' , 'camera_process_name' ).split( ' ' ) :
             processes.append( process_name )
-        self.kill_process( processes )
+        self.adb_kill_process( processes )
             
         return True
 
-    def start_camera( self , ) :
+    def adb_start_camera( self , ) :
         '''@
         [+] callable
         [+] visible
         @short : sc
         @'''
-        self.check_device( )
+        self.adb_check_device( )
         self.lexec( self.read_config( "start_camera" , "command" ) )
         return True
 
-    def take_picture( self , ) :
+    def adb_take_picture( self , ) :
         '''@
         [+] callable
         [+] visible
         @short : tp
         @'''
-        self.check_device( )
+        self.adb_check_device( )
         self.lexec( self.read_config( "take_picture" , "command" ) )
         return True
 
-    def power_button( self , ) :
+    def adb_power_button( self , ) :
         '''@
         [+] callable
         [+] visible
         @short : pb
         @'''
-        self.check_device( )
+        self.adb_check_device( )
         self.lexec( self.read_config( "power_button" , "command" ) )
         return True
 
-    def unlock_screen( self , ) :
+    def adb_unlock_screen( self , ) :
         '''@
         [+] callable
         @short : us
         @'''
-        self.check_device( )
+        self.adb_check_device( )
         self.lexec( self.read_config( "unlock_screen" , "command" ) )
         return True
 
-    def screen_on( self , ) :
+    def adb_screen_on( self , ) :
         '''@
         [+] callable
         [+] visible
@@ -1126,7 +1180,7 @@ class qyh_adb( qyh_base ) :
             screen_lock true    true
             on          true    false
         '''
-        self.check_device( )
+        self.adb_check_device( )
         rc = self.lexec( "adb shell dumpsys window policy" , False , False )
         flags = [ line.split( '=' )[1] for line in rc.split( ) if line[0:6] == "mAwake" or line[0:18] == "mShowingLockscreen" ]
         # for mtk
@@ -1152,7 +1206,7 @@ class qyh_adb( qyh_base ) :
             self.error_exit( 'unknow status' )
         return True
 
-    def screen_off( self , ) :
+    def adb_screen_off( self , ) :
         '''@
         [+] callable
         [+] visible
@@ -1165,7 +1219,7 @@ class qyh_adb( qyh_base ) :
             screen_lock true    true
             on          true    false
         '''
-        self.check_device( )
+        self.adb_check_device( )
         rc = self.lexec( "adb shell dumpsys window policy" , False , False )
         flags = [ line.split( '=' )[1] for line in rc.split( ) if line[0:6] == "mAwake" or line[0:18] == "mShowingLockscreen" ]
         # for mtk
@@ -1190,44 +1244,49 @@ class qyh_adb( qyh_base ) :
             self.error_exit( 'unknow status' )
         return True
 
-    def adb_back( self , ) :
+    def adb_adb_back( self , ) :
         '''@
         [+] callable
         @short : ab
         @'''
-        self.check_device( )
+        self.adb_check_device( )
         self.lexec( self.read_config( "adb_back" , "command" ) )
         return True
 
-    def log_file( self , ) :
+    def adb_log_file( self , ) :
         '''@
         [+] callable
         [+] visible
         @short : lf
         @'''
+        files = self.read_config( "push_lib" , "log_files" ).split("|")
+        print( "[+] records in ini file :" )
+        for index,file in enumerate( files ) :
+            print "[+] {} ---> {}".format( index + 1 , file.replace( "_lib" , "_{lib,boot}" ) )
         import os
+        print( "\n[+] current :" )
         log_filename = os.getenv( 'qyh_llf' )
         if log_filename == None :
-            self.error_exit( 'qyh slf first' )
+            self.error_exit( 'qyh lf_s first' )
         self.print_green( "[+] push_lib   : " + os.getenv( 'qyh_llf' ) + "\n" )
         self.print_green( "[+] flash_boot : " + os.getenv( 'qyh_flf' ) + "\n" )
         return True
 
-    def check_flash_log( self , *args ) :
+    def adb_check_flash_log( self , *args ) :
         '''@
         [+] callable
         [+] visible
-        @short : cfl
+        @short : lf_cf
         @'''
         import os
         log_filename = os.getenv( 'qyh_flf' )
         if log_filename == None :
-            self.error_exit( 'qyh slf first' )
+            self.error_exit( 'qyh lf_s first' )
 
-        self.check_log( log_filename , "Target boot image:" , 0 , 18 )
+        self.adb_check_log( log_filename , "Target boot image:" , 0 , 18 )
 
         self.print_green_light( "[+] check flash log success" + "\n" ) ;
-        logs = self.read_log( log_filename , "Target boot image:" , 0 , 18 )
+        logs = self.adb_read_log( log_filename , "Target boot image:" , 0 , 18 )
         for index , log in enumerate( logs ) :
             self.print_none_color( "[+] " )
             self.print_white( str( index + 1 ) + "/" + str( len( logs ) ) + " : " )
@@ -1235,31 +1294,31 @@ class qyh_adb( qyh_base ) :
 
         return True
 
-    def check_lib_log( self , *args ) :
+    def adb_log_file_check_lib( self , *args ) :
         '''@
         [+] callable
         [+] visible
-        @short : cll
+        @short : lf_cl
         @args : count - print amount of lib files to be installed
         @args : list - list all lib files to be installed
         @'''
         import os
         log_filename = os.getenv( 'qyh_llf' )
         if log_filename == None :
-            self.error_exit( 'qyh slf first' )
+            self.error_exit( 'qyh lf_s first' )
 
         self.check_args( args , ( 'count' , 'list' ) )
-        self.check_log( log_filename , "Install:" , 0 , 8 )
+        self.adb_check_log( log_filename , "Install:" , 0 , 8 )
 
         flag_count , flag_list = tuple( self.trans_args( args , ( 'count' , 'list' ) ) )
         self.print_green_light( "[+] check lib log success" + "\n" ) ;
         if flag_count :
-            logs = self.read_log( log_filename , "Install:" , 0 , 8 )
+            logs = self.adb_read_log( log_filename , "Install:" , 0 , 8 )
             self.print_none_color( "[+] Install: " )
             self.print_white( str( len( logs ) ) )
             self.print_none_color( " file(s)\n" )
         if flag_list :
-            logs = self.read_log( log_filename , "Install:" , 0 , 8 )
+            logs = self.adb_read_log( log_filename , "Install:" , 0 , 8 )
             for index , log in enumerate( logs ) :
                 self.print_none_color( "[+] " )
                 self.print_white( str( index + 1 ) + "/" + str( len( logs ) ) + " : " )
@@ -1267,7 +1326,7 @@ class qyh_adb( qyh_base ) :
 
         return True
 
-    def logcat_with_dmesg( self , ) :
+    def adb_logcat_with_dmesg( self , ) :
         '''@
         [+] callable
         [+] visible
@@ -1304,7 +1363,7 @@ class qyh_adb( qyh_base ) :
         self.print_yellow( '\n'.join( str( f ) for f in self.read_config( "awb_log" , "command" ).split( "\"" ) ) + '\n' )
         return True
 
-    def dump_jpeg( self , *args ) :
+    def adb_dump_jpeg( self , *args ) :
         '''@
         [+] callable
         [+] visible
@@ -1319,7 +1378,7 @@ class qyh_adb( qyh_base ) :
         flag_meta , flag_snapraw , flag_all , flag_del_only =\
             tuple( self.trans_args( args , ( 'meta' , 'snapraw' , 'all' , 'del_only' ) ) )
 
-        self.check_device( )
+        self.adb_check_device( )
 
         file = []
 
@@ -1392,7 +1451,7 @@ class qyh_adb( qyh_base ) :
 
         return True
 
-    def dump_lib( self , *args ) :
+    def adb_dump_lib( self , *args ) :
         '''@
         [+] callable
         [+] visible
@@ -1413,9 +1472,9 @@ class qyh_adb( qyh_base ) :
 
         log_filename = os.getenv( 'qyh_llf' )
         if log_filename == None :
-            self.error_exit( 'qyh slf first' )
-        self.check_log( log_filename , "Install:" , 0 , 8 )
-        logs = self.read_log( log_filename , "Install:" , 0 , 8 )
+            self.error_exit( 'qyh lf_s first' )
+        self.adb_check_log( log_filename , "Install:" , 0 , 8 )
+        logs = self.adb_read_log( log_filename , "Install:" , 0 , 8 )
         for index , log in enumerate( logs ) :
             fsrc = log_filename[:log_filename.rfind('/')] + '/'
             fsrc += log[log.find("out"):].strip()
@@ -1504,7 +1563,6 @@ class qyh_svr( qyh_base ) :
     def svr_check_time( self ) :
         '''@
         [+] callable
-        @short : test
         @'''
         import datetime , time , subprocess , shlex
         from sys import platform as _platform
@@ -1772,7 +1830,7 @@ class qyh_svr( qyh_base ) :
 
 class qyh_php( qyh_base ) :
 
-    def tail_error_logs( self , ) :
+    def php_tail_error_logs( self , ) :
         '''@
         [+] callable
         [+] visible
@@ -1783,7 +1841,7 @@ class qyh_php( qyh_base ) :
             self.error_exit( "cannot detect apache home" ) ;
         self.lexec_( "tail -f \"{}/logs/error.log\"".format( str( os.getenv( 'APACHE_HOME' ) ).replace( '\\' , '/' ) ) )
 
-    def tail_access_logs( self , ) :
+    def php_tail_access_logs( self , ) :
         '''@
         [+] callable
         [+] visible
