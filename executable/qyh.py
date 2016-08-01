@@ -1023,7 +1023,8 @@ class qyh_adb( qyh_base ) :
                 cmd_pull += log[log.find("/system"):].strip() + ' '
                 cmd_pull += dir
                 self.print_none_color( "[+] backup " )
-                self.print_white( str( index + 1 ) + "/" + str( len( logs ) ) )
+                #  self.print_white( str( index + 1 ) + "/" + str( len( logs ) ) )
+                self.print_white( "{:0>4}/{:0>4}".format( str( index + 1 ) , str( len( logs ) ) ) )
                 self.print_none_color( " file(s) :\n" ) ;
                 self.lexec_( cmd_pull )
         if flag_dump_first :
@@ -1050,7 +1051,8 @@ class qyh_adb( qyh_base ) :
                     self.print_yellow( cmd_push + "\n" )
                 else :
                     self.print_none_color( "[+] push " )
-                    self.print_white( str( index + 1 ) + "/" + str( len( logs ) ) )
+                    #  self.print_white( str( index + 1 ) + "/" + str( len( logs ) ) )
+                    self.print_white( "{:0>4}/{:0>4}".format( str( index + 1 ) , str( len( logs ) ) ) )
                     self.print_none_color( " file(s) :\n" ) ;
                     self.lexec_( cmd_push )
         return True
@@ -1289,7 +1291,8 @@ class qyh_adb( qyh_base ) :
         logs = self.adb_read_log( log_filename , "Target boot image:" , 0 , 18 )
         for index , log in enumerate( logs ) :
             self.print_none_color( "[+] " )
-            self.print_white( str( index + 1 ) + "/" + str( len( logs ) ) + " : " )
+            #  self.print_white( str( index + 1 ) + "/" + str( len( logs ) ) + " : " )
+            self.print_white( "{:0>4}/{:0>4} : ".format( str( index + 1 ) , str( len( logs ) ) ) )
             self.print_none_color( log[log.find('out'):].strip() + '\n' ) ;
 
         return True
@@ -1321,7 +1324,8 @@ class qyh_adb( qyh_base ) :
             logs = self.adb_read_log( log_filename , "Install:" , 0 , 8 )
             for index , log in enumerate( logs ) :
                 self.print_none_color( "[+] " )
-                self.print_white( str( index + 1 ) + "/" + str( len( logs ) ) + " : " )
+                #  self.print_white( str( index + 1 ) + "/" + str( len( logs ) ) + " : " )
+                self.print_white( "{:0>4}/{:0>4} : ".format( str( index + 1 ) , str( len( logs ) ) ) )
                 self.print_none_color( log[log.find('/system'):].strip() + '\n' ) ;
 
         return True
@@ -1493,7 +1497,8 @@ class qyh_adb( qyh_base ) :
             except :
                 os.makedirs( fdst )
             self.print_none_color( "[+] copy " )
-            self.print_white( str( index + 1 ) + "/" + str( len( logs ) ) )
+            #  self.print_white( str( index + 1 ) + "/" + str( len( logs ) ) )
+            self.print_white( "{:0>4}/{:0>4}".format( str( index + 1 ) , str( len( logs ) ) ) )
             self.print_none_color( " file(s) : " + fsrc[fsrc.find('/system'):] + '\n' ) ;
             shutil.copy( fsrc , fdst )
         print "\n[+] dump to {}/".format( folder_name )
