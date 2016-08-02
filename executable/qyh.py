@@ -1650,7 +1650,6 @@ class qyh_svr( qyh_base ) :
     def svr_reset( self , output = True , flag_kill = True ) :
         '''@
         [+] callable
-        [+] visible
         @short : svr
         @'''
         from sys import platform as _platform
