@@ -799,7 +799,7 @@ class qyh_adb( qyh_base ) :
         files.append( llf )
         self.write_config( "push_lib" , "log_files" , '|'.join( files ) )
         files = self.read_config( "flash_boot" , "log_files" ).split( '|' )
-        files.append( llf )
+        files.append( flf )
         self.write_config( "flash_boot" , "log_files" , '|'.join( files ) )
         return True
 
@@ -1336,35 +1336,35 @@ class qyh_adb( qyh_base ) :
         [+] visible
         @short : lwd
         @'''
-        self.print_yellow( self.read_config( "logcat_with_dmesg" , "command" ) + "\n" )
+        self.print_none_color( self.read_config( "logcat_with_dmesg" , "command" ) + "\n" )
         return True
 
     def up_privilege( self , ) :
         '''@
         [+] callable
         @'''
-        self.print_yellow( '\n'.join( str( f ) for f in self.read_config( "up_privilege" , "command" ).split( "\"" ) ) + '\n' )
+        self.print_none_color( '\n'.join( str( f ) for f in self.read_config( "up_privilege" , "command" ).split( "\"" ) ) + '\n' )
         return True
 
     def mobicat( self , ) :
         '''@
         [+] callable
         @'''
-        self.print_yellow( '\n'.join( str( f ) for f in self.read_config( "mobicat" , "command" ).split( "\"" ) ) + '\n' )
+        self.print_none_color( '\n'.join( str( f ) for f in self.read_config( "mobicat" , "command" ).split( "\"" ) ) + '\n' )
         return True
 
     def metadata( self , ) :
         '''@
         [+] callable
         @'''
-        self.print_yellow( '\n'.join( str( f ) for f in self.read_config( "metadata" , "command" ).split( "\"" ) ) + '\n' )
+        self.print_none_color( '\n'.join( str( f ) for f in self.read_config( "metadata" , "command" ).split( "\"" ) ) + '\n' )
         return True
 
     def awb_log( self , ) :
         '''@
         [+] callable
         @'''
-        self.print_yellow( '\n'.join( str( f ) for f in self.read_config( "awb_log" , "command" ).split( "\"" ) ) + '\n' )
+        self.print_none_color( '\n'.join( str( f ) for f in self.read_config( "awb_log" , "command" ).split( "\"" ) ) + '\n' )
         return True
 
     def adb_dump_jpeg( self , *args ) :
@@ -1452,6 +1452,58 @@ class qyh_adb( qyh_base ) :
         if not flag_del_only :
             self.lexec( 'adb pull /sdcard/' + folder_name + ' .' )
         self.lexec( 'adb shell rm -rf /sdcard/' + folder_name )
+
+        return True
+
+    def adb_dump_lib_symbol( self , *args ) :
+        '''@
+        [+] callable
+        [+] visible
+        @short : ds
+        @args : path - path to save symbol/ folder, auto mkdir if no exist
+        @'''
+        import os , shutil 
+        spe_dir = False
+        if len( args ) > 1 :
+            self.print_red( "[+] to much args\n" )
+            return False
+        if len( args ) == 1 :
+            try :
+                os.stat( args[0] )
+            except :
+                os.makedirs( args[0] )
+            spe_dir = True
+
+        log_filename = os.getenv( 'qyh_llf' )
+        if log_filename == None :
+            self.error_exit( 'qyh lf_s first' )
+        self.adb_check_log( log_filename , "target Symbolic:" , 0 , 16 )
+        logs = self.adb_read_log( log_filename , "target Symbolic:" , 0 , 16 )
+        for index , log in enumerate( logs ) :
+            log = log.replace( '(' , '' )
+            log = log.replace( ')' , '' )
+            fsrc = log_filename[:log_filename.rfind('/')] + '/'
+            fsrc += log[log.find("out"):].strip()
+            if not spe_dir :
+                import datetime
+                fdst = os.getcwd( ).replace( '\\' , '/' ) + '/'
+                folder_name = str( datetime.datetime.now() ).split('.')[0].replace( '-' , '' ).replace( ':' , '' ).replace( ' ' , '_' )
+                fdst += folder_name
+                fdst += '/'
+            else :
+                folder_name = args[0]
+                fdst = args[0] + '/'
+            fdst += log[log.find("/symbols")+1:log.rfind("/")].strip() + "/"
+            try :
+                os.stat( fdst )
+            except :
+                os.makedirs( fdst )
+            self.print_none_color( "[+] copy " )
+            #  self.print_white( str( index + 1 ) + "/" + str( len( logs ) ) )
+            self.print_white( "{:0>4}/{:0>4}".format( str( index + 1 ) , str( len( logs ) ) ) )
+            self.print_none_color( " file(s) : " + fsrc[fsrc.find('/symbols'):] + '\n' ) ;
+            shutil.copy( fsrc , fdst )
+        print "\n[+] dump to {}/".format( folder_name )
 
         return True
 
