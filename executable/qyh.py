@@ -1963,8 +1963,8 @@ class qyh( qyh_svr , qyh_adb , qyh_php ) :
     def call_log( self , func_name ) :
         import os
         from sys import platform as _platform
-        if _platform == "win32" :
-            identity = os.getenv( 'identity' ) 
+        if _platform == "win32" or _platform == 'cygwin' :
+            identity = os.getenv( 'identity' ) or os.getenv( 'IDENTITY' ) 
             if identity in ( 'Shadow' , 'vivo_work' ) :
                 try :
                     pre_count = self.read_config( "read_config_" + identity , func_name )
