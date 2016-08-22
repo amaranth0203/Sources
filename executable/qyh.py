@@ -1531,18 +1531,15 @@ class qyh_adb( qyh_base ) :
             self.error_exit( 'qyh lf_s first' )
         self.adb_check_log( log_filename , "Install:" , 0 , 8 )
         logs = self.adb_read_log( log_filename , "Install:" , 0 , 8 )
+        if not spe_dir :
+            import datetime
+            folder_name = str( datetime.datetime.now() ).split('.')[0].replace( '-' , '' ).replace( ':' , '' ).replace( ' ' , '_' )
+        else :
+            folder_name = args[0]
         for index , log in enumerate( logs ) :
             fsrc = log_filename[:log_filename.rfind('/')] + '/'
             fsrc += log[log.find("out"):].strip()
-            if not spe_dir :
-                import datetime
-                fdst = os.getcwd( ).replace( '\\' , '/' ) + '/'
-                folder_name = str( datetime.datetime.now() ).split('.')[0].replace( '-' , '' ).replace( ':' , '' ).replace( ' ' , '_' )
-                fdst += folder_name
-                fdst += '/'
-            else :
-                folder_name = args[0]
-                fdst = args[0] + '/'
+            fdst = folder_name + '/'
             fdst += log[log.find("/system")+1:log.rfind("/")].strip() + "/"
             try :
                 os.stat( fdst )
