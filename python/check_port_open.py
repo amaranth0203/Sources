@@ -45,7 +45,7 @@ if __name__ == "__main__" :
             #  t.start( )
             #  threads.append( t )
     host = socket.gethostbyname( "mushroom.jios.org" )
-    for i in range( 1 , 255 ) :
+    for i in range( 1 , 65536 ) :
         t = threading.Thread( target = check_port , args = ( ( host , i ) , ) )
         t.daemon = True
         t.start( )
@@ -53,3 +53,12 @@ if __name__ == "__main__" :
 
     for t in threads :
         t.join( )
+
+
+
+
+
+
+
+
+

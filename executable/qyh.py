@@ -988,12 +988,12 @@ class qyh_adb( qyh_base ) :
         @short : pl
         @args : backup - backup lib file to current directory before push lib file to phone
         @args : fake - print cmd_push only, not execute it
-        @args : dump_first - push multiple files in a directory acts faster than push one by one
+        @args : multi_thread - using multiple thread to execute push or pull
         @'''
         import datetime , os
-        self.check_args( args , ( 'backup' , 'fake' , 'dump_first' ) )
-        flag_backup , flag_fake , flag_dump_first =\
-            tuple( self.trans_args( args , ( 'backup' , 'fake' , 'dump_first' ) ) )
+        self.check_args( args , ( 'backup' , 'fake' , 'dump_first' , 'multi_thread' ) )
+        flag_backup , flag_fake , flag_dump_first , flag_multi_thread =\
+            tuple( self.trans_args( args , ( 'backup' , 'fake' , 'dump_first' , 'multi_thread' ) ) )
 
         log_filename = os.getenv( 'qyh_llf' )
         if log_filename == None :
@@ -1012,6 +1012,8 @@ class qyh_adb( qyh_base ) :
                 os.makedirs( folder_name_backup )
 
         logs = self.adb_read_log( log_filename , "Install:" , 0 , 8 )
+        threads = [] 
+
         if flag_backup :
             for index , log in enumerate( logs ) :
                 dir = folder_name_backup + log[log.find("/system"):log.rfind("/")].strip()
@@ -1022,39 +1024,56 @@ class qyh_adb( qyh_base ) :
                 cmd_pull = 'adb pull '
                 cmd_pull += log[log.find("/system"):].strip() + ' '
                 cmd_pull += dir
-                self.print_none_color( "[+] backup " )
-                #  self.print_white( str( index + 1 ) + "/" + str( len( logs ) ) )
-                self.print_white( "{:0>4}/{:0>4}".format( str( index + 1 ) , str( len( logs ) ) ) )
-                self.print_none_color( " file(s) :\n" ) ;
-                self.lexec_( cmd_pull )
-        if flag_dump_first :
-            if flag_fake :
-                self.lexec( "qyh pl fake" ) 
-            else :
-                import shutil
-                folder_name_tmp = "tmp_lib_" + str( datetime.datetime.now() ).split('.')[0].replace( '-' , '' ).replace( ':' , '' ).replace( ' ' , '_' )
-                try :
-                    os.stat( folder_name_tmp )
-                except :
-                    os.makedirs( folder_name_tmp )
-                import subprocess
-                self.adb_dump_lib( folder_name_tmp ) ;
-                self.lexec_( "adb push " + folder_name_tmp + " /" ) ;
-                shutil.rmtree( folder_name_tmp , True )
-        else :
-            for index , log in enumerate( logs ) :
-                cmd_push = 'adb push '
-                cmd_push += log_filename[:log_filename.rfind('/')] + '/'
-                cmd_push += log[log.find("out"):].strip() + ' '
-                cmd_push += log[log.find("/system"):log.rfind("/")].strip() + " "
-                if flag_fake :
-                    self.print_yellow( cmd_push + "\n" )
+                if not flag_multi_thread :
+                    self.print_none_color( "[+] backup " )
+                    self.print_white( "{:0>4}/{:0>4}".format( str( index + 1 ) , str( len( logs ) ) ) )
+                    self.print_none_color( " file(s) :\n" ) ;
+                    self.lexec_( cmd_pull )
                 else :
+                    import threading
+                    t = threading.Thread( target = self.lexec_ , args = ( cmd_pull , ) )
+                    t.daemon = True
+                    threads.append( t )
+
+        if flag_multi_thread :
+            n = 100
+            for chunk in [ threads[ i : i+n ] for i in xrange( 0 , len( threads ) , n ) ] :
+                for t in chunk :
+                    t.start( )
+                for t in chunk :
+                    t.join( )
+                print '------------ {} job(s) done ------------'.format( len( chunk ) )
+
+        threads = []
+
+        for index , log in enumerate( logs ) :
+            cmd_push = 'adb push '
+            cmd_push += log_filename[:log_filename.rfind('/')] + '/'
+            cmd_push += log[log.find("out"):].strip() + ' '
+            cmd_push += log[log.find("/system"):log.rfind("/")].strip() + " "
+            if flag_fake :
+                self.print_yellow( cmd_push + "\n" )
+            else :
+                if not flag_multi_thread :
                     self.print_none_color( "[+] push " )
-                    #  self.print_white( str( index + 1 ) + "/" + str( len( logs ) ) )
                     self.print_white( "{:0>4}/{:0>4}".format( str( index + 1 ) , str( len( logs ) ) ) )
                     self.print_none_color( " file(s) :\n" ) ;
                     self.lexec_( cmd_push )
+                else :
+                    import threading
+                    t = threading.Thread( target = self.lexec_ , args = ( cmd_push , ) )
+                    t.daemon = True
+                    threads.append( t )
+
+        if flag_multi_thread :
+            n = 100
+            for chunk in [ threads[ i : i+n ] for i in xrange( 0 , len( threads ) , n ) ] :
+                for t in chunk :
+                    t.start( )
+                for t in chunk :
+                    t.join( )
+                print '------------ {} job(s) done ------------'.format( len( chunk ) )
+                    
         return True
 
     def adb_flash_boot( self , ) :
@@ -1450,7 +1469,26 @@ class qyh_adb( qyh_base ) :
         print cmd
         os.remove( folder_name )
         if not flag_del_only :
-            self.lexec( 'adb pull /sdcard/' + folder_name + ' .' )
+            #  self.lexec( 'adb pull /sdcard/' + folder_name + ' .' )
+            import threading
+            threads = []
+            for line in self.lexec( "adb shell ls /sdcard/" + folder_name , False ).split( "\r\r\n" ) :
+                if line == "" : continue
+                cmd = "adb pull /sdcard/" + folder_name + "/" + line + " ."
+                t = threading.Thread( target = self.lexec_ , args = ( cmd , ) )
+                t.daemon = True
+                threads.append( t )
+
+            n = 100
+            for chunk in [ threads[ i : i+n ] for i in xrange( 0 , len( threads ) , n ) ] :
+                for t in chunk :
+                    t.start( )
+                for t in chunk :
+                    t.join( )
+                print '------------ {} job(s) done ------------'.format( len( chunk ) )
+
+
+
         self.lexec( 'adb shell rm -rf /sdcard/' + folder_name )
 
         return True
@@ -1507,14 +1545,21 @@ class qyh_adb( qyh_base ) :
 
         return True
 
+    def toolkit_copy_with_log( self , fsrc , fdst ) :
+        import shutil
+        rc = shutil.copy( fsrc , fdst )
+        self.print_none_color( "[+] copyed : {}\n".format( fsrc ) )
+        return rc
+
     def adb_dump_lib( self , *args ) :
         '''@
         [+] callable
         [+] visible
         @short : dl
         @args : path - path to save system/ folder, auto mkdir if no exist
+        @args : multi_thread - using multiple thread to execute dump
         @'''
-        import os , shutil 
+        import os 
         spe_dir = False
         if len( args ) > 1 :
             self.print_red( "[+] to much args\n" )
@@ -1536,6 +1581,7 @@ class qyh_adb( qyh_base ) :
             folder_name = str( datetime.datetime.now() ).split('.')[0].replace( '-' , '' ).replace( ':' , '' ).replace( ' ' , '_' )
         else :
             folder_name = args[0]
+        threads = []
         for index , log in enumerate( logs ) :
             fsrc = log_filename[:log_filename.rfind('/')] + '/'
             fsrc += log[log.find("out"):].strip()
@@ -1546,10 +1592,21 @@ class qyh_adb( qyh_base ) :
             except :
                 os.makedirs( fdst )
             self.print_none_color( "[+] copy " )
-            #  self.print_white( str( index + 1 ) + "/" + str( len( logs ) ) )
             self.print_white( "{:0>4}/{:0>4}".format( str( index + 1 ) , str( len( logs ) ) ) )
             self.print_none_color( " file(s) : " + fsrc[fsrc.find('/system'):] + '\n' ) ;
-            shutil.copy( fsrc , fdst )
+            #  shutil.copy( fsrc , fdst )
+            import threading
+            t = threading.Thread( target = self.toolkit_copy_with_log , args = ( fsrc , fdst ) )
+            t.daemon = True
+            threads.append( t )
+
+        n = 100
+        for chunk in [ threads[ i : i+n ] for i in xrange( 0 , len( threads ) , n ) ] :
+            for t in chunk :
+                t.start( )
+            for t in chunk :
+                t.join( )
+            print '------------ {} job(s) done ------------'.format( len( chunk ) )
         print "\n[+] dump to {}/".format( folder_name )
 
         return True
@@ -1976,15 +2033,16 @@ class qyh( qyh_svr , qyh_adb , qyh_php ) :
             func_map = { f if self.get_formated_args( "self." + f )[0] == "" else self.get_formated_args( "self." + f )[0] : f for f in funcs }
             self.check_args( args[1:2] , tuple( s for t in func_map.items( ) for s in t ) )
             func_name = "self." + ( func_map[ args[1] ] if args[1] in func_map else args[1] )
-            #  if "git_routine" not in func_name[5:] :
-                #  self.call_log( func_name[5:] )
             self.call_log( func_name[5:] )
+            #  import time
+            #  time_start = time.time( )
             if len( args ) > 2 :
                 f = eval( func_name )
                 f( *args[2:] )
             else :
                 f = eval( func_name )
                 f( )
+            #  self.print_green( "\n\n\n[+] function {} used {} second(s)\n".format( func_name , time.time( ) - time_start ) )
         else :
             self.main_menu( )
 
