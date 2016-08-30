@@ -330,6 +330,7 @@ call :read_ini check_log log_file log_file
 set "%1=false"
 for /f "delims=" %%i in ( !log_file! ) do (
     set "line=%%i"
+    REM echo !line!
     if "!line:~0,8!" equ "Install:" (
         set "%1=true"
         goto :eof
