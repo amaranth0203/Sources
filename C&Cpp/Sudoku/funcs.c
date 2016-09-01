@@ -1,18 +1,21 @@
 #include "funcs.h"
 #include <stdio.h>
+#include <stdlib.h>
 void test( ) {
     printf( "[+] wassup %s called\n" , __func__ ) ;
     return ;
 }
 void print( int* draft ) {
+    // system( "cls" ) ;
     int i , j ;
+            printf ( "\n----------*----------*----------\n" ) ;
     for( i = 0 ; i < 9 ; i ++ ) {
         for( j = 0 ; j < 9 ; j ++ ) {
-            printf( "%2d" , *(draft+9*i+j) ) ;
+            printf( "%3d" , *(draft+9*i+j) ) ;
             if( j % 3 == 2 && j != 8 ) printf( " |" ) ;
         }
-        if( i % 3 == 2 && i != 8 ) 
-            printf ( "\n-------*-------*-------" ) ;
+        if( i % 3 == 2 ) 
+            printf ( "\n----------*----------*----------" ) ;
         puts( "" ) ;
     }
 }
