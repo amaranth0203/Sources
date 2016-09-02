@@ -8,10 +8,31 @@ void test( ) {
 void print( int* draft ) {
     // system( "cls" ) ;
     int i , j ;
-            printf ( "\n----------*----------*----------\n" ) ;
+    printf ( "\n----------*----------*----------\n" ) ;
     for( i = 0 ; i < 9 ; i ++ ) {
         for( j = 0 ; j < 9 ; j ++ ) {
             printf( "%3d" , *(draft+9*i+j) ) ;
+            if( j % 3 == 2 && j != 8 ) printf( " |" ) ;
+        }
+        if( i % 3 == 2 ) 
+            printf ( "\n----------*----------*----------" ) ;
+        puts( "" ) ;
+    }
+}
+void print2( int* draft , int* field , int len ) {
+    int i , j ;
+    int i_f ;
+    printf ( "\n----------*----------*----------\n" ) ;
+    i_f = 0 ;
+    for( i = 0 ; i < 9 ; i ++ ) {
+        for( j = 0 ; j < 9 ; j ++ ) {
+            if( ( 9*i + j ) == field[i_f] ) {
+                printf( "%3d" , *(draft+9*i+j) ) ;
+                i_f ++ ;
+            }
+            else {
+                printf( " *%d" , *(draft+9*i+j) ) ;
+            }
             if( j % 3 == 2 && j != 8 ) printf( " |" ) ;
         }
         if( i % 3 == 2 ) 
@@ -62,6 +83,24 @@ int check_idx( int* draft , int x ) {
             if( ( m != i ) && ( n != j ) && ( 9*m + n ) != x && *( draft + 9*m + n ) == *( draft + x ) )
                 return 0 ;
     return 1 ;
+}
+void re_calc( int* d , int* f , int start , int end ) {
+    int i , j ;
+    if( start == end ) {
+        printf( "\n%d elements given" , 9*9 - end ) ;
+        print( d ) ;
+        puts( "done" ) ;
+    } else {
+        for( j = 1 ; j < 10 ; j ++ ) {
+            d[f[start]] = j ;
+            if( !check_idx( d , f[start] ) ) {
+                d[f[start]] = 0 ;
+                continue ;
+            }
+            re_calc( d , f , start + 1 , end ) ;
+            d[f[start]] = 0 ;
+        }
+    }
 }
 
 
