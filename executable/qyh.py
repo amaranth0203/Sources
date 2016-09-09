@@ -1012,7 +1012,9 @@ class qyh_adb( qyh_base ) :
                 os.makedirs( folder_name_backup )
 
         logs = self.adb_read_log( log_filename , "Install:" , 0 , 8 )
-        threads = [] 
+
+        import threadpool
+        pool = threadpool.ThreadPool( 10 )
 
         if flag_backup :
             for index , log in enumerate( logs ) :
@@ -1030,21 +1032,10 @@ class qyh_adb( qyh_base ) :
                     self.print_none_color( " file(s) :\n" ) ;
                     self.lexec_( cmd_pull )
                 else :
-                    import threading
-                    t = threading.Thread( target = self.lexec_ , args = ( cmd_pull , ) )
-                    t.daemon = True
-                    threads.append( t )
+                    requests = threadpool.makeRequests( self.lexec , ( cmd_pull , ) )
+                    [ pool.putRequest( req ) for req in requests ]
+        if flag_multi_thread : pool.wait( )
 
-        if flag_multi_thread :
-            n = 100
-            for chunk in [ threads[ i : i+n ] for i in xrange( 0 , len( threads ) , n ) ] :
-                for t in chunk :
-                    t.start( )
-                for t in chunk :
-                    t.join( )
-                print '------------ {} job(s) done ------------'.format( len( chunk ) )
-
-        threads = []
 
         for index , log in enumerate( logs ) :
             cmd_push = 'adb push '
@@ -1060,19 +1051,9 @@ class qyh_adb( qyh_base ) :
                     self.print_none_color( " file(s) :\n" ) ;
                     self.lexec_( cmd_push )
                 else :
-                    import threading
-                    t = threading.Thread( target = self.lexec_ , args = ( cmd_push , ) )
-                    t.daemon = True
-                    threads.append( t )
-
-        if flag_multi_thread :
-            n = 100
-            for chunk in [ threads[ i : i+n ] for i in xrange( 0 , len( threads ) , n ) ] :
-                for t in chunk :
-                    t.start( )
-                for t in chunk :
-                    t.join( )
-                print '------------ {} job(s) done ------------'.format( len( chunk ) )
+                    requests = threadpool.makeRequests( self.lexec , ( cmd_push , ) )
+                    [ pool.putRequest( req ) for req in requests ]
+        if flag_multi_thread : pool.wait( )
                     
         return True
 
@@ -1468,24 +1449,29 @@ class qyh_adb( qyh_base ) :
         self.lexec( 'adb shell < ' + folder_name , False , True )
         print cmd
         os.remove( folder_name )
+        import threadpool
+        pool = threadpool.ThreadPool( 10 )
         if not flag_del_only :
             #  self.lexec( 'adb pull /sdcard/' + folder_name + ' .' )
-            import threading
-            threads = []
+            #  import threading
+            #  threads = []
             for line in self.lexec( "adb shell ls /sdcard/" + folder_name , False ).split( "\r\r\n" ) :
                 if line == "" : continue
                 cmd = "adb pull /sdcard/" + folder_name + "/" + line + " ."
-                t = threading.Thread( target = self.lexec_ , args = ( cmd , ) )
-                t.daemon = True
-                threads.append( t )
+                requests = threadpool.makeRequests( self.lexec , ( cmd , ) )
+                [ pool.putRequest( req ) for req in requests ]
+                #  t = threading.Thread( target = self.lexec_ , args = ( cmd , ) )
+                #  t.daemon = True
+                #  threads.append( t )
+            pool.wait( )
 
-            n = 100
-            for chunk in [ threads[ i : i+n ] for i in xrange( 0 , len( threads ) , n ) ] :
-                for t in chunk :
-                    t.start( )
-                for t in chunk :
-                    t.join( )
-                print '------------ {} job(s) done ------------'.format( len( chunk ) )
+            #  n = 100
+            #  for chunk in [ threads[ i : i+n ] for i in xrange( 0 , len( threads ) , n ) ] :
+                #  for t in chunk :
+                    #  t.start( )
+                #  for t in chunk :
+                    #  t.join( )
+                #  print '------------ {} job(s) done ------------'.format( len( chunk ) )
 
 
 
@@ -1543,8 +1529,10 @@ class qyh_adb( qyh_base ) :
 
         return True
 
-    def toolkit_copy_with_log( self , fsrc , fdst ) :
+    def toolkit_copy_with_log( self , args ) :
         import shutil
+        fsrc = args.split( '|' )[0]
+        fdst = args.split( '|' )[1]
         rc = shutil.copy( fsrc , fdst )
         self.print_none_color( "[+] copyed : {}\n".format( fsrc ) )
         return rc
@@ -1555,7 +1543,6 @@ class qyh_adb( qyh_base ) :
         [+] visible
         @short : dl
         @args : path - path to save system/ folder, auto mkdir if no exist
-        @args : multi_thread - using multiple thread to execute dump
         @'''
         import os 
         spe_dir = False
@@ -1579,7 +1566,9 @@ class qyh_adb( qyh_base ) :
             folder_name = str( datetime.datetime.now() ).split('.')[0].replace( '-' , '' ).replace( ':' , '' ).replace( ' ' , '_' )
         else :
             folder_name = args[0]
-        threads = []
+        #  threads = []
+        import threadpool
+        pool = threadpool.ThreadPool( 10 )
         for index , log in enumerate( logs ) :
             fsrc = log_filename[:log_filename.rfind('/')] + '/'
             fsrc += log[log.find("out"):].strip()
@@ -1589,22 +1578,25 @@ class qyh_adb( qyh_base ) :
                 os.stat( fdst )
             except :
                 os.makedirs( fdst )
-            self.print_none_color( "[+] copy " )
-            self.print_white( "{:0>4}/{:0>4}".format( str( index + 1 ) , str( len( logs ) ) ) )
-            self.print_none_color( " file(s) : " + fsrc[fsrc.find('/system'):] + '\n' ) ;
+            #  self.print_none_color( "[+] copy " )
+            #  self.print_white( "{:0>4}/{:0>4}".format( str( index + 1 ) , str( len( logs ) ) ) )
+            #  self.print_none_color( " file(s) : " + fsrc[fsrc.find('/system'):] + '\n' ) ;
             #  shutil.copy( fsrc , fdst )
-            import threading
-            t = threading.Thread( target = self.toolkit_copy_with_log , args = ( fsrc , fdst ) )
-            t.daemon = True
-            threads.append( t )
+            requests = threadpool.makeRequests( self.toolkit_copy_with_log , ( fsrc + '|' + fdst , ) )
+            [ pool.putRequest( req ) for req in requests ]
+        pool.wait( )
+            #  import threading
+            #  t = threading.Thread( target = self.toolkit_copy_with_log , args = ( fsrc , fdst ) )
+            #  t.daemon = True
+            #  threads.append( t )
 
-        n = 100
-        for chunk in [ threads[ i : i+n ] for i in xrange( 0 , len( threads ) , n ) ] :
-            for t in chunk :
-                t.start( )
-            for t in chunk :
-                t.join( )
-            print '------------ {} job(s) done ------------'.format( len( chunk ) )
+        #  n = 100
+        #  for chunk in [ threads[ i : i+n ] for i in xrange( 0 , len( threads ) , n ) ] :
+            #  for t in chunk :
+                #  t.start( )
+            #  for t in chunk :
+                #  t.join( )
+            #  print '------------ {} job(s) done ------------'.format( len( chunk ) )
         print "\n[+] dump to {}/".format( folder_name )
 
         return True
@@ -2032,15 +2024,15 @@ class qyh( qyh_svr , qyh_adb , qyh_php ) :
             self.check_args( args[1:2] , tuple( s for t in func_map.items( ) for s in t ) )
             func_name = "self." + ( func_map[ args[1] ] if args[1] in func_map else args[1] )
             self.call_log( func_name[5:] )
-            #  import time
-            #  time_start = time.time( )
+            import time
+            time_start = time.time( )
             if len( args ) > 2 :
                 f = eval( func_name )
                 f( *args[2:] )
             else :
                 f = eval( func_name )
                 f( )
-            #  self.print_green( "\n\n\n[+] function {} used {} second(s)\n".format( func_name , time.time( ) - time_start ) )
+            self.print_green( "\n\n\n[+] function {} used {} second(s)\n".format( func_name , time.time( ) - time_start ) )
         else :
             self.main_menu( )
 
