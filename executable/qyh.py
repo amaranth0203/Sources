@@ -2024,15 +2024,15 @@ class qyh( qyh_svr , qyh_adb , qyh_php ) :
             self.check_args( args[1:2] , tuple( s for t in func_map.items( ) for s in t ) )
             func_name = "self." + ( func_map[ args[1] ] if args[1] in func_map else args[1] )
             self.call_log( func_name[5:] )
-            import time
-            time_start = time.time( )
+            #  import time
+            #  time_start = time.time( )
             if len( args ) > 2 :
                 f = eval( func_name )
                 f( *args[2:] )
             else :
                 f = eval( func_name )
                 f( )
-            self.print_green( "\n\n\n[+] function {} used {} second(s)\n".format( func_name , time.time( ) - time_start ) )
+            #  self.print_green( "\n\n\n[+] function {} used {} second(s)\n".format( func_name , time.time( ) - time_start ) )
         else :
             self.main_menu( )
 
