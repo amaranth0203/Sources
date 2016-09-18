@@ -45,8 +45,9 @@ if __name__ == "__main__" :
             #  t.start( )
             #  threads.append( t )
     # host = socket.gethostbyname( "mushroom.jios.org" )
-    host = socket.gethostbyname( "smartphone" )
+    # host = socket.gethostbyname( "smartphone" )
     # host = "192.168.5.92"
+    host = "172.20.135.246"
     for i in range( 1 , 65536 ) :
         t = threading.Thread( target = check_port , args = ( ( host , i ) , ) )
         t.daemon = True
