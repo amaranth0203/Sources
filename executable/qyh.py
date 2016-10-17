@@ -1375,12 +1375,14 @@ class qyh_adb( qyh_base ) :
         @args : all - dump VivoCamera's jpeg & snapdragonCamera's raw & metadata
         @args : meta - dump VivoCamera's jpeg & metadata
         @args : snapraw - dump VivoCamera's jpeg & snapdragonCamera's raw
-        @args : del_only - only delete file, not dump
+        @args : del - dump and delete files in cell phone
+        @args : not_dump - not dump 
+        @args : backup - save temporary dumping directory
         @'''
-        self.check_args( args , ( 'meta' , 'snapraw' , 'all' , 'del_only' ) )
+        self.check_args( args , ( 'meta' , 'snapraw' , 'all' , 'del' , 'not_dump' , 'backup' ) )
 
-        flag_meta , flag_snapraw , flag_all , flag_del_only =\
-            tuple( self.trans_args( args , ( 'meta' , 'snapraw' , 'all' , 'del_only' ) ) )
+        flag_meta , flag_snapraw , flag_all , flag_del , flag_not_dump , flag_backup =\
+            tuple( self.trans_args( args , ( 'meta' , 'snapraw' , 'all' , 'del' , 'not_dump' , 'backup' ) ) )
 
         self.adb_check_device( )
 
@@ -1394,88 +1396,57 @@ class qyh_adb( qyh_base ) :
         cmd = ""
         cmd += 'mkdir /sdcard/' + folder_name + '\n'
 
-        if not flag_del_only :
-            ### dump metadata
-            if flag_meta or flag_all :
-                #  rc = self.lexec( 'adb shell ls /data' , False )
-                #  if 'snapshot' in rc : ### grep condition "no such file or directory" out
-                    #  file += [ '/data/' + f for f in rc.split( ) if 'snapshot' in f ]
-                #  rc = self.lexec( 'adb shell ls /data/misc/camera' , False )
-                #  if '.raw' in rc or '.yuv' in rc or '.bin' in rc : ### grep condition "no such file or directory" out
-                    #  file += [ '/data/misc/camera/' + f for f in rc.split( ) if '.raw' in f or '.yuv' in f or '.bin' in f ]
-                cmd += 'cp /data/*snapshot* /sdcard/' + folder_name + '\n'
-                cmd += 'cp /data/misc/camera/*.raw /sdcard/' + folder_name + '\n'
-                cmd += 'cp /data/misc/camera/*.yuv /sdcard/' + folder_name + '\n'
-                cmd += 'cp /data/misc/camera/*.bin /sdcard/' + folder_name + '\n'
-
-            ### dump raw from Snapdragon Camera
-            if flag_snapraw or flag_all :
-                #  rc = self.lexec( 'adb shell ls /sdcard/DCIM/camera/raw' , False )
-                #  if '.raw' in rc : ### grep condition "no such file or directory" out
-                    #  file += [ '/sdcard/DCIM/camera/raw/' + f for f in rc.split( ) if '.raw' in f ]
-                cmd += 'cp /sdcard/DCIM/camera/raw/*.raw /sdcard/' + folder_name + '\n'
-
-            ### dump photo from VivoCamera
-            #  rc = self.lexec( 'adb shell ls /sdcard//' + u'\u76f8\u673a'.encode('utf-8') , False )
-            #  if '.jpg' in rc : ### grep condition "no such file or directory" out
-                #  file += [ '/sdcard/' + u'\u76f8\u673a'.encode('utf-8') + '/' + f for f in rc.split( ) if '.jpg' in f ]
-            cmd += 'cp /sdcard/' + u'\u76f8\u673a'.encode( 'utf-8' ) + '/*.jpg /sdcard/' + folder_name + '\n'
-
-        ### tips
-        #  print( "------------------ file(s) to process start ------------------" )
-        #  print( '\n'.join( str( f ) for f in file ) )
-        #  print( "------------------ file(s) to process end --------------------" )
-        ### pull command
-        #  for index , f in enumerate( file ) :
-            #  print "[+] " + str( index + 1 ) + "/" + str( len( file ) ) + " file(s) :"
-            #  self.lexec( 'adb pull ' + f + ' .' )
+        if not flag_not_dump :
+        	### dump metadata
+        	if flag_meta or flag_all :
+        	    cmd += 'cp /data/*snapshot* /sdcard/' + folder_name + '\n'
+        	    cmd += 'cp /data/misc/camera/*.raw /sdcard/' + folder_name + '\n'
+        	    cmd += 'cp /data/misc/camera/*.yuv /sdcard/' + folder_name + '\n'
+        	    cmd += 'cp /data/misc/camera/*.bin /sdcard/' + folder_name + '\n'
+        	
+        	### dump raw from Snapdragon Camera
+        	if flag_snapraw or flag_all :
+        	    cmd += 'cp /sdcard/DCIM/camera/raw/*.raw /sdcard/' + folder_name + '\n'
+        	
+        	### dump photo from VivoCamera
+        	cmd += 'cp /sdcard/' + u'\u76f8\u673a'.encode( 'utf-8' ) + '/*.jpg /sdcard/' + folder_name + '\n'
+        	
         ### rm files dumped
-        #  if not flag_del_only :
-        #  for index , f in enumerate( file ) :
-            #  print "[+] " + str( index + 1 ) + "/" + str( len( file ) ) + " file(s) :"
-            #  self.lexec( 'adb shell rm ' + f )
-        if flag_meta or flag_all :
-            cmd += 'rm /data/*snapshot*' + '\n'
-            cmd += 'rm /data/misc/camera/*.raw' + '\n'
-            cmd += 'rm /data/misc/camera/*.yuv' + '\n'
-            cmd += 'rm /data/misc/camera/*.bin' + '\n'
-        if flag_snapraw or flag_all :
-            cmd += 'rm /sdcard/DCIM/camera/raw/*.raw' + '\n'
-        cmd += 'rm /sdcard/' + u'\u76f8\u673a'.encode( 'utf-8' ) + '/*.jpg' + '\n'
-
+        if flag_del :
+        	if flag_meta or flag_all :
+        	    cmd += 'rm /data/*snapshot*' + '\n'
+        	    cmd += 'rm /data/misc/camera/*.raw' + '\n'
+        	    cmd += 'rm /data/misc/camera/*.yuv' + '\n'
+        	    cmd += 'rm /data/misc/camera/*.bin' + '\n'
+        	if flag_snapraw or flag_all :
+        	    cmd += 'rm /sdcard/DCIM/camera/raw/*.raw' + '\n'
+        	cmd += 'rm /sdcard/' + u'\u76f8\u673a'.encode( 'utf-8' ) + '/*.jpg' + '\n'
         cmd += "exit\n"
         with open( folder_name , "w" ) as f :
             f.write( cmd )
         self.lexec( 'adb shell < ' + folder_name , False , True )
         print cmd
         os.remove( folder_name )
-        import threadpool
-        pool = threadpool.ThreadPool( 10 )
-        if not flag_del_only :
-            #  self.lexec( 'adb pull /sdcard/' + folder_name + ' .' )
-            #  import threading
-            #  threads = []
-            for line in self.lexec( "adb shell ls /sdcard/" + folder_name , False ).split( "\r\r\n" ) :
-                if line == "" : continue
-                cmd = "adb pull /sdcard/" + folder_name + "/" + line + " ."
-                requests = threadpool.makeRequests( self.lexec , ( cmd , ) )
-                [ pool.putRequest( req ) for req in requests ]
-                #  t = threading.Thread( target = self.lexec_ , args = ( cmd , ) )
-                #  t.daemon = True
-                #  threads.append( t )
-            pool.wait( )
-
-            #  n = 100
-            #  for chunk in [ threads[ i : i+n ] for i in xrange( 0 , len( threads ) , n ) ] :
-                #  for t in chunk :
-                    #  t.start( )
-                #  for t in chunk :
-                    #  t.join( )
-                #  print '------------ {} job(s) done ------------'.format( len( chunk ) )
 
 
-
-        self.lexec( 'adb shell rm -rf /sdcard/' + folder_name )
+        if not flag_not_dump :
+        	import threadpool
+        	pool = threadpool.ThreadPool( 10 )
+        	line_split = ""
+        	from sys import platform as _platform
+        	if _platform == "win32" :
+        	    line_split = "\r\n"
+        	if _platform == "cygwin" :
+        	    line_split = "\r\r\n"
+        	for line in self.lexec( "adb shell ls /sdcard/" + folder_name , False ).split( line_split ) :
+        	    if line == "" : continue
+        	    cmd = "adb pull /sdcard/" + folder_name + "/" + line + " ."
+        	    requests = threadpool.makeRequests( self.lexec , ( cmd , ) )
+        	    [ pool.putRequest( req ) for req in requests ]
+        	pool.wait( )
+        	
+        if not flag_backup :
+            self.lexec( 'adb shell rm -rf /sdcard/' + folder_name )
 
         return True
 
