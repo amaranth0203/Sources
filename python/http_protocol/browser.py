@@ -3,12 +3,12 @@
 
 def send_request( ) :
     import socket , sys
-    url = "www.baidu.com"
+    url = "my.csdn.net"
     host = socket.gethostbyname( url )
     port = 80
     sock = socket.socket( )
     sock.connect( ( host , port ) )
-    content = "GET / HTTP/1.0\r\n\r\n" 
+    content = "GET /echofocus HTTP/1.0\r\n\r\n" 
     sock.send( content )
     response = sock.recv( 1 ) 
     while response != "" :
