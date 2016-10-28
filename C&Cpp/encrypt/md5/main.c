@@ -57,6 +57,9 @@ int main( ) {
     d0 = d0 + D ;
   }
 
+  print_512_bit_chunk( in_padded ) ;
+  printf( " 0 1 2 3 4 5 6 7 8 9 a b c d e f\n" ) ;
+
   print_result( a0 , b0 , c0 , d0 ) ;
 
   return 0 ;
