@@ -5,6 +5,9 @@
 int main( ) {
     int i , len = 0 ;
     int field[ 9*9 ] = { 0 } ;
+#ifdef _DEBUG_
+    trans_input( quick_input , draft ) ;
+#endif
     for( i = 0 , len = 0 ; i < 9*9 ; i ++ ) {
         if( !draft[i] ) {
             field[len++] = i ;

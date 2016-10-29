@@ -103,7 +103,15 @@ void re_calc( int* d , int* f , int start , int end ) {
     }
 }
 
-
+void trans_input( long long* quick_input , int* draft ) {
+  int i , ii ;
+  for( ii = 0 ; ii < 9 ; ii ++ ) {
+    for( i = 8 ; i >= 0 ; i -- ) {
+      draft[ii*9+i] = quick_input[ii]%10 ;
+      quick_input[ii] /= 10 ;
+    }
+  }
+}
 
 
 

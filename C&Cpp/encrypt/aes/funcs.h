@@ -43,4 +43,5 @@ void sub_bytes( unsigned char* state ) ;
 void shift_rows( unsigned char* state ) ;
 void mix_columns( unsigned char* state ) ;
 void generate_keys( unsigned char* passphrase ) ;
+void add_round_key( unsigned char* in , int round ) ;
 #endif

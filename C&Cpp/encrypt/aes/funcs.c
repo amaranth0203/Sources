@@ -24,6 +24,14 @@ void print_4x4_matrix( unsigned char* state ) {
   puts( "'''''''''''" ) ;
 }
 
+void print_16_bytes_a_line( unsigned char* state ) {
+  int i ;
+  for( i = 0 ; i < 16 ; i ++ ) {
+    printf( "%02x " , state[i] ) ;
+  }
+  puts( "" ) ;
+}
+
 void sub_bytes( unsigned char* state ) {
   int i ;
   for( i = 0 ; i < 16 ; i ++ ) {
@@ -98,11 +106,18 @@ void generate_keys( unsigned char* passphrase ) {
     buf += 2 ;
   }
 
+#ifdef _DEBUG_
+  memcpy( keys ,
+          "\x00\x01\x02\x03\x04\x05\x06\x07\x08\x09\x0A\x0B\x0C\x0D\x0E\x0F" ,
+          /* "\x54\x68\x61\x74\x73\x20\x6D\x79\x20\x4B\x75\x6E\x67\x20\x46\x75" , */
+          /* "\x2b\x28\xab\x09\x7e\xae\xf7\xcf\x15\xd2\x15\x4f\x16\xa6\x88\x3c" , */
+          16
+          );
+#endif
+
   /* generate keys for 11 rounds */
-  for( ii = 1 ; ii < 3 ; ii ++ ) {
+  for( ii = 1 ; ii < 11 ; ii ++ ) {
     for( i = 0 ; i < 4 ; i ++ ) {
-      offset_1 = ( i == 0 ? 1 : 0 ) ;
-      offset_2 = ( i == 0 ? 3 : i - 1 ) ;
       if( i == 0 ) {
         keys[ ii*16 + 0*4 + i ] = keys[(ii-1)*16 + 1*4 + 3 ] ;
         keys[ ii*16 + 1*4 + i ] = keys[(ii-1)*16 + 2*4 + 3 ] ;
@@ -127,5 +142,17 @@ void generate_keys( unsigned char* passphrase ) {
       keys[ ii*16 + 2*4 + i ] ^= keys[ (ii-1)*16 + 2*4 + i ] ;
       keys[ ii*16 + 3*4 + i ] ^= keys[ (ii-1)*16 + 3*4 + i ] ;
     }
+  }
+#ifdef _DEBUG_
+  for( ii = 0 ; ii < 11 ; ii ++ ) {
+    print_16_bytes_a_line( keys + ii * 16 ) ;
+  }
+#endif
+}
+
+void add_round_key( unsigned char* in , int round ) {
+  unsigned char ch ;
+  for( ch = 0 ; ch < 16 ; ch ++ ) {
+    in[ch] ^= keys[ch+round*16] ;
   }
 }
