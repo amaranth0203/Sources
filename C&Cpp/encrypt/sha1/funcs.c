@@ -70,8 +70,13 @@ char* get_sha1sum( unsigned char* in_raw ) {
   uint32_t a , b , c , d , e ;
   uint32_t ml , k , f , temp ;
   uint32_t w[80] ;
+  uint32_t h0 = 0x67452301 ;
+  uint32_t h1 = 0xefcdab89 ;
+  uint32_t h2 = 0x98badcfe ;
+  uint32_t h3 = 0x10325476 ;
+  uint32_t h4 = 0xc3d2e1f0 ;
+
   ml = strlen( in_raw ) ;
-  
   block_count = pad_input( in_raw , &in_padded ) ;
 
   int i , ii , g ;

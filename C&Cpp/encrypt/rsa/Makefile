@@ -7,8 +7,5 @@ main:
 	gcc $(CPPFLAGS) -c *.c
 	gcc $(CPPFLAGS) -o a.exe *.o
 
-release:
-	copy a.exe sha1sum.dll $(desktop)
-
 clean:
 	del *.exe *.o

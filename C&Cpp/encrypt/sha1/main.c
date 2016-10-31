@@ -7,6 +7,7 @@
 int main( ) {
 
   printf( "[+] %s\n" , get_sha1sum( "" ) ) ;
+  printf( "[+] %s\n" , get_sha1sum( "" ) ) ;
 
   return 0 ;
   
