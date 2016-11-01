@@ -1,7 +1,7 @@
 NAME = Hello
 OBJS = $(NAME).obj
 
-LINK_FLAG = /subsystem:windows
+LINK_FLAG = /subsystem:windows /align:16 /filealign:16
 ML_FLAG = /c /coff
 
 $(NAME).exe: $(OBJS)
