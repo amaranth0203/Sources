@@ -1378,13 +1378,16 @@ class qyh_adb( qyh_base ) :
         @args : del - dump and delete files in cell phone
         @args : not_dump - not dump 
         @args : backup - save temporary dumping directory
+        @args : peek - only dump the newest jpeg 
+        @args : generate_cmd - only generate command
         @'''
-        self.check_args( args , ( 'meta' , 'snapraw' , 'all' , 'del' , 'not_dump' , 'backup' ) )
+        self.check_args( args , ( 'meta' , 'snapraw' , 'all' , 'del' , 'not_dump' , 'backup' , 'peek' , 'generate_cmd' ) )
 
-        flag_meta , flag_snapraw , flag_all , flag_del , flag_not_dump , flag_backup =\
-            tuple( self.trans_args( args , ( 'meta' , 'snapraw' , 'all' , 'del' , 'not_dump' , 'backup' ) ) )
+        flag_meta , flag_snapraw , flag_all , flag_del , flag_not_dump , flag_backup , flag_peek , flag_generate_cmd =\
+            tuple( self.trans_args( args , ( 'meta' , 'snapraw' , 'all' , 'del' , 'not_dump' , 'backup' , 'peek' , 'generate_cmd' ) ) )
 
-        self.adb_check_device( )
+        if not flag_generate_cmd :
+            self.adb_check_device( )
 
         file = []
 
@@ -1413,6 +1416,7 @@ class qyh_adb( qyh_base ) :
         	
         ### rm files dumped
         if flag_del :
+            if not flag_peek :
         	if flag_meta or flag_all :
         	    cmd += 'rm /data/*snapshot*' + '\n'
         	    cmd += 'rm /data/misc/camera/*.raw' + '\n'
@@ -1424,6 +1428,8 @@ class qyh_adb( qyh_base ) :
         cmd += "exit\n"
         with open( folder_name , "w" ) as f :
             f.write( cmd )
+        if flag_generate_cmd :
+            return True
         self.lexec( 'adb shell < ' + folder_name , False , True )
         print cmd
         os.remove( folder_name )
@@ -1438,11 +1444,13 @@ class qyh_adb( qyh_base ) :
         	    line_split = "\r\n"
         	if _platform == "cygwin" :
         	    line_split = "\r\r\n"
-        	for line in self.lexec( "adb shell ls /sdcard/" + folder_name , False ).split( line_split ) :
+        	for line in self.lexec( "adb shell \"ls /sdcard/" + folder_name + " | tac\"" , False ).split( line_split ) :
         	    if line == "" : continue
         	    cmd = "adb pull /sdcard/" + folder_name + "/" + line + " ."
         	    requests = threadpool.makeRequests( self.lexec , ( cmd , ) )
         	    [ pool.putRequest( req ) for req in requests ]
+                    if flag_peek :
+                        break
         	pool.wait( )
         	
         if not flag_backup :
