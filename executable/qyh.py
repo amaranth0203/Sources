@@ -1444,13 +1444,14 @@ class qyh_adb( qyh_base ) :
         	    line_split = "\r\n"
         	if _platform == "cygwin" :
         	    line_split = "\r\r\n"
-        	for line in self.lexec( "adb shell \"ls /sdcard/" + folder_name + " | tac\"" , False ).split( line_split ) :
+                photos = self.lexec( "adb shell \"ls /sdcard/" + folder_name + "\"" , False ).split( line_split )
+                photos.reverse( )
+        	# for line in self.lexec( "adb shell \"ls /sdcard/" + folder_name , False ).split( line_split ) :
+                for line in photos :
         	    if line == "" : continue
         	    cmd = "adb pull /sdcard/" + folder_name + "/" + line + " ."
         	    requests = threadpool.makeRequests( self.lexec , ( cmd , ) )
         	    [ pool.putRequest( req ) for req in requests ]
-                    if flag_peek :
-                        break
         	pool.wait( )
         	
         if not flag_backup :
