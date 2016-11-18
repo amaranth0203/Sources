@@ -3,6 +3,7 @@
 #include "resource.h"
 
 #define BUF_SIZE (1024*128)
+#define PHOTO_DIR "/sdcard/\xe7\x9b\xb8\xe6\x9c\xba/"
 
 static HWND hwnd_main = NULL ;
 static HWND g_hToolbar = NULL ;
@@ -207,6 +208,23 @@ BOOL CALLBACK ToolDlgProc( HWND hwnd ,
       break ;
     } // end of case IDC_SELECT_LOG
     case IDC_SELECT_DUMP_DIR : {
+      HWND hEdit ;
+      LPITEMIDLIST pidlBrowse ;
+      BROWSEINFO BRinfo ;
+      hEdit = GetDlgItem( hwnd_main , ID_DUMP_DIR ) ;
+      BRinfo.hwndOwner = hwnd ;
+      BRinfo.pidlRoot = NULL ;
+      BRinfo.pszDisplayName = NULL ;
+      BRinfo.lpszTitle = "选择项目根目录" ;
+      BRinfo.ulFlags = BIF_RETURNONLYFSDIRS | BIF_NEWDIALOGSTYLE ;
+      BRinfo.lpfn = NULL ;
+      BRinfo.lParam = NULL ;
+      pidlBrowse = SHBrowseForFolder( &BRinfo ) ;
+      if( pidlBrowse != NULL ) {
+        char szPath[MAX_PATH] ;
+        SHGetPathFromIDList( pidlBrowse , szPath ) ;
+        SetWindowText( hEdit , szPath ) ;
+      }
       break ;
     } // end of case IDC_SELECT_DUMP_DIR :
     case IDC_GENERATE_CMD : {
@@ -427,14 +445,38 @@ BOOL CALLBACK ToolDlgProc( HWND hwnd ,
           CloseHandle( hFile ) ;
         } // end of if( hFile != INVALID_HANDLE_VALUE )
       } // end of if( CHECKED_PL || CHECKED_DL || CHECKED_DS || CHECKED_BK )
-      if( CHECKED_DJ ) {
-      } // end of if( CHECKED_DJ )
-      if( CHECKED_DP ) {
-      } // end of if( CHECKED_DP )
-      if( CHECKED_DR ) {
-      } // end of if( CHECKED_DR )
-      if( CHECKED_DD ) {
-      } // end of if( CHECKED_DD )
+      if( CHECKED_DJ || CHECKED_DP || CHECKED_DR || CHECKED_DD ) {
+        OSVERSIONINFO osv ;
+        char* buf ;
+        STARTUPINFO si ;
+        SECURITY_ATTRIBUTES sa ;
+        SECURITY_DESCRIPTOR sd ;
+        PROCESS_INFORMATION pi ;
+        HANDLE newstdin , newstdout , read_stdout , write_stdin ;
+
+        buf = ( char* )malloc( sizeof( char ) * BUF_SIZE ) ;
+        osv.dwOSVersionInfoSize = sizeof( osv ) ;
+        GetVersionEx( &osv ) ;
+
+        if( osv.dwPlatformId == VER_PLATFORM_WIN32_NT ) {
+          InitializeSecurityDescriptor( &sd , SECURITY_DESCRIPTOR_REVISION ) ;
+          SetSecurityDescriptorDacl( &sd , TRUE , NULL , FALSE ) ;
+          sa.lpSecurityDescriptor = &sd ;
+        } // end of if( osv.dwPlatformId == VER_PLATFORM_WIN32_NT )
+        else sa.lpSecurityDescriptor = NULL ;
+        sa.nLength = sizeof( SECURITY_ATTRIBUTES ) ;
+        sa.bInheritHandle = TRUE ;
+        
+        if( CHECKED_DJ ) {
+        } // end of if( CHECKED_DJ )
+        if( CHECKED_DP ) {
+        } // end of if( CHECKED_DP )
+        if( CHECKED_DR ) {
+        } // end of if( CHECKED_DR )
+        if( CHECKED_DD ) {
+        } // end of if( CHECKED_DD )
+        free( buf ) ;
+      } // end of if( CHECKED_DJ || CHECKED_DP || CHECKED_DR || CHECKED_DD )
       SetWindowText( hCmd , cmd ) ;
       free( cmd ) ;
       break ;
@@ -560,15 +602,15 @@ LRESULT CALLBACK WndProc( HWND hwnd ,
     
     hfDefault = GetStockObject( DEFAULT_GUI_FONT ) ;
     hwnd_pro = CreateWindowEx( WS_EX_CLIENTEDGE ,
-                                "edit" ,
-                                /* "[项目根目录]" , */
-                               "Z:\\proj\\PD1616_slf" ,
-                                WS_CHILD | WS_VISIBLE | WS_TABSTOP | WS_VSCROLL | ES_MULTILINE ,
-                                0 , 0 , 0 , 0 ,
-                                hwnd ,
-                                ( HMENU )( ID_PROJECT_FOLDER ) ,
-                                GetModuleHandle( NULL ) ,
-                                NULL ) ;
+                               "edit" ,
+                               "[项目根目录]" ,
+                               /* "Z:\\proj\\PD1616_slf" , */
+                               WS_CHILD | WS_VISIBLE | WS_TABSTOP | WS_VSCROLL | ES_MULTILINE ,
+                               0 , 0 , 0 , 0 ,
+                               hwnd ,
+                               ( HMENU )( ID_PROJECT_FOLDER ) ,
+                               GetModuleHandle( NULL ) ,
+                               NULL ) ;
     if( hwnd_pro == NULL ) {
       MessageBox( hwnd ,
                   "CreateWindowEx pro" ,
@@ -578,15 +620,15 @@ LRESULT CALLBACK WndProc( HWND hwnd ,
     SendMessage( hwnd_pro , WM_SETFONT , ( WPARAM)hfDefault , MAKELPARAM( FALSE , 0 ) ) ;
 
     hwnd_log = CreateWindowEx( WS_EX_CLIENTEDGE ,
-                                "edit" ,
-                                /* "[编译日志]" , */
-                               "Z:\\proj\\PD1616_slf\\compile_lib.log" ,
-                                WS_CHILD | WS_VISIBLE | WS_TABSTOP | WS_VSCROLL | ES_MULTILINE ,
-                                0 , 0 , 0 , 0 ,
-                                hwnd ,
-                                ( HMENU )( ID_COMPILE_LOG ) ,
-                                GetModuleHandle( NULL ) ,
-                                NULL ) ;
+                               "edit" ,
+                               "[编译日志]" ,
+                               /* "Z:\\proj\\PD1616_slf\\compile_lib.log" , */
+                               WS_CHILD | WS_VISIBLE | WS_TABSTOP | WS_VSCROLL | ES_MULTILINE ,
+                               0 , 0 , 0 , 0 ,
+                               hwnd ,
+                               ( HMENU )( ID_COMPILE_LOG ) ,
+                               GetModuleHandle( NULL ) ,
+                               NULL ) ;
     if( hwnd_log == NULL ) {
       MessageBox( hwnd ,
                   "CreateWindowEx log" ,
@@ -597,8 +639,8 @@ LRESULT CALLBACK WndProc( HWND hwnd ,
 
     hwnd_dump = CreateWindowEx( WS_EX_CLIENTEDGE ,
                                 "edit" ,
-                                /* "[复制/导出目录]" , */
-                                "D:\\Desktop\\dump_dir" ,
+                                "[复制/导出目录]" ,
+                                /* "D:\\Desktop\\dump_dir" , */
                                 WS_CHILD | WS_VISIBLE | WS_TABSTOP | WS_VSCROLL | ES_MULTILINE ,
                                 0 , 0 , 0 , 0 ,
                                 hwnd ,
@@ -614,14 +656,15 @@ LRESULT CALLBACK WndProc( HWND hwnd ,
     SendMessage( hwnd_dump , WM_SETFONT , ( WPARAM)hfDefault , MAKELPARAM( FALSE , 0 ) ) ;
 
     hwnd_cmd = CreateWindowEx( WS_EX_CLIENTEDGE ,
-                                "edit" ,
-                                "[生成的待执行的命令]" ,
-                                WS_CHILD | WS_VISIBLE | WS_TABSTOP | WS_VSCROLL | ES_MULTILINE ,
-                                0 , 0 , 0 , 0 ,
-                                hwnd ,
-                                ( HMENU )( ID_CMD ) ,
-                                GetModuleHandle( NULL ) ,
-                                NULL ) ;
+                               "edit" ,
+                               "[生成的待执行的命令]" ,
+                               /* "adb shell ls "PHOTO_DIR , */
+                               WS_CHILD | WS_VISIBLE | WS_TABSTOP | WS_VSCROLL | ES_MULTILINE ,
+                               0 , 0 , 0 , 0 ,
+                               hwnd ,
+                               ( HMENU )( ID_CMD ) ,
+                               GetModuleHandle( NULL ) ,
+                               NULL ) ;
     if( hwnd_cmd == NULL ) {
       MessageBox( hwnd ,
                   "CreateWindowEx cmd" ,
@@ -701,18 +744,18 @@ LRESULT CALLBACK WndProc( HWND hwnd ,
     } // end of switch( LOWORD( wParam ) )
     break ;
   } // end of case WM_COMMAND :
-  /* case WM_LBUTTONDOWN : { */
-  /*   char szFileName[ MAX_PATH ] ; */
-  /*   HINSTANCE hInstance = GetModuleHandle( NULL ) ; */
-  /*   GetModuleFileName( hInstance , */
-  /*                      szFileName , */
-  /*                      MAX_PATH ) ; */
-  /*   MessageBox( hwnd , */
-  /*               szFileName , */
-  /*               "This program is : " , */
-  /*               MB_OK | MB_ICONEXCLAMATION ) ; */
-  /* } */
-  /*   break ; */
+    /* case WM_LBUTTONDOWN : { */
+    /*   char szFileName[ MAX_PATH ] ; */
+    /*   HINSTANCE hInstance = GetModuleHandle( NULL ) ; */
+    /*   GetModuleFileName( hInstance , */
+    /*                      szFileName , */
+    /*                      MAX_PATH ) ; */
+    /*   MessageBox( hwnd , */
+    /*               szFileName , */
+    /*               "This program is : " , */
+    /*               MB_OK | MB_ICONEXCLAMATION ) ; */
+    /* } */
+    /*   break ; */
   case WM_CLOSE :
     DestroyWindow( hwnd ) ;
     break ;
