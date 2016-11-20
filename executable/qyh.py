@@ -41,9 +41,9 @@ class qyh_base( object ) :
             if identity == 'Shadow' :
                 cmd = ""
                 if flag_32 :
-                    cmd += '"C:\Program Files (x86)\Microsoft Visual Studio 12.0\VC\\vcvarsall.bat"\n'
+                    cmd += '"C:\Program Files (x86)\Microsoft Visual Studio 11.0\VC\\vcvarsall.bat"\n'
                 elif flag_64 :
-                    cmd += '"C:\Program Files (x86)\Microsoft Visual Studio 12.0\VC\\vcvarsall.bat" amd64\n'
+                    cmd += '"C:\Program Files (x86)\Microsoft Visual Studio 11.0\VC\\vcvarsall.bat" amd64\n'
                 if flag_masm :
                     cmd += "set Masm32Dir=C:\Masm32\n"
                     cmd += "set include=%Masm32Dir%\Include;%include%\n"
