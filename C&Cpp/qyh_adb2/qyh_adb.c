@@ -4,6 +4,7 @@
 
 #define BUF_SIZE (1024*128)
 #define PHOTO_DIR "/sdcard/\xe7\x9b\xb8\xe6\x9c\xba/"
+#define THREAD_COUNT (10)
 
 static HWND hwnd_main = NULL ;
 static HWND g_hToolbar = NULL ;
@@ -30,6 +31,30 @@ static HWND hwnd_generate_cmd = NULL ;
 static HWND hwnd_execute_cmd = NULL ;
 
 const char g_szClassName[] = "qyh_adb" ;
+
+void CALLBACK EXECUTE_CMD( PTP_CALLBACK_INSTANCE Instance , PVOID Context, PTP_WORK Work ) {
+  STARTUPINFO si ;
+  PROCESS_INFORMATION pi ;
+  ZeroMemory( &si , sizeof( si ) ) ;
+  si.cb = sizeof( si ) ;
+  ZeroMemory( &pi , sizeof( pi ) ) ;
+
+  CreateProcess( 0 ,
+                 /* "ping baidu.com" , */
+                 Context ,
+                 NULL ,
+                 NULL ,
+                 TRUE ,
+                 0 ,
+                 NULL ,
+                 "C:\\windows\\system32\\" ,
+                 &si ,
+                 &pi ) ;
+  WaitForSingleObject( pi.hProcess , INFINITE ) ;
+  CloseHandle( pi.hThread ) ;
+  CloseHandle( pi.hProcess ) ;
+
+}
 
 void wassup( char* str ) {
   MessageBox( NULL , str , "wassup" , NULL ) ;
@@ -68,7 +93,7 @@ void lexec( char* cmd , char* result ) {
   }
   GetStartupInfo( &si ) ;
   si.dwFlags = STARTF_USESTDHANDLES | STARTF_USESHOWWINDOW ;
-  si.wShowWindow = SW_HIDE ;
+  si.wShowWindow = SW_SHOW ;
   si.hStdOutput = newstdout ;
   si.hStdError = newstdout ;
   si.hStdInput = newstdin ;
@@ -98,7 +123,7 @@ void lexec( char* cmd , char* result ) {
   strcat( cmd_ , "\necho " ) ;
   strcat( cmd_ , end_flag ) ;
   strcat( cmd_ , "\nexit\n" ) ;
-  WriteFile( write_stdin , cmd_ , strlen( cmd_ ) , &bread , NULL ) ;
+  WriteFile( write_stdin , cmd , strlen( cmd ) , &bread , NULL ) ;
   free( cmd_ ) ;
   for( ; ; ) {
     GetExitCodeProcess( pi.hProcess , &exit ) ;
@@ -109,8 +134,8 @@ void lexec( char* cmd , char* result ) {
   if( bread != 0 ) {
     memset( buf , 0 , BUF_SIZE ) ;
     ReadFile( read_stdout , buf , BUF_SIZE , &bread , NULL ) ;
-    strcat( result , strstr( strstr( buf , start_flag ) + strlen( start_flag ) , start_flag ) + strlen( start_flag ) ) ;
-    strstr( result , end_flag )[-5] = '\0' ;
+    /* strcat( result , strstr( strstr( buf , start_flag ) + strlen( start_flag ) , start_flag ) + strlen( start_flag ) ) ; */
+    /* strstr( result , end_flag )[-5] = '\0' ; */
   } // end of if( bread != 0 )
   free( buf ) ;
   CloseHandle( pi.hThread ) ;
@@ -582,7 +607,8 @@ LRESULT CALLBACK WndProc( HWND hwnd ,
                                "edit" ,
                                /* "[项目根目录]" , */
                                /* "Z:\\proj\\PD1616_slf" , */
-                               "adb shell ls"PHOTO_DIR ,
+                               "Z:\\proj\\PD1619A" ,
+                               /* "adb shell \"ls "PHOTO_DIR" | head -n 147\"" , */
                                WS_CHILD | WS_VISIBLE | WS_TABSTOP | WS_VSCROLL | ES_MULTILINE ,
                                0 , 0 , 0 , 0 ,
                                hwnd ,
@@ -599,7 +625,8 @@ LRESULT CALLBACK WndProc( HWND hwnd ,
 
     hwnd_log = CreateWindowEx( WS_EX_CLIENTEDGE ,
                                "edit" ,
-                               "[编译日志]" ,
+                               /* "[编译日志]" , */
+                               "Z:\\proj\\PD1619A\\compile_lib.log" ,
                                /* "Z:\\proj\\PD1616_slf\\compile_lib.log" , */
                                WS_CHILD | WS_VISIBLE | WS_TABSTOP | WS_VSCROLL | ES_MULTILINE ,
                                0 , 0 , 0 , 0 ,
@@ -633,11 +660,12 @@ LRESULT CALLBACK WndProc( HWND hwnd ,
     } // end of if( hwnd_dump == NULL )
     SendMessage( hwnd_dump , WM_SETFONT , ( WPARAM)hfDefault , MAKELPARAM( FALSE , 0 ) ) ;
 
+    LoadLibrary( "Msftedit.dll" ) ;
     hwnd_cmd = CreateWindowEx( WS_EX_CLIENTEDGE ,
-                               "edit" ,
+                               "RICHEDIT50W" ,
                                "[生成的待执行的命令]" ,
                                /* "adb shell ls "PHOTO_DIR , */
-                               WS_CHILD | WS_VISIBLE | WS_TABSTOP | WS_VSCROLL | ES_MULTILINE ,
+                               WS_CHILD | WS_VISIBLE | WS_TABSTOP | WS_VSCROLL | ES_MULTILINE | ES_NOHIDESEL ,
                                0 , 0 , 0 , 0 ,
                                hwnd ,
                                ( HMENU )( ID_CMD ) ,
@@ -650,6 +678,8 @@ LRESULT CALLBACK WndProc( HWND hwnd ,
                   MB_OK | MB_ICONERROR ) ;
     } // end of if( hwnd_cmd == NULL )
     SendMessage( hwnd_cmd , WM_SETFONT , ( WPARAM)hfDefault , MAKELPARAM( FALSE , 0 ) ) ;
+    /* SendMessage( hwnd_cmd , EM_SETLIMITTEXT , 99999999 , 0 ) ; */
+    SendMessage( hwnd_cmd , EM_SETLIMITTEXT , 64 * BUF_SIZE , 0 ) ;
     
     hwnd_group_config = CreateWindowEx( NULL ,
                                         "button" ,
@@ -1145,8 +1175,8 @@ LRESULT CALLBACK WndProc( HWND hwnd ,
       char logFileName[MAX_PATH] ;
       char dumpDir[MAX_PATH] ;
       char* cmd ;
-      cmd = ( char* )malloc( sizeof( char ) * BUF_SIZE ) ;
-      memset( cmd , 0 , BUF_SIZE ) ;
+      cmd = GlobalAlloc( GPTR , BUF_SIZE * 64 ) ;
+      ZeroMemory( cmd , BUF_SIZE * 64 ) ;
       
       hPro = GetDlgItem( hwnd_main , ID_PROJECT_FOLDER ) ;
       hLog = GetDlgItem( hwnd_main , ID_COMPILE_LOG ) ;
@@ -1354,12 +1384,14 @@ LRESULT CALLBACK WndProc( HWND hwnd ,
         } // end of if( hFile != INVALID_HANDLE_VALUE )
       } // end of if( CHECKED_PL || CHECKED_DL || CHECKED_DS || CHECKED_BK )
       if( CHECKED_DJ || CHECKED_DP || CHECKED_DR || CHECKED_DD ) {
-        char* result ;
-        result = ( char* )malloc( sizeof( char ) * BUF_SIZE ) ;
-        memset( result , 0 , BUF_SIZE ) ;
-        lexec( "adb shell \"ls "PHOTO_DIR" | head -n500 \"" , result ) ;
+        char result[10240] ;
+        /* result = ( char* )malloc( sizeof( char ) * BUF_SIZE ) ; */
+        /* memset( result , 0 , BUF_SIZE ) ; */
+        memset( result , 0 , 10240 ) ;
+        GetWindowText( GetDlgItem( hwnd_main , ID_CMD ) , cmd , BUF_SIZE ) ;
+//        lexec( cmd , result ) ;
         SetWindowText( hCmd , result ) ;
-        free( result ) ;
+        /* free( result ) ; */
         if( CHECKED_DJ ) {
         } // end of if( CHECKED_DJ )
         if( CHECKED_DP ) {
@@ -1369,8 +1401,9 @@ LRESULT CALLBACK WndProc( HWND hwnd ,
         if( CHECKED_DD ) {
         } // end of if( CHECKED_DD )
       } // end of if( CHECKED_DJ || CHECKED_DP || CHECKED_DR || CHECKED_DD )
-//      SetWindowText( hCmd , cmd ) ;
-      free( cmd ) ;
+      SetWindowText( hCmd , cmd ) ;
+      GlobalFree( cmd ) ;
+//      free( cmd ) ;
       break ;
     } // end of case ID_GENERATE_CMD
     case ID_EXECUTE_CMD : {
@@ -1378,48 +1411,49 @@ LRESULT CALLBACK WndProc( HWND hwnd ,
       char* cmd ;
       char* cmd_buf ;
       char* pch = NULL ;
-      STARTUPINFO si ;
-      PROCESS_INFORMATION pi ;
+      int i , ii ;
+      PTP_WORK pw[THREAD_COUNT] ;
+      TP_CALLBACK_ENVIRON cbe ;
+      PTP_POOL pool ;
+      pool = CreateThreadpool( NULL ) ;
+      if( NULL == pool ) {
+        wassup( "CreateThreadpool" ) ;
+      } // end of if( NULL == pool )
+      SetThreadpoolThreadMaximum( pool , THREAD_COUNT ) ;
+      InitializeThreadpoolEnvironment( &cbe ) ;
+      SetThreadpoolCallbackPool( &cbe , pool ) ;
 
-      cmd = ( char* )malloc( sizeof( char ) * BUF_SIZE ) ;
-      cmd_buf = ( char* )malloc( sizeof( char ) * BUF_SIZE ) ;
-      memset( cmd , 0 , BUF_SIZE ) ;
-      memset( cmd_buf , 0 , BUF_SIZE ) ;
+
+      cmd = GlobalAlloc( GPTR , BUF_SIZE * 65 ) ;
+      cmd_buf = GlobalAlloc( GPTR , BUF_SIZE * 64 ) ;
+      ZeroMemory( cmd , BUF_SIZE * 65 ) ;
+      ZeroMemory( cmd_buf , BUF_SIZE * 64 ) ;
 
       hCmd = GetDlgItem( hwnd_main , ID_CMD ) ;
-      GetWindowText( hCmd , cmd_buf , 1024*128 ) ;
-      ZeroMemory( &si , sizeof( si ) ) ;
-      si.cb = sizeof( si ) ;
-      ZeroMemory( &pi , sizeof( pi ) ) ;
+      GetWindowText( hCmd , cmd_buf , BUF_SIZE ) ;
 
-      strcat( cmd , "cmd /c @echo off & " ) ;
       pch = strtok( cmd_buf , "\r\n" ) ;
+      ii = 0 ;
       while( pch != NULL ) {
-        strcat( cmd , "echo " ) ;
-        strcat( cmd , pch ) ;
-        strcat( cmd , " & " ) ;
-        strcat( cmd , pch ) ;
-        strcat( cmd , " & " ) ;
+        /* strcat( cmd , "start /wait " ) ; */
+        /* strcat( cmd , pch ) ; */
+        pw[ii%THREAD_COUNT] = CreateThreadpoolWork( EXECUTE_CMD , pch , &cbe ) ;
+        SubmitThreadpoolWork( pw[ii%THREAD_COUNT] ) ;
+        if( ii && ii%THREAD_COUNT == 0 ) {
+          for( i = 0 ; i < THREAD_COUNT ; i ++ ) {
+            WaitForThreadpoolWorkCallbacks( pw[i] , FALSE ) ;
+          }
+        }
         pch = strtok( NULL , "\r\n" ) ;
+        ii ++ ;
       }
-      strcat( cmd , " echo DONE & " ) ;
-      strcat( cmd , " pause>nul" ) ;
-      CreateProcess( 0 ,
-                     cmd ,
-                     NULL ,
-                     NULL ,
-                     TRUE ,
-                     0 ,
-                     NULL ,
-                     "C:\\windows\\system32\\" ,
-                     &si ,
-                     &pi ) ;
-      WaitForSingleObject( pi.hProcess , INFINITE ) ;
-      CloseHandle( pi.hThread ) ;
-      CloseHandle( pi.hProcess ) ;
+      for( i = 0 ; i < THREAD_COUNT ; i ++ ) {
+        CloseThreadpoolWork( pw[i] ) ;
+      }
+
       /* MessageBox( hwnd , cmd , "CMD" , MB_OK ) ; */
-      free( cmd ) ;
-      free( cmd_buf ) ;
+      GlobalFree( cmd ) ;
+      GlobalFree( cmd_buf ) ;
       break ;
     } // end of case ID_EXECUTE_CMD
     case ID_FILE_EXIT :
