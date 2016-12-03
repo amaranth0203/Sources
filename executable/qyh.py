@@ -598,7 +598,7 @@ class qyh_base( object ) :
     def error_exit( self , str = "" ) :
         import sys
         self.print_red( '[-] ' + sys._getframe().f_back.f_code.co_name + '() exit : ' + str + '\n' )
-        exit( )
+        exit( -1 )
 
     def check_args( self , *args ) :
         import sys
