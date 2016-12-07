@@ -8,7 +8,7 @@ def send_request( ) :
     port = 80
     sock = socket.socket( )
     sock.connect( ( host , port ) )
-    content = "GET /echofocus HTTP/1.0\r\n\r\n" 
+    content = "GET /echofocus HTTP/1.1\r\nHost: my.csdn.net\r\n\r\n" 
     sock.send( content )
     response = sock.recv( 1 ) 
     while response != "" :
