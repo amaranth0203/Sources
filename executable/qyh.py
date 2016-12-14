@@ -923,8 +923,6 @@ class qyh_adb( qyh_base ) :
     #   
     #   log_filename    :   log文件名
     #   keyword         :   记录的关键字
-    #   k_index_start   :   keyword在每一行出现的起始位置
-    #   k_index_end     :   keyword在每一行出现的结束位置
     #
     #   log有效返回True
     #   log无效返回False
@@ -932,7 +930,8 @@ class qyh_adb( qyh_base ) :
         try :
             with open( log_filename , 'r' ) as f :
                 for line in f.readlines( ) :
-                    if line[k_index_start:k_index_end] == keyword :
+                    # if line[k_index_start:k_index_end] == keyword :
+                    if keyword in line :
                         self.print_green_light( "[+] log available\n" )
                         return True ;
             self.error_exit( "[-] log not available ><\n" )
@@ -945,14 +944,19 @@ class qyh_adb( qyh_base ) :
     #   
     #   log_filename    :   log文件名
     #   keyword         :   记录的关键字
-    #   k_index_start   :   keyword在每一行出现的起始位置
-    #   k_index_end     :   keyword在每一行出现的结束位置
     #
     #   返回值log_list中为log文件里keyword位置正确的每一行
     #
-        log_list = []
+        log_list_ = []
         with open( log_filename , 'r' ) as f :
-            log_list = [ line for line in f.readlines( ) if line[k_index_start:k_index_end] == keyword ]
+            # log_list = [ line for line in f.readlines( ) if line[k_index_start:k_index_end] == keyword ]
+            log_list_ = [ line for line in f.readlines( ) if keyword in line ]
+        log_list = []
+        # 去掉颜色 2016.12.13
+        import re
+        for log in log_list_ :
+            log = re.sub( '\x1B\[([0-9]{1,2}(;[0-9]{1,2})?)?[mGK]' , '' ,log )
+            log_list.append( log.strip() )
         return log_list
 
     def adb_kill_process( self , *args ) :
@@ -1360,11 +1364,11 @@ class qyh_adb( qyh_base ) :
         self.print_none_color( '\n'.join( str( f ) for f in self.read_config( "metadata" , "command" ).split( "\"" ) ) + '\n' )
         return True
 
-    def awb_log( self , ) :
+    def aaa_log( self , ) :
         '''@
         [+] callable
         @'''
-        self.print_none_color( '\n'.join( str( f ) for f in self.read_config( "awb_log" , "command" ).split( "\"" ) ) + '\n' )
+        self.print_none_color( '\n'.join( str( f ) for f in self.read_config( "aaa_log" , "command" ).split( "\"" ) ) + '\n' )
         return True
 
     def adb_dump_jpeg( self , *args ) :
