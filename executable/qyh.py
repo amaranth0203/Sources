@@ -1364,11 +1364,11 @@ class qyh_adb( qyh_base ) :
         self.print_none_color( '\n'.join( str( f ) for f in self.read_config( "metadata" , "command" ).split( "\"" ) ) + '\n' )
         return True
 
-    def aaa_log( self , ) :
+    def log_prop( self , ) :
         '''@
         [+] callable
         @'''
-        self.print_none_color( '\n'.join( str( f ) for f in self.read_config( "aaa_log" , "command" ).split( "\"" ) ) + '\n' )
+        self.print_none_color( '\n'.join( str( f ) for f in self.read_config( "log_prop" , "command" ).split( "\"" ) ) + '\n' )
         return True
 
     def adb_dump_jpeg( self , *args ) :
