@@ -1,5 +1,8 @@
 #!/usr/bin/env python 
 #-*- coding=utf-8 -*-
+__author__ = "qiyunhu"
+__status__ = "test"
+__version__ = "1.0.0"
 
 class qyh_base( object ) :
 
