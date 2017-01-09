@@ -1,0 +1,8 @@
+StartSign
+GetCurrentTeb
+GetCurrentPeb
+GetKernel32Base
+HashKey
+GetProcAddrByHash
+ShellCode
+EndSign

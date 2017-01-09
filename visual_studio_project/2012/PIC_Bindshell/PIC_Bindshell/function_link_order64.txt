@@ -1,0 +1,4 @@
+Begin
+GetProcAddressWithHash
+ExecutePayload
+wrapper_jmp_end_of_file
