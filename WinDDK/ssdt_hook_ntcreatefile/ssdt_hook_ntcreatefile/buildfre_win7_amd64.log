@@ -1,0 +1,6 @@
+BUILD: Computing Include file dependencies:
+BUILD: Examining f:\programming\code\poc\success\driver\64\ssdt_hook_ntcreatefile directory for files to compile.
+oacr invalidate root:amd64fre /autocleanqueue
+1>Compiling and Linking f:\programming\code\poc\success\driver\64\ssdt_hook_ntcreatefile *************
+1>'nmake.exe /nologo BUILDMSG=Stop. -i BUILD_PASS=PASS2 LINKONLY=1 NOPASS0=1 MAKEDIR_RELATIVE_TO_BASEDIR='
+1>f:\programming\code\poc\success\driver\64\ssdt_hook_ntcreatefile: TARGETPATH is obj
