@@ -1,0 +1,4 @@
+TARGETNAME=2_4_String_Operation
+TARGETTYPE=DRIVER
+TARGETPATH=obj
+SOURCES = main.c
