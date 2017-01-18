@@ -13,3 +13,4 @@ VOID DriverUnload( PDRIVER_OBJECT pDriverObj ) ;
 NTSTATUS DispatchCreate( PDEVICE_OBJECT pDevObj , PIRP pIrp ) ;
 NTSTATUS DispatchClose( PDEVICE_OBJECT pDevObj , PIRP pIrp ) ;
 NTSTATUS DispatchIoctl( PDEVICE_OBJECT pDevObj , PIRP pIrp ) ;
+ULONG SearchDirectory( LPSTR lpPath ) ;

@@ -60,9 +60,8 @@ oacr invalidate root:amd64fre /autocleanqueue
 1> /wd4603
 1> /wd4627
 1> /FIC:\WinDDK\7600.16385.1\inc\api\warning.h
-1> .\funcs.c .\main.c 
+1> .\funcs.c 
 1>funcs.c
-1>main.c
 1> C:\WinDDK\7600.16385.1\Bin\amd64\oacr\oacrlink /out:e:\sources\winddk\practice\[2-5]fileoperationtest\objfre_win7_amd64\amd64\_driver_name_.sys /machine:amd64 @e:\sources\winddk\practice\[2-5]fileoperationtest\objfre_win7_amd64\amd64\lnk.rsp
 1>Microsoft (R) Incremental Linker Version 9.00.30729.207
 1>Copyright (C) Microsoft Corporation.  All rights reserved.

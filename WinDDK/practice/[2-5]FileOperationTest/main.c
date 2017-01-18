@@ -25,6 +25,7 @@ NTSTATUS DriverEntry( PDRIVER_OBJECT pDriverObj , PUNICODE_STRING pRegistryStrin
     IoDeleteDevice( pDevObj ) ;
     return status ;
   }
+  DbgPrint( "Count=%ld\n" , SearchDirectory( "C:\\windows" ) ) ;
   DbgPrint( "[KrnlHW64]DriverEntry\n" ) ;
   return STATUS_SUCCESS ;
 }
