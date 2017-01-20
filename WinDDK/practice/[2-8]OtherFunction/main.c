@@ -25,5 +25,10 @@ NTSTATUS DriverEntry( PDRIVER_OBJECT pDriverObj , PUNICODE_STRING pRegistryStrin
     return status ;
   }
   DbgPrint( "[KrnlHW64]DriverEntry\n" ) ;
+
+  /* EnumDriver( pDriverObj ) ; */
+  MyGetCurrentTime( ) ;
+  CreateThreadTest( ) ;
+
   return STATUS_SUCCESS ;
 }

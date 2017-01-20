@@ -1,0 +1,8 @@
+TARGETNAME=_driver_name_
+TARGETTYPE=DRIVER
+TARGETPATH=obj
+
+INCLUDES=.\
+
+SOURCES	=	funcs.c	\
+            main.c

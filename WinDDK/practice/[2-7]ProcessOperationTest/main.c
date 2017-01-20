@@ -1,5 +1,6 @@
 #include <ntddk.h>
 #include <windef.h>
+#include <stdlib.h>
 
 #include "funcs.h"
 
@@ -25,5 +26,6 @@ NTSTATUS DriverEntry( PDRIVER_OBJECT pDriverObj , PUNICODE_STRING pRegistryStrin
     return status ;
   }
   DbgPrint( "[KrnlHW64]DriverEntry\n" ) ;
+  EnumProcess( ) ;
   return STATUS_SUCCESS ;
 }

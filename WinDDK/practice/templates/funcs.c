@@ -1,6 +1,5 @@
 #include <ntddk.h>
 #include <windef.h>
-#include <stdlib.h>
 
 #include "funcs.h"
 
