@@ -1,0 +1,5 @@
+ExecutePayload
+InitialFuncs
+Daemon
+GetProcAddressWithHash
+end_of_file

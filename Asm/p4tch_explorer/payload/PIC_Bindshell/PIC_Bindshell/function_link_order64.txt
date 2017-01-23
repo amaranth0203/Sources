@@ -1,0 +1,6 @@
+Begin
+GetProcAddressWithHash
+ExecutePayload
+InitialFuncs
+Daemon
+wrapper_jmp_end_of_file
