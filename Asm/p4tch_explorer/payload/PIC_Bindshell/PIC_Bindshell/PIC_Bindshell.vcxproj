@@ -495,7 +495,7 @@ powershell.exe -NoProfile -ExecutionPolicy Bypass -File $(SolutionDir)lib\PowerS
       </Profile>
       <RegisterOutput>
       </RegisterOutput>
-      <AdditionalDependencies>$(IntDir)\AdjustStack.obj;$(IntDir)\jmp_EOF.obj</AdditionalDependencies>
+      <AdditionalDependencies>$(IntDir)\AdjustStack.obj;$(IntDir)\toolkit.obj</AdditionalDependencies>
       <AllowIsolation>
       </AllowIsolation>
       <EnableUAC>
@@ -528,7 +528,8 @@ powershell.exe -NoProfile -ExecutionPolicy Bypass -File $(SolutionDir)lib\PowerS
     </Manifest>
     <PreBuildEvent>
       <Command>ml64 /nologo /c /Cx /Fo $(ProjectDir)$(IntDir)AdjustStack.obj $(ProjectDir)AdjustStack.asm
-ml64 /nologo /c /Cx /Fo $(ProjectDir)$(IntDir)jmp_EOF.obj $(ProjectDir)jmp_EOF.asm</Command>
+
+ml64 /nologo /c /Cx /Fo $(ProjectDir)$(IntDir)toolkit.obj $(ProjectDir)toolkit.asm</Command>
     </PreBuildEvent>
     <PreBuildEvent>
       <Message>Build AdjustStack.asm</Message>
@@ -549,7 +550,7 @@ powershell.exe -NoProfile -ExecutionPolicy Bypass -File $(SolutionDir)lib\PowerS
   </ItemGroup>
   <ItemGroup>
     <None Include="AdjustStack.asm" />
-    <None Include="jmp_EOF.asm">
+    <None Include="toolkit.asm">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
       </ExcludedFromBuild>
       <Command Condition="'$(Configuration)|$(Platform)'=='Release|x64'">ml64 /c %(fileName).asm</Command>
