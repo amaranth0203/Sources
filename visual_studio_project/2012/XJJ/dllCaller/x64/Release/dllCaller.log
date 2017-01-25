@@ -1,23 +1,8 @@
-﻿生成启动时间为 2017/1/24 14:36:50。
-     1>项目“E:\Sources\visual_studio_project\2012\XJJ\dllCaller\dllCaller.vcxproj”在节点 3 上(Rebuild 个目标)。
-     1>InitializeBuildStatus:
-         正在创建“x64\Release\dllCaller.unsuccessfulbuild”，因为已指定“AlwaysCreate”。
-       ClCompile:
-         D:\Program Files (x86)\Microsoft Visual Studio 11.0\VC\bin\x86_amd64\CL.exe /c /Zi /nologo /W3 /WX- /O2 /Oi /GL /D WIN32 /D NDEBUG /D _CONSOLE /D _UNICODE /D UNICODE /Gm- /EHsc /MD /GS /Gy /fp:precise /Zc:wchar_t /Zc:forScope /Fo"x64\Release\\" /Fd"x64\Release\vc110.pdb" /Gd /TC /errorReport:prompt funcs.c main.c
-         funcs.c
-         main.c
-     1>main.c(8): warning C4013: “getch”未定义；假设外部返回 int
-       Link:
-         D:\Program Files (x86)\Microsoft Visual Studio 11.0\VC\bin\x86_amd64\link.exe /ERRORREPORT:PROMPT /OUT:"E:\Sources\visual_studio_project\2012\XJJ\x64\Release\dllCaller.exe" /INCREMENTAL:NO /NOLOGO kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib odbc32.lib odbccp32.lib /MANIFEST /MANIFESTUAC:"level='asInvoker' uiAccess='false'" /manifest:embed /DEBUG /PDB:"E:\Sources\visual_studio_project\2012\XJJ\x64\Release\dllCaller.pdb" /SUBSYSTEM:CONSOLE /OPT:REF /OPT:ICF /LTCG /TLBID:1 /DYNAMICBASE /NXCOMPAT /IMPLIB:"E:\Sources\visual_studio_project\2012\XJJ\x64\Release\dllCaller.lib" /MACHINE:X64 x64\Release\funcs.obj
-         x64\Release\main.obj
-         正在生成代码
-         已完成代码的生成
-         dllCaller.vcxproj -> E:\Sources\visual_studio_project\2012\XJJ\x64\Release\dllCaller.exe
-       FinalizeBuildStatus:
-         正在删除文件“x64\Release\dllCaller.unsuccessfulbuild”。
-         正在对“x64\Release\dllCaller.lastbuildstate”执行 Touch 任务。
-     1>已完成生成项目“E:\Sources\visual_studio_project\2012\XJJ\dllCaller\dllCaller.vcxproj”(Rebuild 个目标)的操作。
+﻿生成启动时间为 2017/1/25 18:43:44。
+     1>项目“E:\Sources\visual_studio_project\2012\XJJ\dllCaller\dllCaller.vcxproj”在节点 2 上(Clean 个目标)。
+     1>C:\Program Files (x86)\MSBuild\Microsoft.Cpp\v4.0\V110\Microsoft.CppClean.targets(75,5): warning : 对路径“E:\Sources\visual_studio_project\2012\XJJ\x64\Release\dllCaller.exe”的访问被拒绝。
+     1>已完成生成项目“E:\Sources\visual_studio_project\2012\XJJ\dllCaller\dllCaller.vcxproj”(Clean 个目标)的操作。
 
 生成成功。
 
-已用时间 00:00:00.95
+已用时间 00:00:00.00

@@ -18,6 +18,9 @@
     <ClInclude Include="funcs.h">
       <Filter>头文件</Filter>
     </ClInclude>
+    <ClInclude Include="VMProtectSDK.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="funcs.c">

