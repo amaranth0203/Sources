@@ -1,0 +1,7 @@
+1>warnings in directory e:\sources\winddk\practice\create_file
+1>e:\sources\winddk\practice\create_file\funcs.c(80) : warning C4995: 'wcscpy': name was marked as #pragma deprecated
+1>e:\sources\winddk\practice\create_file\funcs.c(434) : warning C4133: 'function' : incompatible types - from 'int *' to 'PUNICODE_STRING'
+1>e:\sources\winddk\practice\create_file\funcs.c(435) : warning C4133: 'function' : incompatible types - from 'int *' to 'PUNICODE_STRING'
+1>e:\sources\winddk\practice\create_file\funcs.c(435) : warning C4047: '=' : 'int' differs in levels of indirection from 'PVOID'
+1>e:\sources\winddk\practice\create_file\funcs.c(436) : warning C4022: 'BBGetModuleExport' : pointer mismatch for actual parameter 1
+1>e:\sources\winddk\practice\create_file\funcs.c(437) : warning C4022: 'BBGetModuleExport' : pointer mismatch for actual parameter 1

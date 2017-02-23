@@ -4,6 +4,7 @@
 /* #define PRINTF( ... ) printf( __VA_ARGS__ ) */
 #define bool BOOLEAN
 
+#pragma comment( lib , "User32.lib" )
 #pragma comment( lib , "Ws2_32.lib" )
 
 int wmain(int argc, wchar_t* argv[]) {
