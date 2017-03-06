@@ -959,6 +959,8 @@ class qyh_adb( qyh_base ) :
         import re
         for log in log_list_ :
             log = re.sub( '\x1B\[([0-9]{1,2}(;[0-9]{1,2})?)?[mGK]' , '' ,log )
+            if "mkdir -p" in log : # 去掉 android 7.1 的进度提示
+                continue
             log_list.append( log.strip() )
         return log_list
 
@@ -1013,10 +1015,11 @@ class qyh_adb( qyh_base ) :
 
         if flag_backup :
             folder_name_backup = "backup_lib_" + str( datetime.datetime.now() ).split('.')[0].replace( '-' , '' ).replace( ':' , '' ).replace( ' ' , '_' )
-            try :
-                os.stat( folder_name_backup )
-            except :
-                os.makedirs( folder_name_backup )
+            if not flag_fake :
+                try :
+                    os.stat( folder_name_backup )
+                except :
+                    os.makedirs( folder_name_backup )
 
         logs = self.adb_read_log( log_filename , "Install:" , 0 , 8 )
 
@@ -1026,22 +1029,27 @@ class qyh_adb( qyh_base ) :
         if flag_backup :
             for index , log in enumerate( logs ) :
                 dir = folder_name_backup + log[log.find("/system"):log.rfind("/")].strip()
-                try :
-                    os.stat( dir )
-                except :
-                    os.makedirs( dir )
+                if not flag_fake :
+                    try :
+                        os.stat( dir )
+                    except :
+                        os.makedirs( dir )
                 cmd_pull = 'adb pull '
                 cmd_pull += log[log.find("/system"):].strip() + ' '
                 cmd_pull += dir
-                if not flag_multi_thread :
-                    self.print_none_color( "[+] backup " )
-                    self.print_white( "{:0>4}/{:0>4}".format( str( index + 1 ) , str( len( logs ) ) ) )
-                    self.print_none_color( " file(s) :\n" ) ;
-                    self.lexec_( cmd_pull )
+                cmd_pull += log[log.rfind('/'):].strip()
+                if flag_fake :
+                    self.print_yellow( cmd_pull + "\n" )
                 else :
-                    requests = threadpool.makeRequests( self.lexec , ( cmd_pull , ) )
-                    [ pool.putRequest( req ) for req in requests ]
-        if flag_multi_thread : pool.wait( )
+                    if not flag_multi_thread :
+                        self.print_none_color( "[+] backup " )
+                        self.print_white( "{:0>4}/{:0>4}".format( str( index + 1 ) , str( len( logs ) ) ) )
+                        self.print_none_color( " file(s) :\n" ) ;
+                        self.lexec_( cmd_pull )
+                    else :
+                        requests = threadpool.makeRequests( self.lexec , ( cmd_pull , ) )
+                        [ pool.putRequest( req ) for req in requests ]
+            if flag_multi_thread : pool.wait( )
 
 
         for index , log in enumerate( logs ) :
@@ -1382,85 +1390,94 @@ class qyh_adb( qyh_base ) :
         @args : all - dump VivoCamera's jpeg & snapdragonCamera's raw & metadata
         @args : meta - dump VivoCamera's jpeg & metadata
         @args : snapraw - dump VivoCamera's jpeg & snapdragonCamera's raw
-        @args : del - dump and delete files in cell phone
         @args : not_dump - not dump 
         @args : backup - save temporary dumping directory
         @args : peek - only dump the newest jpeg 
-        @args : generate_cmd - only generate command
         @'''
-        self.check_args( args , ( 'meta' , 'snapraw' , 'all' , 'del' , 'not_dump' , 'backup' , 'peek' , 'generate_cmd' ) )
+        '''
+        执行流程 :
+        先 ls jpeg_folder_path 查看可以 dump 的 jpeg 名字 -- peek
+        之后将要 dump 的文件移动制到临时文件中（文件夹名字依赖时间来命名）
+        最后从临时文件夹中 pull 出来 -- not_dump 则不 pull
+        再删除临时文件夹 -- backup 则不删临时文件夹
 
-        flag_meta , flag_snapraw , flag_all , flag_del , flag_not_dump , flag_backup , flag_peek , flag_generate_cmd =\
-            tuple( self.trans_args( args , ( 'meta' , 'snapraw' , 'all' , 'del' , 'not_dump' , 'backup' , 'peek' , 'generate_cmd' ) ) )
+        peek 对 meta/snapraw/all 无效
+        not_dump 和 backup 一起使用可以备份当前状态的照片到临时文件夹中
+        '''
 
-        if not flag_generate_cmd :
-            self.adb_check_device( )
+        # 检测
+        self.check_args( args , ( 'meta' , 'snapraw' , 'all' , 'not_dump' , 'backup' , 'peek' ) )
+        flag_meta , flag_snapraw , flag_all , flag_not_dump , flag_backup , flag_peek =\
+            tuple( self.trans_args( args , ( 'meta' , 'snapraw' , 'all' , 'not_dump' , 'backup' , 'peek' ) ) )
+        self.adb_check_device( )
 
+        # 全局变量
         file = []
-
+        jpeg_folder_path = "/sdcard/" + u'\u76f8\u673a'.encode( 'utf-8' ) + "/*.jpg"
         import datetime , os
-        fdst = os.getcwd( ).replace( '\\' , '/' ) + '/'
         folder_name = "dump_qyh_" + str( datetime.datetime.now() ).split('.')[0].replace( '-' , '' ).replace( ':' , '' ).replace( ' ' , '_' )
+
+        # 生成要 dump 的 jpeg 名
+        cmd = "ls " + jpeg_folder_path + '\r\n'
+        cmd += "exit" + '\r\n'
+        with open( folder_name , "w" ) as f :
+            f.write( cmd )
+        photos = self.lexec( 'adb shell < ' + folder_name , False , True )
+        os.remove( folder_name )
+        photos = [ photo.strip( ) for photo in photos.split( '\r\n' ) if photo != '' ] # ls 的结果按行分
+        photos = [ photo for photo in photos if photo[:14] == jpeg_folder_path[:14] and 'No such file' not in photo ] # 只要 jpeg 的部分
+        photos = [ p for photo in photos for p in photo.split( ) ] # PD1635 ls 的结果有多个 jpeg 在同一行
+        photos.sort( )
+        photos.reverse( )
+        if flag_peek :
+            photos = photos[:1]
+        # 拼接要 dump 的文件成为 adb 使用的命令
+        fdst = os.getcwd( ).replace( '\\' , '/' ) + '/'
         fdst += folder_name
         fdst += '/'
         cmd = ""
         cmd += 'mkdir /sdcard/' + folder_name + '\n'
-
         if not flag_not_dump :
-        	### dump metadata
-        	if flag_meta or flag_all :
-        	    cmd += 'cp /data/*snapshot* /sdcard/' + folder_name + '\n'
-        	    cmd += 'cp /data/misc/camera/*.raw /sdcard/' + folder_name + '\n'
-        	    cmd += 'cp /data/misc/camera/*.yuv /sdcard/' + folder_name + '\n'
-        	    cmd += 'cp /data/misc/camera/*.bin /sdcard/' + folder_name + '\n'
-        	
-        	### dump raw from Snapdragon Camera
-        	if flag_snapraw or flag_all :
-        	    cmd += 'cp /sdcard/DCIM/camera/raw/*.raw /sdcard/' + folder_name + '\n'
-        	
-        	### dump photo from VivoCamera
-        	cmd += 'cp /sdcard/' + u'\u76f8\u673a'.encode( 'utf-8' ) + '/*.jpg /sdcard/' + folder_name + '\n'
-        	
-        ### rm files dumped
-        if flag_del :
-            if not flag_peek :
-        	if flag_meta or flag_all :
-        	    cmd += 'rm /data/*snapshot*' + '\n'
-        	    cmd += 'rm /data/misc/camera/*.raw' + '\n'
-        	    cmd += 'rm /data/misc/camera/*.yuv' + '\n'
-        	    cmd += 'rm /data/misc/camera/*.bin' + '\n'
-        	if flag_snapraw or flag_all :
-        	    cmd += 'rm /sdcard/DCIM/camera/raw/*.raw' + '\n'
-        	cmd += 'rm /sdcard/' + u'\u76f8\u673a'.encode( 'utf-8' ) + '/*.jpg' + '\n'
+            ### dump metadata
+            if flag_meta or flag_all :
+        	cmd += 'mv /data/*snapshot* /sdcard/' + folder_name + '\n'
+        	cmd += 'mv /data/misc/camera/*.raw /sdcard/' + folder_name + '\n'
+        	cmd += 'mv /data/misc/camera/*.yuv /sdcard/' + folder_name + '\n'
+        	cmd += 'mv /data/misc/camera/*.bin /sdcard/' + folder_name + '\n'
+            ### dump raw from Snapdragon Camera
+            if flag_snapraw or flag_all :
+        	cmd += 'mv /sdcard/DCIM/camera/raw/*.raw /sdcard/' + folder_name + '\n'
+            ### dump photo from VivoCamera
+            for photo in photos :
+                cmd += 'mv ' + photo + ' ' + '/sdcard/' + folder_name + '\n'
         cmd += "exit\n"
+        # 执行拼接成的命令
         with open( folder_name , "w" ) as f :
             f.write( cmd )
-        if flag_generate_cmd :
-            return True
         self.lexec( 'adb shell < ' + folder_name , False , True )
-        print cmd
         os.remove( folder_name )
 
-
-        if not flag_not_dump :
-        	import threadpool
-        	pool = threadpool.ThreadPool( 10 )
-        	line_split = ""
-        	from sys import platform as _platform
-        	if _platform == "win32" :
-        	    line_split = "\r\n"
-        	if _platform == "cygwin" :
-        	    line_split = "\r\r\n"
-                photos = self.lexec( "adb shell \"ls /sdcard/" + folder_name + "\"" , False ).split( line_split )
-                photos.reverse( )
-        	# for line in self.lexec( "adb shell \"ls /sdcard/" + folder_name , False ).split( line_split ) :
-                for line in photos :
-        	    if line == "" : continue
-        	    cmd = "adb pull /sdcard/" + folder_name + "/" + line + " ."
-        	    requests = threadpool.makeRequests( self.lexec , ( cmd , ) )
-        	    [ pool.putRequest( req ) for req in requests ]
-        	pool.wait( )
-        	
+        # pull 操作
+        import threadpool
+        pool = threadpool.ThreadPool( 10 )
+        cmd = "ls /sdcard/" + folder_name + '/*\r\n'
+        cmd += "exit" + '\r\n'
+        with open( folder_name , "w" ) as f :
+            f.write( cmd )
+        photos = self.lexec( 'adb shell < ' + folder_name , False , True )
+        os.remove( folder_name )
+        # photos = self.lexec( "adb shell \"ls /sdcard/" + folder_name + "\"" , False )
+        photos = [ photo.strip( ) for photo in photos.split( '\r\n' ) if photo != '' ] # ls 的结果按行分
+        photos = [ photo for photo in photos if photo[:14] == "/sdcard/" + folder_name[:6] and 'No such file' not in photo ] # 只要 jpeg 的部分
+        photos = [ p for photo in photos for p in photo.split( ) ] # PD1635 ls 的结果有多个 jpeg 在同一行
+        for line in photos :
+            if line == "" : continue
+            cmd = "adb pull " + line + " ."
+            requests = threadpool.makeRequests( self.lexec , ( cmd , ) )
+            [ pool.putRequest( req ) for req in requests ]
+        pool.wait( )
+        
+        # 删除临时文件夹
         if not flag_backup :
             self.lexec( 'adb shell rm -rf /sdcard/' + folder_name )
 
