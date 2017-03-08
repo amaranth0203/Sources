@@ -1,23 +1,25 @@
-﻿生成启动时间为 2017/2/22 20:28:48。
-     1>项目“E:\Sources\visual_studio_project\2012\XJJ\XJJ.vcxproj”在节点 2 上(Build 个目标)。
-     1>InitializeBuildStatus:
+﻿生成启动时间为 2017/3/8 17:05:50。
+     1>项目“E:\Sources\visual_studio_project\2012\XJJ\XJJ.vcxproj”在节点 2 上(Rebuild 个目标)。
+     1>_PrepareForClean:
+         正在删除文件“x64\Release\XJJ.lastbuildstate”。
+       InitializeBuildStatus:
          正在创建“x64\Release\XJJ.unsuccessfulbuild”，因为已指定“AlwaysCreate”。
        ClCompile:
          D:\Program Files (x86)\Microsoft Visual Studio 11.0\VC\bin\x86_amd64\CL.exe /c /Zi /nologo /W0 /WX- /O2 /Oi /GL /D WIN32 /D NDEBUG /D _CONSOLE /D _WINDLL /D _UNICODE /D UNICODE /Gm- /EHsc /MT /GS /Gy /fp:precise /Zc:wchar_t /Zc:forScope /Fo"x64\Release\\" /Fd"x64\Release\vc110.pdb" /Gd /TC /errorReport:prompt funcs.c main.c
          funcs.c
          main.c
        Link:
-         D:\Program Files (x86)\Microsoft Visual Studio 11.0\VC\bin\x86_amd64\link.exe /ERRORREPORT:PROMPT /OUT:"E:\Sources\visual_studio_project\2012\XJJ\x64\Release\XJJ.dll" /INCREMENTAL:NO /NOLOGO /MANIFEST /MANIFESTUAC:"level='asInvoker' uiAccess='false'" /manifest:embed /manifestinput:"D:\Program Files (x86)\Microsoft Visual Studio 11.0\VC\Include\Manifest\dpiaware.manifest" /DEBUG /PDB:"E:\Sources\visual_studio_project\2012\XJJ\x64\Release\XJJ.pdb" /SUBSYSTEM:CONSOLE /OPT:REF /OPT:ICF /LTCG /TLBID:1 /DYNAMICBASE /NXCOMPAT /IMPLIB:"E:\Sources\visual_studio_project\2012\XJJ\x64\Release\XJJ.lib" /MACHINE:X64 /DLL x64\Release\funcs.obj
+         D:\Program Files (x86)\Microsoft Visual Studio 11.0\VC\bin\x86_amd64\link.exe /ERRORREPORT:PROMPT /OUT:"E:\Sources\visual_studio_project\2012\XJJ\x64\Release\xjj.dll" /INCREMENTAL:NO /NOLOGO /MANIFEST /MANIFESTUAC:"level='asInvoker' uiAccess='false'" /manifest:embed /manifestinput:"D:\Program Files (x86)\Microsoft Visual Studio 11.0\VC\Include\Manifest\dpiaware.manifest" /DEBUG /PDB:"E:\Sources\visual_studio_project\2012\XJJ\x64\Release\xjj.pdb" /SUBSYSTEM:CONSOLE /OPT:REF /OPT:ICF /LTCG /TLBID:1 /DYNAMICBASE /NXCOMPAT /IMPLIB:"E:\Sources\visual_studio_project\2012\XJJ\x64\Release\xjj.lib" /MACHINE:X64 /DLL x64\Release\funcs.obj
          x64\Release\main.obj
-            正在创建库 E:\Sources\visual_studio_project\2012\XJJ\x64\Release\XJJ.lib 和对象 E:\Sources\visual_studio_project\2012\XJJ\x64\Release\XJJ.exp
+            正在创建库 E:\Sources\visual_studio_project\2012\XJJ\x64\Release\xjj.lib 和对象 E:\Sources\visual_studio_project\2012\XJJ\x64\Release\xjj.exp
          正在生成代码
          已完成代码的生成
-         XJJ.vcxproj -> E:\Sources\visual_studio_project\2012\XJJ\x64\Release\XJJ.dll
+         XJJ.vcxproj -> E:\Sources\visual_studio_project\2012\XJJ\x64\Release\xjj.dll
        FinalizeBuildStatus:
          正在删除文件“x64\Release\XJJ.unsuccessfulbuild”。
          正在对“x64\Release\XJJ.lastbuildstate”执行 Touch 任务。
-     1>已完成生成项目“E:\Sources\visual_studio_project\2012\XJJ\XJJ.vcxproj”(Build 个目标)的操作。
+     1>已完成生成项目“E:\Sources\visual_studio_project\2012\XJJ\XJJ.vcxproj”(Rebuild 个目标)的操作。
 
 生成成功。
 
-已用时间 00:00:01.63
+已用时间 00:00:00.99

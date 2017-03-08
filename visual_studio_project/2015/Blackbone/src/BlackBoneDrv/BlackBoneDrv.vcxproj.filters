@@ -40,6 +40,9 @@
     <ClCompile Include="VadRoutines.c">
       <Filter>Core</Filter>
     </ClCompile>
+    <ClCompile Include="_hijack.c">
+      <Filter>Core</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Remap.h">

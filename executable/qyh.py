@@ -996,13 +996,14 @@ class qyh_adb( qyh_base ) :
         [+] visible
         @short : pl
         @args : backup - backup lib file to current directory before push lib file to phone
-        @args : fake - print cmd_push only, not execute it
+        @args : fake - run script only, not execute it, maybe for generate batch
         @args : multi_thread - using multiple thread to execute push or pull
+        @args : generate_backup_batch - generate backup batch scripts ( backup needed )
         @'''
         import datetime , os
-        self.check_args( args , ( 'backup' , 'fake' , 'dump_first' , 'multi_thread' ) )
-        flag_backup , flag_fake , flag_dump_first , flag_multi_thread =\
-            tuple( self.trans_args( args , ( 'backup' , 'fake' , 'dump_first' , 'multi_thread' ) ) )
+        self.check_args( args , ( 'backup' , 'fake' , 'dump_first' , 'multi_thread' , 'generate_backup_batch' ) )
+        flag_backup , flag_fake , flag_dump_first , flag_multi_thread , flag_generate_backup_batch =\
+            tuple( self.trans_args( args , ( 'backup' , 'fake' , 'dump_first' , 'multi_thread' , 'generate_backup_batch' ) ) )
 
         log_filename = os.getenv( 'qyh_llf' )
         if log_filename == None :
@@ -1026,6 +1027,7 @@ class qyh_adb( qyh_base ) :
         import threadpool
         pool = threadpool.ThreadPool( 10 )
 
+        all_cmd_pull = []
         if flag_backup :
             for index , log in enumerate( logs ) :
                 dir = folder_name_backup + log[log.find("/system"):log.rfind("/")].strip()
@@ -1038,8 +1040,11 @@ class qyh_adb( qyh_base ) :
                 cmd_pull += log[log.find("/system"):].strip() + ' '
                 cmd_pull += dir
                 cmd_pull += log[log.rfind('/'):].strip()
+                if flag_generate_backup_batch :
+                    all_cmd_pull.append( cmd_pull )
                 if flag_fake :
-                    self.print_yellow( cmd_pull + "\n" )
+                    # self.print_yellow( cmd_pull + "\n" )
+                    pass
                 else :
                     if not flag_multi_thread :
                         self.print_none_color( "[+] backup " )
@@ -1050,6 +1055,9 @@ class qyh_adb( qyh_base ) :
                         requests = threadpool.makeRequests( self.lexec , ( cmd_pull , ) )
                         [ pool.putRequest( req ) for req in requests ]
             if flag_multi_thread : pool.wait( )
+            if flag_generate_backup_batch :
+                with open( folder_name_backup + ".bat" , "w" ) as f :
+                    f.write( "\r\n".join( all_cmd_pull ) )
 
 
         for index , log in enumerate( logs ) :
@@ -1058,7 +1066,8 @@ class qyh_adb( qyh_base ) :
             cmd_push += log[log.find("out"):].strip() + ' '
             cmd_push += log[log.find("/system"):log.rfind("/")].strip() + " "
             if flag_fake :
-                self.print_yellow( cmd_push + "\n" )
+                # self.print_yellow( cmd_push + "\n" )
+                pass
             else :
                 if not flag_multi_thread :
                     self.print_none_color( "[+] push " )
