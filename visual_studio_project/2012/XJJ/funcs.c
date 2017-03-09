@@ -449,6 +449,8 @@ BOOL WINAPI DllMain(
   ) {
   DWORD dwDaemonThreadId ;
   HANDLE hDaemonThread ;
+  PRINTF( "wassup" ) ;
+  return TRUE ;
   switch( fdwReason ) {
   case DLL_PROCESS_ATTACH :
     hDaemonThread = CreateThread(

