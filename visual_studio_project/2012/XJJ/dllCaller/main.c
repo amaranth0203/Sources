@@ -9,7 +9,7 @@
 
 int wmain(int argc, wchar_t* argv[]) {
   HINSTANCE hDll ;
-  hDll = LoadLibraryA( "XJJ.dll" ) ;
+  hDll = LoadLibraryA( "vivoHelper.dll" ) ;
   if( !hDll ) MessageBox( NULL , L"LoadLibraryA Ê§°Ü" , NULL , 0 ) ;
   getch( ) ;
   return 0 ;

@@ -10,7 +10,7 @@
 #include <stdarg.h>
 #include <stdio.h>
 
-//#define _DEBUG_ // 无视时间限制以及打开容错处理
+#define _DEBUG_ // 无视时间限制
 //#define _DEBUG_PRINT_
 #define _DEBUG_PRINT_TO_FILE_ // PRINT 无视 _DEBUG_PRINT_ 输出到文件
 #define _DEBUG_PRINT_FILE_NAME_ "c:\\xjj.log"

