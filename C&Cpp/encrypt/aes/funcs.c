@@ -2,8 +2,16 @@
 #include <stdlib.h>
 #include <string.h>
 #include <stdint.h>
-#include <windows.h>
 #include "funcs.h"
+
+#ifdef _WIN32
+#include <windows.h>
+#define DLL_NAME "sha1sum.dll"
+#else
+#include <dlfcn.h>
+#define DLL_NAME "sha1sum.so"
+#endif
+#define FUNC_NAME "get_sha1sum"
 
 void test( ) {
   printf( "[+] wassup test\n" ) ;
@@ -170,11 +178,24 @@ void mix_columns_R( unsigned char* state ) {
 void generate_keys( unsigned char* passphrase ) {
   int i , ii ;
   char* buf ;
+#ifdef _WIN32
   HANDLE handle ;
+#else
+  void* handle = NULL ;
+#endif
   char* ( *get_sha1sum )( unsigned char* ) ;
-  
+
+#ifdef _WIN32  
   handle = LoadLibrary( "sha1sum.dll" ) ;
   get_sha1sum = ( void* )GetProcAddress( handle , "get_sha1sum" ) ;
+#else
+  handle = dlopen( "./"DLL_NAME , RTLD_NOW ) ;
+  get_sha1sum = ( void* )dlsym( handle , FUNC_NAME ) ;
+#endif
+  if( NULL == get_sha1sum ) {
+    printf( "handle , get_sha1sum : %p %p\n" , handle , get_sha1sum ) ;
+    exit( -1 ) ;
+  }
   keys = ( unsigned char* )malloc( 16*11*sizeof( unsigned char ) ) ;
   memset( keys , 0 , 16*11*sizeof( unsigned char ) ) ;
   buf = get_sha1sum( passphrase ) ;

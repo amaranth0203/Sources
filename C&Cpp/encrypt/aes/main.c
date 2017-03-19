@@ -54,7 +54,8 @@ int main(int argc, char *argv[])
   assert( fclose( f_in ) == 0 ) ;
   assert( fclose( f_out ) == 0 ) ;
 
-  system( "pause" ) ;
+  printf( "[+] done. Press any key to continue...\n" ) ;
+  getchar( ) ;
 #if 0
   unsigned char in[16] = {
     0x19 , 0xa0 , 0x9a , 0xe9 ,
