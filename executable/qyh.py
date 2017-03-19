@@ -1075,7 +1075,7 @@ class qyh_adb( qyh_base ) :
                     self.print_none_color( " file(s) :\n" ) ;
                     self.lexec_( cmd_push )
                 else :
-                    requests = threadpool.makeRequests( self.lexec , ( cmd_push , ) )
+                    requests = threadpool.makeRequests( self.lexec_ , ( cmd_push , ) )
                     [ pool.putRequest( req ) for req in requests ]
         if flag_multi_thread : pool.wait( )
                     
@@ -1103,6 +1103,7 @@ class qyh_adb( qyh_base ) :
             cmd_flash += log_filename[:log_filename.rfind('/')] + '/'
             cmd_flash += log[log.find("out"):].strip() + " "
             self.lexec_( cmd_flash )
+        self.lexec_( "fastboot bbk lock_vivo" )
         self.lexec_( "fastboot reboot" )
 
         return True
