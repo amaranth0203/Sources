@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<Document Version="2">
+    <Protection InputFileName="vivo_dump_exif.ori.exe" Options="499656" OutputFileName="vivo_dump_exif.exe">
+        <Messages>
+            <Message Id="0">调戏我想干嘛(╯°Д°)╯┻━┻</Message>
+            <Message Id="1">我不喜欢虚拟机_(:з」∠)_</Message>
+            <Message Id="2">我受伤了_(:з」∠)_</Message>
+        </Messages>
+        <Folders />
+        <Procedures />
+        <Objects />
+    </Protection>
+    <DLLBox>
+        <Folders />
+    </DLLBox>
+    <Script />
+    <LicenseManager />
+</Document>
