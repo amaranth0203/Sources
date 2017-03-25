@@ -172,7 +172,7 @@ void write_to_file( wchar_t* f_name , DWORD color_temperature , DWORD lux_index 
         + sizeof( DWORD ) // lux index
         + 2 // \r\n
         )
-      - 4 // end of line is null
+      - 2 // end of line is null
       ;
     BYTE* buf = ( BYTE* )LocalAlloc( 
       LMEM_FIXED , 
@@ -191,7 +191,7 @@ void write_to_file( wchar_t* f_name , DWORD color_temperature , DWORD lux_index 
       swprintf(
         ptr ,
         buf_size ,
-        L"\t%d\t%d\r\n" ,
+        L"\t%d\t%d\r\n\r\n" ,
         color_temperature ,
         lux_index
         ) ;

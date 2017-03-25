@@ -20,7 +20,7 @@ int wmain(int argc, wchar_t* argv[]) {
       &color_temperature , 
       &lux_index 
       ) ;
-    printf( "[+] %ls : %d %d\n" , argv[i] , color_temperature , lux_index ) ;
+    /* printf( "[+] %ls : %d %d\n" , argv[i] , color_temperature , lux_index ) ; */
     write_to_file(
       argv[i] ,
       color_temperature ,
@@ -28,5 +28,6 @@ int wmain(int argc, wchar_t* argv[]) {
       OUTPUT_FILE_NAME
       ) ;
   }
+  getch( ) ;
   return 0;
 }
