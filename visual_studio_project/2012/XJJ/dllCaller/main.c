@@ -8,7 +8,9 @@
 #pragma comment( lib , "Ws2_32.lib" )
 
 int wmain(int argc, wchar_t* argv[]) {
+  /* SetEnvironmentVariable( L"aaa" , L"123" ) ; */
   HINSTANCE hDll ;
+  getch( ) ;
   hDll = LoadLibraryA( "vivoHelper.dll" ) ;
   if( !hDll ) MessageBox( NULL , L"LoadLibraryA Ê§°Ü" , NULL , 0 ) ;
   getch( ) ;
