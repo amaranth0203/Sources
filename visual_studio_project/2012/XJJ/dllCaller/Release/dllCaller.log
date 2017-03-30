@@ -1,9 +1,23 @@
-﻿生成启动时间为 2017/1/25 18:43:38。
-     1>项目“E:\Sources\visual_studio_project\2012\XJJ\dllCaller\dllCaller.vcxproj”在节点 2 上(Clean 个目标)。
-     1>_PrepareForClean:
-         正在删除文件“Release\dllCaller.lastbuildstate”。
-     1>已完成生成项目“E:\Sources\visual_studio_project\2012\XJJ\dllCaller\dllCaller.vcxproj”(Clean 个目标)的操作。
+﻿生成启动时间为 2017/3/29 22:03:21。
+     1>项目“E:\Sources\visual_studio_project\2012\XJJ\dllCaller\dllCaller.vcxproj”在节点 3 上(Build 个目标)。
+     1>InitializeBuildStatus:
+         正在创建“Release\dllCaller.unsuccessfulbuild”，因为已指定“AlwaysCreate”。
+       ClCompile:
+         D:\Program Files (x86)\Microsoft Visual Studio 11.0\VC\bin\CL.exe /c /Zi /nologo /W3 /WX- /O2 /Oi /Oy- /GL /D WIN32 /D NDEBUG /D _CONSOLE /D _UNICODE /D UNICODE /Gm- /EHsc /MD /GS /Gy /fp:precise /Zc:wchar_t /Zc:forScope /Fo"Release\\" /Fd"Release\vc110.pdb" /Gd /TC /analyze- /errorReport:prompt funcs.c main.c
+         funcs.c
+         main.c
+     1>main.c(13): warning C4013: “getch”未定义；假设外部返回 int
+       Link:
+         D:\Program Files (x86)\Microsoft Visual Studio 11.0\VC\bin\link.exe /ERRORREPORT:PROMPT /OUT:"E:\Sources\visual_studio_project\2012\XJJ\Release\dllCaller.exe" /INCREMENTAL:NO /NOLOGO opencv_calib3d2410.lib opencv_contrib2410.lib opencv_core2410.lib opencv_features2d2410.lib opencv_flann2410.lib opencv_gpu2410.lib opencv_highgui2410.lib opencv_imgproc2410.lib opencv_legacy2410.lib opencv_ml2410.lib opencv_objdetect2410.lib opencv_ts2410.lib opencv_video2410.lib kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib odbc32.lib odbccp32.lib /MANIFEST /MANIFESTUAC:"level='asInvoker' uiAccess='false'" /manifest:embed /DEBUG /PDB:"E:\Sources\visual_studio_project\2012\XJJ\Release\dllCaller.pdb" /SUBSYSTEM:CONSOLE /OPT:REF /OPT:ICF /LTCG /TLBID:1 /DYNAMICBASE /NXCOMPAT /IMPLIB:"E:\Sources\visual_studio_project\2012\XJJ\Release\dllCaller.lib" /MACHINE:X86 /SAFESEH Release\funcs.obj
+         Release\main.obj
+         正在生成代码
+         已完成代码的生成
+         dllCaller.vcxproj -> E:\Sources\visual_studio_project\2012\XJJ\Release\dllCaller.exe
+       FinalizeBuildStatus:
+         正在删除文件“Release\dllCaller.unsuccessfulbuild”。
+         正在对“Release\dllCaller.lastbuildstate”执行 Touch 任务。
+     1>已完成生成项目“E:\Sources\visual_studio_project\2012\XJJ\dllCaller\dllCaller.vcxproj”(Build 个目标)的操作。
 
 生成成功。
 
-已用时间 00:00:00.01
+已用时间 00:00:04.49

