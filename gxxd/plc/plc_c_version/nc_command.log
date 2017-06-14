@@ -1,0 +1,10 @@
+netstat -aon | findstr "9999"
+nc -v 192.168.0.101 9999
+
+set:127.0.0.1,db21.dbx0.0:1,db21.dbx0.1:0,db21.dbx0.2:0,DB21.dbb0:1,DB21.dbw0:258,DB21.dbd0:16909320
+
+get:127.0.0.1,DB21.dbx0.0,DB21.dbx0.1,DB21.dbx0.2,DB21.dbb0,DB21.dbw0,DB21.dbd0
+set:127.0.0.1,db21.dbx0.0:1,db21.dbx0.1:1,db21.dbx0.2:1
+set:127.0.0.1,db21.dbb0:4
+set:127.0.0.1,db21.dbw0:44
+set:127.0.0.1,db21.dbd0:4444
