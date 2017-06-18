@@ -21,6 +21,6 @@ REM D:\Program Files\Java\jdk1.7.0_67
 @set ws=E:\Source
 @set wn=E:\Stay\txt_and_more\notes
 @set PATH=%PATH%;%BINARY_HOME%;%PYTHON_HOME%;%PYTHON_HOME%\Scripts;%PYQT_HOME%;%JAVA_HOME%\bin;%NMAP_HOME%;%SVN_HOME%;%NODE_HOME%;%FIREFOX_HOME%;%MINGW_HOME%\bin;%TIDY_HOME%;%PHP_HOME%;%MYSQL_HOME%;%APACHE_HOME%\bin;%SSH_HOME%;%GLOBAL_HOME%;%NC_HOME%;
-@set HTTP_PROXY=localhost:2333
-@set HTTPS_PROXY=localhost:2333
+rem @set HTTP_PROXY=localhost:2333
+rem @set HTTPS_PROXY=localhost:2333
 
