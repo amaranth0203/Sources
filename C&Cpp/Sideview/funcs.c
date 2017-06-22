@@ -40,7 +40,7 @@ void print2( int* draft , int* field , int len ) {
         puts( "" ) ;
     }
 }
-int check_idx( 
+int check_duplicate( 
   int* draft , 
   int x /* offset in 81 */
   ) {
@@ -49,6 +49,7 @@ int check_idx(
   for( m = 1 ; m < 8 ; m ++ ) 
     if( 
       ( 9*i + m ) != x && // not itself
+      *( draft + x ) != 2 && // skip blank
       *( draft + 9*i + m ) == *( draft + x ) // same value in row
       )
       return 0 ;
@@ -56,23 +57,59 @@ int check_idx(
   for( m = 1 ; m < 8 ; m ++ )
     if( 
       ( 9*m + j ) != x &&  // not itself
+      *( draft + x ) != 2 && // skip blank
       *( draft + 9*m + j ) == *( draft + x ) // same value in column
       )
       return 0 ;
 
   return 1 ;
 }
-int check_view( int* d ) {
+int check_view( 
+  int* draft , 
+  int x /* offset in 81 */
+  ) {
+  int i = x / 9 , j = x % 9 ; /* coordinate */
+  int m , n ;
+  int count_2 = 0 ;
+  // top view
+  for( m = 1 ; m < 8 ; m ++ ) {
+    if( *( draft + 9*1 + m ) == 1 ) { // un_filled
+      continue ;
+    }
+    else if( *( draft + 9*1 + m ) == 2 ){ // fill blank , search down
+      for( n = 2 ; n < 8 ; n ++ ) {
+        if( *( draft + 9*m + n ) == 1 ) {
+          break ;
+        }
+        else if( *( draft + 9*m + n ) == 2 ) {
+          count_2 ++ ;
+          continue ;
+        }
+        else {
+          if( *( draft + 9*m + n ) != *( draft + 9*0 + m ) ) {
+            return 0 ;
+          }
+        }
+      }
+      if( count_2 > 6 ) return 0 ;
+      count_2 = 0 ;
+    }
+    else { // fill other, need to check view
+      if( *( draft + 9*1 + m ) != *( draft + 9*0 + m ) ) {
+        return 0 ;
+      }
+    }
+  }
   return 1 ;
 }
 void re_calc( int* d , int* f , int start , int end ) {
   /*
    * f[start] stands for current offset in matrix to fill in
    */
-  print( d ) ;
-  printf( "start end %d %d\n" , start , end ) ;
+  /* print( d ) ; */
+  /* printf( "start end %d %d\n" , start , end ) ; */
   int i , j ;
-  if( start == end && check_view( d ) ) {
+  if( start == end && check_view( d , f[start] ) ) {
     printf( "\n%d elements given" , 9*9 - end ) ;
     print( d ) ;
     puts( "done" ) ;
@@ -80,13 +117,13 @@ void re_calc( int* d , int* f , int start , int end ) {
     for( j = 2 ; j < 9 ; j ++ ) {
       d[f[start]] = j ;
       /* d[start] = j ; */
-      if( !check_idx( d , f[start] ) ) {
+      if( !check_duplicate( d , f[start] ) || !check_view( d , f[start] ) ) {
       /* if( !check_idx( d , start ) ) { */
-        d[start] = 2 ;
+        d[start] = 1 ;
         continue ;
       }
       re_calc( d , f , start + 1 , end ) ;
-      d[start] = 2 ;
+      d[start] = 1 ;
     }
   }
 }

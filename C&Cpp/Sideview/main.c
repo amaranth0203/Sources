@@ -13,7 +13,9 @@ int main( ) {
             field[len++] = i ;
         }
     }
-    re_calc( draft , field , 10 , len ) ; // from ( 1 , 1 ) to ( 7 , 7 )
+    print( draft ) ;
+    print( field ) ;
+    re_calc( draft , field , 0 , len ) ; // from ( 1 , 1 ) to ( 7 , 7 )
     return 0 ;
 }
 

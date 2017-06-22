@@ -13,6 +13,7 @@ int draft[ 9*9 ] = {
 /*
  * for sideview
  *
+ * 1 - un_filled
  * 2 - blank
  * 3 - green
  * 4 - red
