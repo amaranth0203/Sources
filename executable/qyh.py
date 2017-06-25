@@ -136,7 +136,6 @@ class qyh_base( object ) :
 
     def BASE_delete_vim_session( self , ) :
         '''@
-        [+] visible
         [+] callable
         @short : dvs
         @'''
@@ -154,15 +153,17 @@ class qyh_base( object ) :
         [+] callable
         @short : news
         @'''
-        from sys import platform as _platform
-        if _platform == "win32" or _platform == "cygwin" :
-            pass
-        else :
-            print '[-] not windows ><'
-            exit( )
+        # from sys import platform as _platform
+        # if _platform == "win32" or _platform == "cygwin" :
+        #     pass
+        # else :
+        #     print '[-] not windows ><'
+        #     exit( )
         import urllib  
         import urllib2  
-        import cookielib  
+        import cookielib
+        import selenium
+
         opener = urllib2.build_opener()
         url = 'http://news.baidu.com'
         resp = opener.open(url)
@@ -188,10 +189,10 @@ class qyh_base( object ) :
         @args : keyword - keyword to translate
         @'''
         from sys import platform as _platform
-        if _platform == "win32" or _platform == "cygwin" :
+        if _platform == "win32" or _platform == "cygwin" or _platform == "linux2" :
             pass
         else :
-            print '[-] not windows ><'
+            print '[-] this platform not implement yet ><'
             exit( )
         if len( args ) < 1 :
             self.error_exit( 'takes keyword to translate' )
@@ -201,6 +202,8 @@ class qyh_base( object ) :
         if _platform == "win32" :
             url = "http://dict.youdao.com/w/" + urllib.quote( ' '.join( args ).decode( 'gbk' ).encode( 'utf-8' ) )
         elif _platform == "cygwin" :
+            url = "http://dict.youdao.com/w/" + urllib.quote( ' '.join( args ) )
+        elif _platform == "linux2" :
             url = "http://dict.youdao.com/w/" + urllib.quote( ' '.join( args ) )
         opener = urllib2.build_opener()
         resp = opener.open(url)
@@ -1966,7 +1969,7 @@ class qyh_php( qyh_base ) :
             self.error_exit( "cannot detect apache home" ) ;
         self.lexec_( "tail -f \"{}/logs/access.log\"".format( str( os.getenv( 'APACHE_HOME' ) ).replace( '\\' , '/' ) ) )
 
-class qyh( qyh_svr , qyh_adb , qyh_php ) :
+class qyh( qyh_svr , qyh_php ) :
 
     def extract_comments( self , func_name = "" ) :
         import sys

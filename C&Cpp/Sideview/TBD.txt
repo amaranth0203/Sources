@@ -1,0 +1,2 @@
+only implemented 7x7 matrix
+the [dynamic range] for matrix needs To Be Done in the future

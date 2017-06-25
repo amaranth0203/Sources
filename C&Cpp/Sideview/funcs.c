@@ -18,6 +18,8 @@ void print( int* draft ) {
             printf ( "\n----------*----------*----------" ) ;
         puts( "" ) ;
     }
+    printf( "\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n" ) ;
+    
 }
 void print2( int* draft , int* field , int len ) {
     int i , j ;
@@ -64,35 +66,78 @@ int check_duplicate(
 
   return 1 ;
 }
+
+int check_blank_count( int* draft ) {
+  /* TO BE DONE */
+  ( void* )draft ;
+
+  int m , n ;
+  int max = 3 ;
+  int count_2_max ;
+  int count_2 ;
+  for( m = 1 ; m < 8 ; m ++ ) {
+    if( *( draft + 9*0 + m ) > max ) max = *( draft + 9*0 + m ) ;
+  }
+  for( m = 1 ; m < 8 ; m ++ ) {
+    if( *( draft + 9*8 + m ) > max ) max = *( draft + 9*8 + m ) ;
+  }
+  for( n = 1 ; n < 8 ; n ++ ) {
+    if( *( draft + 9*n + 0 ) > max ) max = *( draft + 9*n + 0 ) ;
+  }
+  for( n = 1 ; n < 8 ; n ++ ) {
+    if( *( draft + 9*n + 8 ) > max ) max = *( draft + 9*n + 8 ) ;
+  }
+  count_2_max = 9 - max ;
+
+  for( m = 1 ; m < 8 ; m ++ ) {
+    count_2 = 0 ;
+    for( n = 1 ; n < 8 ; n ++ ) {
+      if( *( draft + 9*n + m ) == 2 ) count_2 ++ ;
+    }
+    if( count_2 > count_2_max ) return 0 ;
+  }
+
+  for( m = 1 ; m < 8 ; m ++ ) {
+    count_2 = 0 ;
+    for( n = 1 ; n < 8 ; n ++ ) {
+      if( *( draft + 9*m + n ) == 2 ) count_2 ++ ;
+    }
+    if( count_2 > count_2_max ) return 0 ;
+  }
+
+  return 1 ;
+}
+
 int check_view( 
   int* draft , 
   int x /* offset in 81 */
   ) {
   int i = x / 9 , j = x % 9 ; /* coordinate */
   int m , n ;
-  int count_2 = 0 ;
+
   // top view
   for( m = 1 ; m < 8 ; m ++ ) {
+    if( *( draft + 9*0 + m ) == 0 ) { // needn't check view
+      continue ;
+    }
     if( *( draft + 9*1 + m ) == 1 ) { // un_filled
       continue ;
     }
     else if( *( draft + 9*1 + m ) == 2 ){ // fill blank , search down
       for( n = 2 ; n < 8 ; n ++ ) {
-        if( *( draft + 9*m + n ) == 1 ) {
+        if( *( draft + 9*n + m ) == 1 ) { // this line unfinished
           break ;
         }
-        else if( *( draft + 9*m + n ) == 2 ) {
-          count_2 ++ ;
+        else if( *( draft + 9*n + m ) == 2 ) { // continue search
           continue ;
         }
-        else {
-          if( *( draft + 9*m + n ) != *( draft + 9*0 + m ) ) {
+        else { // check view
+          if( *( draft + 9*n + m ) != *( draft + 9*0 + m ) ) {
             return 0 ;
           }
+          break ;
         }
       }
-      if( count_2 > 6 ) return 0 ;
-      count_2 = 0 ;
     }
     else { // fill other, need to check view
       if( *( draft + 9*1 + m ) != *( draft + 9*0 + m ) ) {
@@ -100,6 +145,109 @@ int check_view(
       }
     }
   }
+
+  // left view
+  for( m = 1 ; m < 8 ; m ++ ) {
+    if( *( draft + 9*0 + m ) == 0 ) { // needn't check view
+      continue ;
+    }
+    if( *( draft + 9*m + 1 ) == 1 ) { // un_filled
+      continue ;
+    }
+    else if( *( draft + 9*m + 1 ) == 2 ){ // fill blank , search down
+      for( n = 2 ; n < 8 ; n ++ ) {
+        if( *( draft + 9*m + n ) == 1 ) { // this line unfinished
+          /* printf( "[+] search %d %d %d line unfinished\n" , m , n , *(draft+9*m+n) ) ; */
+          break ;
+        }
+        else if( *( draft + 9*m + n ) == 2 ) { // continue search
+          /* printf( "[+] search %d %d %d continue search\n" , m , n , *(draft+9*m+n) ) ; */
+          continue ;
+        }
+        else { // check view
+          if( *( draft + 9*m + n ) != *( draft + 9*m + 0 ) ) {
+            return 0 ;
+          }
+          /* printf( "[+] search %d %d %d pass\n" , m , n , *(draft+9*m+n) ) ; */
+          break ;
+        }
+      }
+    }
+    else { // fill other, need to check view
+      if( *( draft + 9*m + 1 ) != *( draft + 9*m + 0 ) ) {
+        return 0 ;
+      }
+    }
+  }
+
+  // right view
+  for( m = 1 ; m < 8 ; m ++ ) {
+    if( *( draft + 9*0 + m ) == 0 ) { // needn't check view
+      continue ;
+    }
+    if( *( draft + 9*m + 7 ) == 1 ) { // un_filled
+      continue ;
+    }
+    else if( *( draft + 9*m + 7 ) == 2 ){ // fill blank , search down
+      for( n = 6 ; n > 0 ; n -- ) {
+        if( *( draft + 9*m + n ) == 1 ) { // this line unfinished
+          /* printf( "[+] search %d %d %d line unfinished\n" , m , n , *(draft+9*m+n) ) ; */
+          break ;
+        }
+        else if( *( draft + 9*m + n ) == 2 ) { // continue search
+          /* printf( "[+] search %d %d %d continue search\n" , m , n , *(draft+9*m+n) ) ; */
+          continue ;
+        }
+        else { // check view
+          if( *( draft + 9*m + n ) != *( draft + 9*m + 8 ) ) {
+            return 0 ;
+          }
+          /* printf( "[+] search %d %d %d pass\n" , m , n , *(draft+9*m+n) ) ; */
+          break ;
+        }
+      }
+    }
+    else { // fill other, need to check view
+      if( *( draft + 9*m + 7 ) != *( draft + 9*m + 8 ) ) {
+        return 0 ;
+      }
+    }
+  }
+
+  // bottom view
+  for( m = 1 ; m < 8 ; m ++ ) {
+    if( *( draft + 9*0 + m ) == 0 ) { // needn't check view
+      continue ;
+    }
+    if( *( draft + 9*7 + m ) == 1 ) { // un_filled
+      continue ;
+    }
+    else if( *( draft + 9*7 + m ) == 2 ){ // fill blank , search down
+      for( n = 6 ; n > 0 ; n -- ) {
+        if( *( draft + 9*n + m ) == 1 ) { // this line unfinished
+          /* printf( "[+] search %d %d %d line unfinished\n" , m , n , *(draft+9*n+m) ) ; */
+          break ;
+        }
+        else if( *( draft + 9*n + m ) == 2 ) { // continue search
+          /* printf( "[+] search %d %d %d continue search\n" , m , n , *(draft+9*n+m) ) ; */
+          continue ;
+        }
+        else { // check view
+          if( *( draft + 9*n + m ) != *( draft + 9*8 + m ) ) {
+            return 0 ;
+          }
+          /* printf( "[+] search %d %d %d pass\n" , m , n , *(draft+9*n+m) ) ; */
+          break ;
+        }
+      }
+    }
+    else { // fill other, need to check view
+      if( *( draft + 9*7 + m ) != *( draft + 9*8 + m ) ) {
+        return 0 ;
+      }
+    }
+  }
+
   return 1 ;
 }
 void re_calc( int* d , int* f , int start , int end ) {
@@ -114,16 +262,20 @@ void re_calc( int* d , int* f , int start , int end ) {
     print( d ) ;
     puts( "done" ) ;
   } else {
-    for( j = 2 ; j < 9 ; j ++ ) {
+    for( j = 2 ; j < 8 ; j ++ ) {
       d[f[start]] = j ;
       /* d[start] = j ; */
-      if( !check_duplicate( d , f[start] ) || !check_view( d , f[start] ) ) {
+      if( 
+        !check_duplicate( d , f[start] ) || 
+        !check_view( d , f[start] ) ||
+        !check_blank_count( d )
+        ) {
       /* if( !check_idx( d , start ) ) { */
-        d[start] = 1 ;
+        d[f[start]] = 1 ;
         continue ;
       }
       re_calc( d , f , start + 1 , end ) ;
-      d[start] = 1 ;
+      d[f[start]] = 1 ;
     }
   }
 }
