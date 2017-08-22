@@ -1,3 +1,6 @@
+#ifndef _DRAFTS_H_
+#define _DRAFTS_H_
+
 long long quick_input[9] = {
   1090801040 ,
   1003006070 ,
@@ -9,11 +12,13 @@ long long quick_input[9] = {
   1605094080 ,
   1400300007 ,
 } ;
+
+
 int draft[ 9*9 ] = { 
 /*
  * for sideview
  *
- * 1 - un_filled
+ * 1 - un_filled - needs to fill in main( )
  * 2 - blank
  * 3 - green
  * 4 - red
@@ -148,3 +153,5 @@ int draft[ 9*9 ] = {
     // /*7*9*/0 , 0 , 3 ,/**/ 4 , 0 , 0 ,/**/ 0 , 0 , 0 ,
     // /*8*9*/0 , 0 , 0 ,/**/ 2 , 0 , 0 ,/**/ 6 , 0 , 0 ,
 // } ;
+
+#endif

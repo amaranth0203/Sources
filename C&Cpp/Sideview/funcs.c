@@ -9,16 +9,17 @@ void print( int* draft ) {
     // system( "cls" ) ;
     int i , j ;
     printf ( "\n----------*----------*----------\n" ) ;
-    for( i = 0 ; i < 9 ; i ++ ) {
-        for( j = 0 ; j < 9 ; j ++ ) {
-            printf( "%3d" , *(draft+9*i+j) ) ;
-            if( j % 3 == 2 && j != 8 ) printf( " |" ) ;
+    for( i = 0 ; i < (MATRIX_LONG+2) ; i ++ ) {
+      for( j = 0 ; j < (MATRIX_LONG+2) ; j ++ ) {
+            /* printf( "%3d" , *(draft+9*i+j) ) ; */
+            printf( "%2d" , *(draft+9*i+j) ) ;
+            /* if( j % 3 == 2 && j != 8 ) printf( " |" ) ; */
         }
-        if( i % 3 == 2 ) 
-            printf ( "\n----------*----------*----------" ) ;
+        /* if( i % 3 == 2 )  */
+            /* printf ( "\n----------*----------*----------" ) ; */
         puts( "" ) ;
     }
-    printf( "\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n" ) ;
+    /* printf( "\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n" ) ; */
     
 }
 void print2( int* draft , int* field , int len ) {

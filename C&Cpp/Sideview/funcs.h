@@ -1,6 +1,7 @@
 #ifndef _FUNCS_H_
 #define _FUNCS_H_
 
+#define MATRIX_LONG 7
 void test( ) ;
 void print( int* ) ;
 void print2( int* , int* , int ) ;
