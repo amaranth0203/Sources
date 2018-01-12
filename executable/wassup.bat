@@ -17,10 +17,11 @@ REM D:\Program Files\Java\jdk1.7.0_67
 @set SSH_HOME=D:\Program Files\OpenSSH-Win64
 @set GLOBAL_HOME=D:\binary\glo656wb\bin
 @set NC_HOME=D:\binary\netcat-1.11
+@set BTC_HOME=D:\bitcoin-0.15.1\
 
 @set ws=E:\Source
 @set wn=E:\Stay\txt_and_more\notes
-@set PATH=%PATH%;%BINARY_HOME%;%PYTHON_HOME%;%PYTHON_HOME%\Scripts;%PYQT_HOME%;%JAVA_HOME%\bin;%NMAP_HOME%;%SVN_HOME%;%NODE_HOME%;%FIREFOX_HOME%;%MINGW_HOME%\bin;%TIDY_HOME%;%PHP_HOME%;%MYSQL_HOME%;%APACHE_HOME%\bin;%SSH_HOME%;%GLOBAL_HOME%;%NC_HOME%;
+@set PATH=%PATH%;%BINARY_HOME%;%PYTHON_HOME%;%PYTHON_HOME%\Scripts;%PYQT_HOME%;%JAVA_HOME%\bin;%NMAP_HOME%;%SVN_HOME%;%NODE_HOME%;%FIREFOX_HOME%;%MINGW_HOME%\bin;%TIDY_HOME%;%PHP_HOME%;%MYSQL_HOME%;%APACHE_HOME%\bin;%SSH_HOME%;%GLOBAL_HOME%;%NC_HOME%;%BTC_HOME%\bin
 rem @set HTTP_PROXY=localhost:2333
 rem @set HTTPS_PROXY=localhost:2333
 
